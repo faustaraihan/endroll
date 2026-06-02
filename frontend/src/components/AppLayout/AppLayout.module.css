@@ -1,0 +1,20 @@
+/* AppLayout — full bleed, no global max-width */
+.layout {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.main {
+  flex: 1;
+  margin-left: 220px;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+    padding-bottom: 80px;
+  }
+}

@@ -1,0 +1,480 @@
+import { useState } from 'react'
+import { FolderPlus, Trash2, ChevronLeft, Plus, Film, Search, X, FolderHeart, Folder, Edit3 } from 'lucide-react'
+import { useApp, useToast } from '../../contexts'
+import { TitleCard } from '../../components'
+import styles from './Collections.module.css'
+
+export default function Collections() {
+  const {
+    collections,
+    setCollections,
+    collectionItems,
+    watchLogs,
+    addCollection,
+    deleteCollection,
+    addTitleToCollection,
+    removeTitleFromCollection,
+  } = useApp()
+
+  const { addToast } = useToast()
+
+  // State
+  const [selectedColId, setSelectedColId] = useState<string | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  
+  // Create form state
+  const [colName, setColName] = useState('')
+  const [colDesc, setColDesc] = useState('')
+
+  // Edit header state
+  const [isEditingHeader, setIsEditingHeader] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editDesc, setEditDesc] = useState('')
+
+  // Title search in detail view state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+
+  const activeCollection = collections.find(c => c.id === selectedColId)
+  const activeItems = collectionItems.filter(item => item.collection_id === selectedColId)
+
+  // Get unique titles from watch logs to add to collection
+  const uniqueWatchedTitles = Array.from(
+    new Map(watchLogs.map(log => [log.title.tmdb_id, log.title])).values()
+  )
+
+  // Filter out titles already in the active collection
+  const availableTitles = uniqueWatchedTitles.filter(
+    title => !activeItems.some(item => item.title.tmdb_id === title.tmdb_id)
+  )
+
+  // Filter available titles by search query
+  const filteredAvailable = availableTitles.filter(title =>
+    title.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  function handleCreateCollection(e: React.FormEvent) {
+    e.preventDefault()
+    if (!colName.trim()) return
+
+    const newId = addCollection(colName.trim(), colDesc.trim(), false)
+    addToast(`Collection "${colName}" created successfully!`, 'success')
+    
+    // Reset form
+    setColName('')
+    setColDesc('')
+    setShowCreateModal(false)
+    
+    // Auto-view the newly created collection
+    setSelectedColId(newId)
+  }
+
+  function handleDeleteCollection(id: string, name: string, e: React.MouseEvent) {
+    e.stopPropagation() // Prevent entering detail view
+    if (id === 'col-favorites') {
+      addToast('Default Favorites collection cannot be deleted.', 'error')
+      return
+    }
+
+    const confirmed = window.confirm(`Are you sure you want to delete the collection "${name}"?`)
+    if (confirmed) {
+      deleteCollection(id)
+      addToast(`Collection "${name}" has been deleted.`, 'info')
+      if (selectedColId === id) {
+        setSelectedColId(null)
+      }
+    }
+  }
+
+  function handleAddTitle(title: any) {
+    if (!selectedColId) return
+    addTitleToCollection(selectedColId, title)
+    addToast(`"${title.title}" added to collection.`, 'success')
+    setSearchQuery('')
+    setIsSearchFocused(false)
+  }
+
+  function handleRemoveTitle(titleId: string, titleName: string) {
+    if (!selectedColId) return
+    removeTitleFromCollection(selectedColId, titleId)
+    addToast(`"${titleName}" removed from collection.`, 'info')
+  }
+
+  function handleSaveHeader(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedColId || !editName.trim()) return
+
+    setCollections(prev =>
+      prev.map(c =>
+        c.id === selectedColId
+          ? { ...c, name: editName.trim(), description: editDesc.trim() }
+          : c
+      )
+    )
+    addToast('Collection updated successfully!', 'success')
+    setIsEditingHeader(false)
+  }
+
+  return (
+    <div className={styles.page}>
+      {!selectedColId ? (
+        // ─── Grid View: All Collections ───
+        <div style={{ animation: 'fade-in 0.3s ease' }}>
+          <header className={styles.header}>
+            <div>
+              <h1 className={styles.pageTitle}>Collections</h1>
+              <p className={styles.pageSub}>
+                Group your watchlist by mood, genre, or personal custom lists.
+              </p>
+            </div>
+            <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+              <FolderPlus size={16} /> Create Collection
+            </button>
+          </header>
+
+          <div className={styles.grid}>
+            {collections.map(col => {
+              const isFav = col.id === 'col-favorites'
+              const colItems = collectionItems.filter(item => item.collection_id === col.id)
+              console.log('COLLECTION:', col.name, 'ITEMS:', colItems.map(i => i.title.title))
+              const count = Math.min(colItems.length, 4)
+              const gridStyle: React.CSSProperties = {
+                gridTemplateColumns: count === 1 ? '1fr' : count === 2 ? '1fr 1fr' : count === 3 ? '1.2fr 1fr' : '1fr 1fr',
+                gridTemplateRows: (count === 3 || count === 4) ? '1fr 1fr' : undefined,
+              }
+              return (
+                <div
+                  key={col.id}
+                  className={styles.card}
+                  onClick={() => setSelectedColId(col.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => e.key === 'Enter' && setSelectedColId(col.id)}
+                  aria-label={`Open collection ${col.name}`}
+                >
+                  {/* Poster/Cover Art */}
+                  <div className={styles.cardCover}>
+                    {colItems.length > 0 ? (
+                      <div
+                        className={styles.coverGrid}
+                        style={gridStyle}
+                      >
+                        {colItems.slice(0, count).map((item, idx) => {
+                          const isFirstChildAndCount3 = idx === 0 && count === 3
+                          const childStyle: React.CSSProperties = isFirstChildAndCount3 ? { gridRow: 'span 2' } : {}
+                          return item.title.poster_path ? (
+                            <img
+                              key={item.id}
+                              src={item.title.poster_path}
+                              alt={`Poster ${item.title.title}`}
+                              className={styles.coverGridImg}
+                              style={childStyle}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div key={item.id} className={styles.coverGridPlaceholder} style={childStyle}>
+                              <Film size={16} />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div className={styles.coverPlaceholder}>
+                        {isFav ? (
+                          <FolderHeart size={36} className={styles.placeholderHeart} />
+                        ) : (
+                          <Folder size={36} className={styles.placeholderFolder} />
+                        )}
+                      </div>
+                    )}
+
+                    <div className={styles.cardOverlay}>
+                      <span className={styles.itemCountBadge}>
+                        {col.items_count} titles
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardHeaderRow}>
+                      <h2 className={styles.cardName}>
+                        {col.name}
+                        {isFav && <span className={styles.favIndicator}>★</span>}
+                      </h2>
+                      {!isFav && (
+                        <button
+                          className={styles.deleteCardBtn}
+                          onClick={e => handleDeleteCollection(col.id, col.name, e)}
+                          aria-label={`Delete collection ${col.name}`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <p className={styles.cardDesc}>
+                      {col.description || 'No description provided.'}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Creation Modal Overlay */}
+          {showCreateModal && (
+            <div
+              className={styles.modalOverlay}
+              onClick={() => setShowCreateModal(false)}
+              role="dialog"
+              aria-modal="true"
+            >
+              <div className={styles.createModal} onClick={e => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                  <h3 className={styles.modalTitle}>New Collection</h3>
+                  <button
+                    className={styles.closeModalBtn}
+                    onClick={() => setShowCreateModal(false)}
+                    aria-label="Close"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateCollection} className={styles.modalForm}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="col-name" className="input-label">
+                      Collection Name
+                    </label>
+                    <input
+                      id="col-name"
+                      type="text"
+                      className="input"
+                      placeholder="e.g. Best of Korean Cinema, Rainy Day Watches..."
+                      value={colName}
+                      onChange={e => setColName(e.target.value)}
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="col-desc" className="input-label">
+                      Description <span className="text-muted">(optional)</span>
+                    </label>
+                    <textarea
+                      id="col-desc"
+                      className="input"
+                      style={{ height: '80px', resize: 'none' }}
+                      placeholder="Write a brief description of this collection..."
+                      value={colDesc}
+                      onChange={e => setColDesc(e.target.value)}
+                    />
+                  </div>
+
+                  <div className={styles.modalFooter}>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => setShowCreateModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Create Collection
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        // ─── Detail View: Inside one Collection ───
+        <div style={{ animation: 'fade-in 0.3s ease' }}>
+          {/* Header & Back */}
+          <div className={styles.detailBackRow}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => {
+                setSelectedColId(null)
+                setSearchQuery('')
+                setIsSearchFocused(false)
+                setIsEditingHeader(false)
+              }}
+            >
+              <ChevronLeft size={16} /> Back to Collections
+            </button>
+          </div>
+
+          <header className={styles.detailHeader}>
+            {isEditingHeader ? (
+              <form onSubmit={handleSaveHeader} className={styles.editHeaderForm}>
+                <div className={styles.editFormGroup}>
+                  <input
+                    type="text"
+                    className="input"
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    required
+                    placeholder="Collection Name"
+                    autoFocus
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <textarea
+                    className="input"
+                    style={{ height: '60px', resize: 'none', marginTop: '8px' }}
+                    value={editDesc}
+                    placeholder="Collection Description (optional)"
+                    onChange={e => setEditDesc(e.target.value)}
+                  />
+                </div>
+                <div className={styles.editActions}>
+                  <button type="submit" className="btn btn-primary btn-sm">Save</button>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setIsEditingHeader(false)}>Cancel</button>
+                </div>
+              </form>
+            ) : (
+              <div className={styles.detailInfo}>
+                <div className={styles.detailNameRow}>
+                  <h1 className={styles.detailTitle}>
+                    {activeCollection?.name}
+                    {activeCollection?.id === 'col-favorites' && (
+                      <span className={styles.detailFavBadge}>★ Favorite</span>
+                    )}
+                  </h1>
+                  
+                  <div className={styles.detailActions}>
+                    <button
+                      className="btn btn-icon btn-ghost"
+                      onClick={() => {
+                        if (activeCollection) {
+                          setEditName(activeCollection.name)
+                          setEditDesc(activeCollection.description || '')
+                          setIsEditingHeader(true)
+                        }
+                      }}
+                      title="Edit name and description"
+                      aria-label="Edit name and description"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+
+                    {activeCollection?.id !== 'col-favorites' && (
+                      <button
+                        className="btn btn-icon btn-ghost"
+                        style={{ color: 'var(--color-error)' }}
+                        onClick={e =>
+                          activeCollection &&
+                          handleDeleteCollection(activeCollection.id, activeCollection.name, e)
+                        }
+                        title="Delete this collection"
+                        aria-label="Delete collection"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p className={styles.detailDesc}>
+                  {activeCollection?.description || 'No description provided.'}
+                </p>
+                <span className={styles.detailMetaCount}>
+                  {activeItems.length} titles logged
+                </span>
+              </div>
+            )}
+
+            {/* Quick Add Search Bar */}
+            <div className={styles.searchContainer}>
+              <div className={styles.searchBar}>
+                <Search size={16} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Add title from your logged diary entries…"
+                  className={styles.searchInput}
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)} // delay to allow clicks
+                />
+                {searchQuery && (
+                  <button className={styles.clearSearchBtn} onClick={() => setSearchQuery('')}>
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Autocomplete Dropdown */}
+              {isSearchFocused && searchQuery && (
+                <div className={styles.dropdown}>
+                  {filteredAvailable.length === 0 ? (
+                    <div className={styles.dropdownEmpty}>
+                      No new titles found for "{searchQuery}".
+                    </div>
+                  ) : (
+                    <ul className={styles.dropdownList} role="listbox">
+                      {filteredAvailable.map(title => (
+                        <li key={title.id}>
+                          <button
+                            type="button"
+                            className={styles.dropdownItem}
+                            onMouseDown={() => handleAddTitle(title)}
+                          >
+                            {title.poster_path ? (
+                              <img
+                                src={title.poster_path}
+                                alt={`Poster ${title.title}`}
+                                className={styles.dropdownPoster}
+                              />
+                            ) : (
+                              <div className={styles.dropdownPosterPlaceholder}>
+                                <Film size={12} />
+                              </div>
+                            )}
+                            <div className={styles.dropdownItemInfo}>
+                              <span className={styles.dropdownItemTitle}>{title.title}</span>
+                              <span className={styles.dropdownItemMeta}>
+                                {title.release_year} · {title.type === 'film' ? 'Film' : 'Series'}
+                              </span>
+                            </div>
+                            <Plus size={14} className={styles.dropdownAddIcon} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+          </header>
+
+          {/* Grid of Titles */}
+          <div className={styles.detailGridContainer}>
+            {activeItems.length === 0 ? (
+              <div className={styles.detailEmptyState}>
+                <Film size={48} strokeWidth={1} className={styles.emptyIcon} />
+                <h3>No titles in this collection yet.</h3>
+                <p>Search for a title you've logged in your diary above to add it.</p>
+              </div>
+            ) : (
+              <ul className={styles.posterGrid} role="list">
+                {activeItems.map((item, index) => (
+                  <li key={item.id}>
+                    <TitleCard
+                      title={item.title}
+                      index={index}
+                      onRemove={() => handleRemoveTitle(item.title.id, item.title.title)}
+                      removeTooltip="Remove from collection"
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,397 @@
+/* ==========================================================================
+   Profile — Two-column layout
+   ========================================================================== */
+
+.page {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  min-height: 100dvh;
+  animation: fade-in 0.4s ease;
+}
+
+/* ── Left Column (Sticky Sidebar) ── */
+.left {
+  border-right: 1px solid var(--color-border-soft);
+  background: rgba(11, 10, 15, 0.4);
+}
+
+.profileSticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.profileSticky::-webkit-scrollbar {
+  display: none;
+}
+
+.profileCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.avatarWrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-border-soft);
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--gradient-violet);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  border: 3px solid var(--color-border-soft);
+}
+
+.editAvatarBtn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.editAvatarBtn:hover {
+  background: var(--color-violet-500);
+  border-color: var(--color-violet-400);
+  color: white;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.username {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.joinDate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.genresList {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.editProfileBtn {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.accountCard {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.sectionTitleSmall {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.accountList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accountRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.accountIcon {
+  color: var(--color-text-muted);
+}
+
+.accountDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.accountLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.accountValue {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.logoutBtn {
+  color: var(--color-error);
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.logoutBtn:hover {
+  color: var(--color-error);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+/* ── Right Column (Stats) ── */
+.right {
+  padding: 40px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+/* Streak Hero */
+.streakHero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.streakHeroCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(26,23,38,0) 100%);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-xl);
+}
+
+.streakHeroIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: rgba(245,158,11,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-amber-400);
+}
+
+.streakHeroInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.streakHeroLabel {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.streakHeroValue {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.streakHeroValue span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0;
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Directors */
+.directorCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.directorCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  position: relative;
+}
+
+.directorCard:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: var(--color-border);
+}
+
+.directorRank {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 28px;
+  height: 28px;
+  background: var(--color-violet-600);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2px solid var(--color-bg);
+  z-index: 1;
+}
+
+.directorAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid var(--color-border-soft);
+}
+
+.directorImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.directorInitials {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-violet-400);
+}
+
+.directorDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.directorName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.directorCount {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .page {
+    grid-template-columns: 280px 1fr;
+  }
+  
+  .right {
+    padding: 32px 40px 80px;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .left {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+  
+  .profileSticky {
+    position: static;
+    height: auto;
+    padding: 24px 20px;
+  }
+  
+  .right {
+    padding: 24px 20px 100px;
+  }
+  
+  .streakHero {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Watchlist — Poster wall layout
+   ========================================================================== */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  animation: fade-in 0.35s ease;
+}
+
+/* ── Top bar ── */
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.topLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.pageTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+}
+
+.count {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Content ── */
+.content {
+  padding: 32px 40px 80px;
+}
+
+/* ── Poster grid ── */
+.posterGrid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .topBar {
+    padding: 14px 20px;
+  }
+
+  .content {
+    padding: 20px 20px 100px;
+  }
+
+  .posterGrid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+  }
+}

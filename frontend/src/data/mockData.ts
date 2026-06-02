@@ -1,0 +1,484 @@
+import type { Title, WatchLog, WatchlistItem, UserProfile, UserStats, Streak, Collection, CollectionItem } from '../types'
+
+// ---------------------------------------------------------------------------
+// Mock Titles
+// ---------------------------------------------------------------------------
+export const mockTitles: Title[] = [
+  {
+    id: 't1',
+    tmdb_id: 496243,
+    title: 'Parasite',
+    type: 'film',
+    poster_path: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
+    release_year: 2019,
+    runtime_minutes: 132,
+    genres: ['Thriller', 'Drama', 'Comedy'],
+    director: 'Bong Joon-ho',
+    cast: ['Song Kang-ho', 'Lee Sun-kyun', 'Cho Yeo-jeong'],
+    overview:
+      'The impoverished Kim family devises a scheme to become employed by the wealthy Park family and infiltrate their lives.',
+  },
+  {
+    id: 't2',
+    tmdb_id: 238,
+    title: 'The Godfather',
+    type: 'film',
+    poster_path: 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
+    release_year: 1972,
+    runtime_minutes: 175,
+    genres: ['Drama', 'Crime'],
+    director: 'Francis Ford Coppola',
+    cast: ['Marlon Brando', 'Al Pacino', 'James Caan'],
+    overview:
+      'Don Vito Corleone, head of a fictional criminal dynasty, transfers control to his reluctant son Michael as powerful enemies close in.',
+  },
+  {
+    id: 't3',
+    tmdb_id: 603,
+    title: 'The Matrix',
+    type: 'film',
+    poster_path: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg',
+    release_year: 1999,
+    runtime_minutes: 136,
+    genres: ['Action', 'Sci-Fi'],
+    director: 'The Wachowskis',
+    cast: ['Keanu Reeves', 'Laurence Fishburne', 'Carrie-Anne Moss'],
+    overview:
+      'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
+  },
+  {
+    id: 't4',
+    tmdb_id: 1396,
+    title: 'Breaking Bad',
+    type: 'series',
+    poster_path: 'https://image.tmdb.org/t/p/w500/zzWGRw277MNoCs3zhyG3YmYQsXv.jpg',
+    release_year: 2008,
+    runtime_minutes: 47,
+    genres: ['Drama', 'Crime', 'Thriller'],
+    director: 'Vince Gilligan',
+    cast: ['Bryan Cranston', 'Aaron Paul', 'Anna Gunn'],
+    overview:
+      'A high school chemistry teacher diagnosed with lung cancer turns to manufacturing methamphetamine with a former student.',
+  },
+  {
+    id: 't5',
+    tmdb_id: 299536,
+    title: 'Avengers: Infinity War',
+    type: 'film',
+    poster_path: 'https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg',
+    release_year: 2018,
+    runtime_minutes: 149,
+    genres: ['Action', 'Adventure', 'Sci-Fi'],
+    director: 'Anthony Russo, Joe Russo',
+    cast: ['Robert Downey Jr.', 'Chris Evans', 'Mark Ruffalo'],
+    overview:
+      'The Avengers join forces to stop Thanos from collecting all six Infinity Stones and wiping out half of all life in the universe.',
+  },
+  {
+    id: 't6',
+    tmdb_id: 550,
+    title: 'Fight Club',
+    type: 'film',
+    poster_path: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
+    release_year: 1999,
+    runtime_minutes: 139,
+    genres: ['Drama', 'Thriller'],
+    director: 'David Fincher',
+    cast: ['Brad Pitt', 'Edward Norton', 'Helena Bonham Carter'],
+    overview:
+      'An insomniac office worker and a charismatic soap salesman form an underground fight club that evolves into something far more dangerous.',
+  },
+  {
+    id: 't7',
+    tmdb_id: 157336,
+    title: 'Interstellar',
+    type: 'film',
+    poster_path: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+    release_year: 2014,
+    runtime_minutes: 169,
+    genres: ['Adventure', 'Drama', 'Sci-Fi'],
+    director: 'Christopher Nolan',
+    cast: ['Matthew McConaughey', 'Anne Hathaway', 'Jessica Chastain'],
+    overview:
+      'A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.',
+  },
+  {
+    id: 't8',
+    tmdb_id: 1399,
+    title: 'Game of Thrones',
+    type: 'series',
+    poster_path: 'https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg',
+    release_year: 2011,
+    runtime_minutes: 60,
+    genres: ['Drama', 'Fantasy', 'Adventure'],
+    director: 'David Benioff, D.B. Weiss',
+    cast: ['Emilia Clarke', 'Kit Harington', 'Peter Dinklage'],
+    overview:
+      'Nine noble families fight for control of the mythical land of Westeros, while an ancient enemy awakens in the frozen north.',
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Mock User
+// ---------------------------------------------------------------------------
+export const mockUser: UserProfile = {
+  id: 'u1',
+  email: 'dara@example.com',
+  username: 'dara',
+  avatar_url: undefined,
+  created_at: '2026-01-15T10:00:00Z',
+  preferences: {
+    favorite_genres: ['Drama', 'Thriller', 'Sci-Fi'],
+    theme: 'dark',
+    notifications_enabled: true,
+  },
+}
+
+// ---------------------------------------------------------------------------
+// Mock Watch Logs
+// ---------------------------------------------------------------------------
+export const mockWatchLogs: WatchLog[] = [
+  {
+    id: 'wl1',
+    user_id: 'u1',
+    title_id: 't1',
+    title: mockTitles[0],
+    watched_at: '2026-05-28',
+    rating: 9.5,
+    notes:
+      'An extraordinary film. Bong Joon-ho is a genius at delivering social critique through a gripping thriller.',
+    rewatch_count: 1,
+  },
+  {
+    id: 'wl2',
+    user_id: 'u1',
+    title_id: 't7',
+    title: mockTitles[6],
+    watched_at: '2026-05-20',
+    rating: 9.0,
+    notes: 'Nolan at his creative peak. Stunning visuals and an epic Hans Zimmer score.',
+    rewatch_count: 0,
+  },
+  {
+    id: 'wl3',
+    user_id: 'u1',
+    title_id: 't6',
+    title: mockTitles[5],
+    watched_at: '2026-05-10',
+    rating: 8.5,
+    notes: 'The twist ending still catches me off guard even on the second rewatch.',
+    rewatch_count: 1,
+  },
+  {
+    id: 'wl4',
+    user_id: 'u1',
+    title_id: 't4',
+    title: mockTitles[3],
+    watched_at: '2026-04-25',
+    rating: 10.0,
+    notes:
+      'The best series I\'ve ever watched. Walter White\'s character development is an absolute masterpiece.',
+    rewatch_count: 0,
+    season_number: 1,
+  },
+  {
+    id: 'wl5',
+    user_id: 'u1',
+    title_id: 't3',
+    title: mockTitles[2],
+    watched_at: '2026-04-15',
+    rating: 8.0,
+    notes: 'Still incredibly relevant today. The bullet-time sequence is iconic.',
+    rewatch_count: 2,
+  },
+  {
+    id: 'wl6',
+    user_id: 'u1',
+    title_id: 't2',
+    title: mockTitles[1],
+    watched_at: '2026-03-20',
+    rating: 9.5,
+    notes: 'A classic you have to watch. Marlon Brando is perfect in every frame.',
+    rewatch_count: 0,
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Mock Watchlist
+// ---------------------------------------------------------------------------
+export const mockWatchlist: WatchlistItem[] = [
+  {
+    id: 'wi1',
+    user_id: 'u1',
+    title_id: 't5',
+    title: mockTitles[4],
+    added_at: '2026-05-01',
+    priority: 1,
+  },
+  {
+    id: 'wi2',
+    user_id: 'u1',
+    title_id: 't8',
+    title: mockTitles[7],
+    added_at: '2026-04-10',
+    priority: 2,
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Mock Streak
+// ---------------------------------------------------------------------------
+export const mockStreak: Streak = {
+  id: 's1',
+  user_id: 'u1',
+  current_streak_weeks: 8,
+  longest_streak_weeks: 12,
+  last_log_week: '2026-W22',
+}
+
+// ---------------------------------------------------------------------------
+// Mock Daily Activity (for GitHub-style heatmap)
+// Generate 90 days of activity data ending today
+// ---------------------------------------------------------------------------
+function generateDailyActivity(): Record<string, number> {
+  const activity: Record<string, number> = {}
+  const today = new Date('2026-06-02')
+  for (let i = 89; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const key = d.toISOString().split('T')[0]
+    // Simulate realistic watch activity: ~40% days have watches
+    const rand = Math.random()
+    if (rand < 0.12) activity[key] = 3       // watched 3+
+    else if (rand < 0.25) activity[key] = 2  // watched 2
+    else if (rand < 0.45) activity[key] = 1  // watched 1
+    // else 0 (no activity)
+  }
+  // Force some recent activity to match the streak
+  activity['2026-05-28'] = 2
+  activity['2026-05-25'] = 1
+  activity['2026-05-20'] = 3
+  activity['2026-05-10'] = 1
+  activity['2026-04-25'] = 2
+  activity['2026-04-15'] = 1
+  activity['2026-03-20'] = 1
+  return activity
+}
+export const mockDailyActivity = generateDailyActivity()
+
+// ---------------------------------------------------------------------------
+// Mock Stats
+// ---------------------------------------------------------------------------
+export const mockStats: UserStats = {
+  total_films: 142,
+  total_series: 18,
+  total_watch_hours: 384,
+  average_rating: 4.2,
+  favorite_genres: [
+    { genre: 'Thriller', count: 42 },
+    { genre: 'Drama', count: 38 },
+    { genre: 'Sci-Fi', count: 24 },
+    { genre: 'Horror', count: 12 },
+  ],
+  favorite_directors: [
+    { director: 'Denis Villeneuve', count: 8, avatar_url: 'https://image.tmdb.org/t/p/w185/8xtLh9TL4v1DZuGHFoKRCjYJMlH.jpg' },
+    { director: 'David Fincher', count: 7, avatar_url: 'https://image.tmdb.org/t/p/w185/tpEczFclQZeKAiCeKZZ0adRvtfz.jpg' },
+    { director: 'Céline Sciamma', count: 5, avatar_url: undefined },
+  ],
+  watches_this_year: 38,
+  watches_this_month: 5,
+  era_distribution: [
+    { era: '70s', count: 8 },
+    { era: '80s', count: 12 },
+    { era: '90s', count: 31 },
+    { era: '00s', count: 45 },
+    { era: '10s', count: 46 },
+  ],
+  favorite_actors: [
+    { name: 'Timothée Chalamet', count: 12, avatar_url: 'https://image.tmdb.org/t/p/w185/oq657rL4v8eY56Y645K53846664d.jpg' },
+    { name: 'Florence Pugh', count: 9, avatar_url: 'https://image.tmdb.org/t/p/w185/k4Z82pS8s4fR6y0e9gY97k4l1n2.jpg' },
+    { name: 'Saoirse Ronan', count: 7, avatar_url: undefined },
+  ],
+  monthly_activity: [
+    { month: 'Jun 25', count: 12 },
+    { month: 'Jul 25', count: 15 },
+    { month: 'Aug 25', count: 8 },
+    { month: 'Sep 25', count: 18 },
+    { month: 'Oct 25', count: 14 },
+    { month: 'Nov 25', count: 20 },
+    { month: 'Dec 25', count: 25 },
+    { month: 'Jan 26', count: 10 },
+    { month: 'Feb 26', count: 16 },
+    { month: 'Mar 26', count: 22 },
+    { month: 'Apr 26', count: 18 },
+    { month: 'May 26', count: 28 },
+  ],
+}
+
+// ---------------------------------------------------------------------------
+// Mock TMDb Search Results
+// ---------------------------------------------------------------------------
+export const mockSearchResults = [
+  {
+    tmdb_id: 496243,
+    title: 'Parasite',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
+    release_year: 2019,
+    overview: 'The impoverished Kim family devises a scheme to infiltrate the wealthy Park family.',
+    genres: ['Thriller', 'Drama'],
+  },
+  {
+    tmdb_id: 27205,
+    title: 'Inception',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg',
+    release_year: 2010,
+    overview: 'A thief who steals secrets through dream-sharing technology.',
+    genres: ['Action', 'Sci-Fi', 'Thriller'],
+  },
+  {
+    tmdb_id: 120,
+    title: 'The Lord of the Rings: The Fellowship of the Ring',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg',
+    release_year: 2001,
+    overview: 'Young Hobbit Frodo Baggins must carry the One Ring across Middle-earth to the fires of Mount Doom.',
+    genres: ['Adventure', 'Fantasy'],
+  },
+  {
+    tmdb_id: 19404,
+    title: 'Dilwale Dulhania Le Jayenge',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0pW.jpg',
+    release_year: 1995,
+    overview: 'A classic Bollywood film about love, family, and belonging.',
+    genres: ['Romance', 'Drama'],
+  },
+  {
+    tmdb_id: 1399,
+    title: 'Game of Thrones',
+    type: 'series' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg',
+    release_year: 2011,
+    overview: 'Nine noble families fight for control of the mythical land of Westeros.',
+    genres: ['Drama', 'Fantasy'],
+  },
+  {
+    tmdb_id: 1396,
+    title: 'Breaking Bad',
+    type: 'series' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/zzWGRw277MNoCs3zhyG3YmYQsXv.jpg',
+    release_year: 2008,
+    overview: 'A high school chemistry teacher turns to manufacturing methamphetamine.',
+    genres: ['Drama', 'Crime'],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Genres for Onboarding Taste Profiling
+// ---------------------------------------------------------------------------
+export const allGenres = [
+  'Drama',
+  'Thriller',
+  'Comedy',
+  'Action',
+  'Sci-Fi',
+  'Horror',
+  'Romance',
+  'Documentary',
+  'Animation',
+  'Fantasy',
+  'Crime',
+  'Adventure',
+  'Mystery',
+  'Historical',
+  'Musical',
+]
+
+// ---------------------------------------------------------------------------
+// Mock Collections and Collection Items
+// ---------------------------------------------------------------------------
+export const mockCollections: Collection[] = [
+  {
+    id: 'col-favorites',
+    user_id: 'u1',
+    name: 'Favorites',
+    description: 'All-time favorite movies and series.',
+    is_private: false,
+    created_at: '2026-05-01T10:00:00Z',
+    items_count: 4,
+    cover_title_id: 't1',
+    cover_title: mockTitles[0], // Parasite
+  },
+  {
+    id: 'col-scifi',
+    user_id: 'u1',
+    name: 'Sci-Fi Essentials',
+    description: 'Mind-bending sci-fi masterpieces.',
+    is_private: false,
+    created_at: '2026-05-15T12:00:00Z',
+    items_count: 3,
+    cover_title_id: 't7',
+    cover_title: mockTitles[6], // Interstellar
+  },
+]
+
+export const mockCollectionItems: CollectionItem[] = [
+  {
+    id: 'ci1',
+    collection_id: 'col-favorites',
+    title_id: 't1',
+    title: mockTitles[0],
+    sort_order: 0,
+    added_at: '2026-05-28T15:00:00Z',
+  },
+  {
+    id: 'ci2',
+    collection_id: 'col-favorites',
+    title_id: 't2',
+    title: mockTitles[1],
+    sort_order: 1,
+    added_at: '2026-05-28T15:02:00Z',
+  },
+  {
+    id: 'ci3',
+    collection_id: 'col-favorites',
+    title_id: 't6',
+    title: mockTitles[5],
+    sort_order: 2,
+    added_at: '2026-05-28T15:04:00Z',
+  },
+  {
+    id: 'ci4',
+    collection_id: 'col-favorites',
+    title_id: 't4',
+    title: mockTitles[3],
+    sort_order: 3,
+    added_at: '2026-05-28T15:05:00Z',
+  },
+  {
+    id: 'ci5',
+    collection_id: 'col-scifi',
+    title_id: 't7',
+    title: mockTitles[6],
+    sort_order: 0,
+    added_at: '2026-05-20T11:00:00Z',
+  },
+  {
+    id: 'ci6',
+    collection_id: 'col-scifi',
+    title_id: 't3',
+    title: mockTitles[2],
+    sort_order: 1,
+    added_at: '2026-05-20T11:10:00Z',
+  },
+  {
+    id: 'ci7',
+    collection_id: 'col-scifi',
+    title_id: 't5',
+    title: mockTitles[4],
+    sort_order: 2,
+    added_at: '2026-05-20T11:12:00Z',
+  },
+]

@@ -1,0 +1,631 @@
+/* =====================================================================
+   Stats Page — Cinematic dashboard layout
+   ===================================================================== */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 40px 80px;
+  animation: fade-in 0.4s ease;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pageTitle {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.pageSub {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  max-width: 480px;
+}
+
+/* ── Main grid: heatmap left + stat cards right ── */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* ── Heatmap card ── */
+.heatmapCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  min-width: 0;
+}
+
+.heatmapTop {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Streak info block */
+.streakInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 140px;
+  flex-shrink: 0;
+  padding-right: 32px;
+  border-right: 1px solid var(--color-border-soft);
+}
+
+.streakLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-amber-400);
+}
+
+.streakValue {
+  font-size: 3.25rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.streakUnit {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  padding-bottom: 6px;
+}
+
+.streakBest {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* Heatmap grid */
+.heatmapWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.heatmapLegendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heatmapPeriod {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.heatmapLegend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legendLabel {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+.legendDot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.heatmapScroll {
+  overflow-x: auto;
+  padding-bottom: 8px;
+  /* Hide scrollbar for a cleaner look, but still scrollable */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.heatmapScroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* The actual heatmap */
+.heatmap {
+  display: flex;
+  gap: 3px;
+  min-width: max-content;
+}
+
+.heatmapCol {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heatmapCell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  cursor: default;
+  transition: opacity 0.15s ease;
+}
+
+.heatmapCell:hover {
+  opacity: 0.75;
+}
+
+/* Activity level colors */
+.cellEmpty {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cellLow {
+  background: #3f3f46;
+}
+
+.cellMid {
+  background: #71717a;
+}
+
+.cellHigh {
+  background: #f59e0b; /* Amber highlight */
+}
+
+/* ── Stat cards (2×2 grid on the right) ── */
+.statCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+
+/* ── Bottom row: genre + eras ── */
+.bottomRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Genre Focus */
+.genreCard,
+.erasCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.sectionTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.sectionBadge {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.genreList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.genreRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.genreName {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.genreTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.genreFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  /* Clean neutral grey gradients that get lighter/darker */
+  background: linear-gradient(90deg,
+    hsl(240, 5%, calc(30% - var(--bar-index, 0) * 4%)),
+    hsl(240, 5%, calc(45% - var(--bar-index, 0) * 5%))
+  );
+  transition: width 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* First bar: amber highlight */
+.genreRow:first-child .genreFill {
+  background: linear-gradient(90deg, #f59e0b, #fcd34d);
+}
+
+.genreCount {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  width: 54px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* Eras Explored */
+.erasChart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 100px;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.eraCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  height: 100%;
+}
+
+.eraBarWrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.eraBar {
+  width: 100%;
+  background: linear-gradient(to top, #27272a, #71717a);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  min-height: 4px;
+  transition: height 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.eraLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Cinematic Flow (Monthly Activity) ── */
+.flowCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.flowChart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 120px;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.flowCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+}
+
+.flowBarWrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.flowBar {
+  width: 100%;
+  background: linear-gradient(to top, #27272a, #71717a);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  min-height: 4px;
+  transition: height 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.flowBarPeak {
+  background: linear-gradient(to top, #f59e0b, #fcd34d) !important;
+}
+
+.flowLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Bottom Grid (Directors & Actors side-by-side) ── */
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── Directors ── */
+.directorsCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.viewAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: var(--color-violet-400);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.viewAllBtn:hover {
+  color: var(--color-violet-300);
+}
+
+.directorsList {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.directorItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+}
+
+.directorAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #27272a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid var(--color-border-soft);
+}
+
+.directorAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.directorInitials {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.directorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.directorName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.directorCount {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Actors ── */
+.actorsCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.actorsList {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.actorItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+}
+
+.actorAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #27272a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid var(--color-border-soft);
+}
+
+.actorAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.actorInitials {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.actorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.actorName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.actorCount {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .page {
+    padding: 24px 20px 100px;
+    gap: 20px;
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCardsGrid {
+    width: 100%;
+  }
+
+  .heatmapCard {
+    padding: 20px;
+  }
+
+  .heatmapTop {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .streakInfo {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid var(--color-border-soft);
+    padding-bottom: 20px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .streakValue {
+    justify-content: center;
+  }
+
+  .heatmapCell {
+    width: 9px;
+    height: 9px;
+  }
+
+  .legendDot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .bottomRow {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .directorsList,
+  .actorsList {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .flowChart {
+    gap: 6px;
+    height: 100px;
+  }
+  .flowLabel {
+    font-size: 0.625rem;
+    transform: rotate(-45deg);
+    margin-top: 8px;
+    padding-right: 4px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .heatmapCell {
+    width: 8px;
+    height: 8px;
+  }
+
+  .heatmap {
+    gap: 2px;
+  }
+
+  .heatmapCol {
+    gap: 2px;
+  }
+}
