@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Search as SearchIcon, Film, Tv, Plus, X, Clock } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
 import { mockSearchResults } from '../../data/mockData'
 import { EmptyState, GenrePill } from '../../components'
@@ -9,6 +10,7 @@ import styles from './Search.module.css'
 export default function Search() {
   const { watchlist, setWatchlist } = useApp()
   const { addToast } = useToast()
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -180,7 +182,10 @@ export default function Search() {
                           <><Plus size={13} /> Watchlist</>
                         )}
                       </button>
-                      <button className="btn btn-primary btn-sm">
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => navigate('/log', { state: { title: result } })}
+                      >
                         <Plus size={13} /> Log film
                       </button>
                     </div>

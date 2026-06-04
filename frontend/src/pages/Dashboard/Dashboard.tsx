@@ -6,7 +6,7 @@ import { StatBox, EmptyState, GenrePill } from '../../components'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
-  const { user, stats, watchLogs, streak, watchlist } = useApp()
+  const { user, stats, watchLogs, streak, watchlist, personalRatings } = useApp()
   const recentLogs = watchLogs.slice(0, 5)
 
   return (
@@ -83,16 +83,26 @@ export default function Dashboard() {
                       <h3 className={styles.logTitle}>{log.title.title}</h3>
                       <div className={styles.logMeta}>
                         <span className={styles.metaYear}>{log.title.release_year}</span>
+                        {log.season_number && (
+                          <span className="badge">Season {log.season_number}</span>
+                        )}
                         {log.rewatch_count > 0 && (
                           <span className="badge badge-violet">Rewatch</span>
                         )}
                       </div>
-                      {log.rating != null && (
-                        <div className={styles.rating}>
-                          <Star size={12} fill="currentColor" />
-                          <span>{log.rating.toFixed(1)}</span>
-                        </div>
-                      )}
+                      {(() => {
+                        const ratingToShow = log.title.type === 'film'
+                          ? (log.rating ?? personalRatings[log.title_id])
+                          : personalRatings[log.title_id];
+                        if (ratingToShow == null) return null;
+                        return (
+                          <div className={styles.ratingBig}>
+                            <Star size={12} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
+                            <span>{ratingToShow.toFixed(1)}</span>
+                            <span className={styles.ratingMax}>/10</span>
+                          </div>
+                        );
+                      })()}
                       {log.notes && (
                         <p className={styles.logNotes}>{log.notes}</p>
                       )}

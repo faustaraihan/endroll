@@ -135,6 +135,18 @@ export const mockUser: UserProfile = {
 }
 
 // ---------------------------------------------------------------------------
+// Mock Personal Ratings (Title ID -> Rating)
+// ---------------------------------------------------------------------------
+export const mockPersonalRatings: Record<string, number> = {
+  t1: 9.5, // Parasite
+  t7: 9.0, // Interstellar
+  t6: 8.5, // Fight Club
+  t4: 10.0, // Breaking Bad
+  t3: 8.0, // The Matrix
+  t2: 9.5, // The Godfather
+}
+
+// ---------------------------------------------------------------------------
 // Mock Watch Logs
 // ---------------------------------------------------------------------------
 export const mockWatchLogs: WatchLog[] = [
@@ -144,7 +156,6 @@ export const mockWatchLogs: WatchLog[] = [
     title_id: 't1',
     title: mockTitles[0],
     watched_at: '2026-05-28',
-    rating: 9.5,
     notes:
       'An extraordinary film. Bong Joon-ho is a genius at delivering social critique through a gripping thriller.',
     rewatch_count: 1,
@@ -155,7 +166,6 @@ export const mockWatchLogs: WatchLog[] = [
     title_id: 't7',
     title: mockTitles[6],
     watched_at: '2026-05-20',
-    rating: 9.0,
     notes: 'Nolan at his creative peak. Stunning visuals and an epic Hans Zimmer score.',
     rewatch_count: 0,
   },
@@ -165,7 +175,6 @@ export const mockWatchLogs: WatchLog[] = [
     title_id: 't6',
     title: mockTitles[5],
     watched_at: '2026-05-10',
-    rating: 8.5,
     notes: 'The twist ending still catches me off guard even on the second rewatch.',
     rewatch_count: 1,
   },
@@ -175,7 +184,6 @@ export const mockWatchLogs: WatchLog[] = [
     title_id: 't4',
     title: mockTitles[3],
     watched_at: '2026-04-25',
-    rating: 10.0,
     notes:
       'The best series I\'ve ever watched. Walter White\'s character development is an absolute masterpiece.',
     rewatch_count: 0,
@@ -187,7 +195,6 @@ export const mockWatchLogs: WatchLog[] = [
     title_id: 't3',
     title: mockTitles[2],
     watched_at: '2026-04-15',
-    rating: 8.0,
     notes: 'Still incredibly relevant today. The bullet-time sequence is iconic.',
     rewatch_count: 2,
   },
@@ -197,7 +204,6 @@ export const mockWatchLogs: WatchLog[] = [
     title_id: 't2',
     title: mockTitles[1],
     watched_at: '2026-03-20',
-    rating: 9.5,
     notes: 'A classic you have to watch. Marlon Brando is perfect in every frame.',
     rewatch_count: 0,
   },

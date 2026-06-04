@@ -25,6 +25,7 @@ export interface WatchLog {
   title_id: string
   title: Title
   watched_at: string // ISO date string
+  /** @deprecated Rating kini disimpan secara global di level judul (personalRatings) */
   rating?: number // 0.0 - 10.0, DECIMAL(3,1)
   notes?: string
   rewatch_count: number

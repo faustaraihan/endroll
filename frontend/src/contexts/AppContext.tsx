@@ -8,6 +8,7 @@ import {
   mockStreak,
   mockCollections,
   mockCollectionItems,
+  mockPersonalRatings,
 } from '../data/mockData'
 
 interface AppContextValue {
@@ -27,6 +28,10 @@ interface AppContextValue {
   deleteCollection: (id: string) => void
   addTitleToCollection: (collectionId: string, title: Title) => void
   removeTitleFromCollection: (collectionId: string, titleId: string) => void
+  personalRatings: Record<string, number>
+  setRatingForTitle: (titleId: string, rating: number | null) => void
+  seasonRatings: Record<string, number>
+  setSeasonRating: (titleId: string, seasonNumber: number, rating: number | null) => void
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -36,6 +41,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(mockWatchlist)
   const [collections, setCollections] = useState<Collection[]>(mockCollections)
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>(mockCollectionItems)
+  const [personalRatings, setPersonalRatings] = useState<Record<string, number>>(mockPersonalRatings)
+  const [seasonRatings, setSeasonRatings] = useState<Record<string, number>>({})
+
+  const setRatingForTitle = (titleId: string, rating: number | null) => {
+    setPersonalRatings(prev => {
+      const next = { ...prev }
+      if (rating === null) {
+        delete next[titleId]
+      } else {
+        next[titleId] = rating
+      }
+      return next
+    })
+  }
+
+  // seasonRatings key: `${titleId}:${seasonNumber}`
+  const setSeasonRating = (titleId: string, seasonNumber: number, rating: number | null) => {
+    const key = `${titleId}:${seasonNumber}`
+    setSeasonRatings(prev => {
+      const next = { ...prev }
+      if (rating === null) delete next[key]
+      else next[key] = rating
+      return next
+    })
+  }
+
+  // Calculate dynamic average rating
+  const ratingsArray = Object.values(personalRatings)
+  const dynamicAverageRating = ratingsArray.length > 0
+    ? ratingsArray.reduce((sum, r) => sum + r, 0) / ratingsArray.length
+    : undefined
 
   const addCollection = (name: string, description?: string, isPrivate = false) => {
     const newId = crypto.randomUUID()
@@ -119,7 +155,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider
       value={{
         user: mockUser,
-        stats: mockStats,
+        stats: {
+          ...mockStats,
+          average_rating: dynamicAverageRating,
+        },
         watchLogs,
         watchlist,
         streak: mockStreak,
@@ -134,6 +173,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         deleteCollection,
         addTitleToCollection,
         removeTitleFromCollection,
+        personalRatings,
+        setRatingForTitle,
+        seasonRatings,
+        setSeasonRating,
       }}
     >
       {children}

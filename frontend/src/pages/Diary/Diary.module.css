@@ -178,6 +178,9 @@
 .diaryList.list {
   flex-direction: column;
 }
+.diaryList.list .entryTitle {
+  font-size: 1.125rem;
+}
 
 /* COMPACT VIEW */
 .diaryList.compact {
@@ -196,6 +199,20 @@
 }
 .diaryList.compact .notes {
   display: none;
+}
+.diaryList.compact .entryTitle {
+  font-size: 0.9375rem;
+}
+.diaryList.compact .metaType {
+  padding: 1px 6px;
+  font-size: 0.7rem;
+}
+.diaryList.compact .metaYear {
+  font-size: 0.75rem;
+}
+.diaryList.compact .metaBadge {
+  padding: 1px 6px;
+  font-size: 0.65rem;
 }
 
 /* GRID VIEW */
@@ -228,11 +245,31 @@
   align-items: stretch;
 }
 .diaryList.grid .entryRight {
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
 }
 .diaryList.grid .notes {
   display: none;
+}
+.diaryList.grid .entryTitle {
+  font-size: 0.95rem;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.35;
+}
+.diaryList.grid .metaType {
+  padding: 1px 6px;
+  font-size: 0.7rem;
+}
+.diaryList.grid .metaYear {
+  font-size: 0.75rem;
+}
+.diaryList.grid .metaBadge {
+  padding: 1px 6px;
+  font-size: 0.65rem;
 }
 
 .diaryList.grid .date {
@@ -315,6 +352,7 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  flex: 1;
 }
 
 .entryTitle {
@@ -325,6 +363,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.4;
 }
 
 .entryMeta {
@@ -376,29 +415,24 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--color-amber-400);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+  line-height: 1;
 }
 
 .ratingMax {
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--color-text-muted);
-  font-family: var(--font-sans);
+  margin-left: 1px;
 }
 
-.entryActions {
-  display: flex;
-  gap: 2px;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
 
-.entry:hover .entryActions {
-  opacity: 1;
-}
 
 /* Notes */
 .notes {
@@ -453,10 +487,6 @@
   .posterFallback {
     width: 56px;
     height: 84px;
-  }
-
-  .entryActions {
-    opacity: 1;
   }
 
   .controls {

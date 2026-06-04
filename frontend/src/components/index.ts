@@ -6,3 +6,5 @@ export * from './Navigation'
 export * from './StatBox'
 export * from './TitleCard'
 export * from './Toast'
+export * from './SeriesTracker'
+

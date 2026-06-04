@@ -57,7 +57,7 @@ export function TitleCard({
               </div>
             ) : (
               showLogAction && (
-                <Link to="/log" className="btn btn-primary btn-sm" aria-label={`Log ${title.title}`} onClick={stopNav}>
+                <Link to="/log" state={{ title }} className="btn btn-primary btn-sm" aria-label={`Log ${title.title}`} onClick={stopNav}>
                   <Plus size={14} />
                   Log now
                 </Link>

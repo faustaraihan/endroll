@@ -1,54 +1,91 @@
 import { useState, useMemo } from 'react'
-import { Film, Star, Plus, Edit3, Trash2, ChevronDown, LayoutGrid, List, AlignJustify, FolderHeart } from 'lucide-react'
+import { Film, Star, Plus, ChevronDown, LayoutGrid, List, AlignJustify } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useApp, useToast } from '../../contexts'
+import { useApp } from '../../contexts'
 import { formatDate } from '../../utils'
-import { EmptyState, CollectModal } from '../../components'
-import type { Title } from '../../types'
+import { EmptyState } from '../../components'
 import styles from './Diary.module.css'
+import type { WatchLog } from '../../types'
 
 type SortOption = 'date-desc' | 'date-asc' | 'rating-desc' | 'rating-asc' | 'title-asc' | 'title-desc' | 'year-desc' | 'year-asc'
 type FilterType = 'all' | 'film' | 'series'
 type ViewMode = 'list' | 'grid' | 'compact'
 
 export default function Diary() {
-  const { watchLogs, setWatchLogs } = useApp()
-  const { addToast } = useToast()
+  const { watchLogs, personalRatings } = useApp()
   const [sort, setSort] = useState<SortOption>('date-desc')
   const [filter, setFilter] = useState<FilterType>('all')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
-  const [collectTitle, setCollectTitle] = useState<Title | null>(null)
 
   const filtered = useMemo(() => {
-    return watchLogs
+    // 1. Filter out episode logs (if any) and filter by type (film / series)
+    const baseLogs = watchLogs
       .filter(log => filter === 'all' || log.title.type === filter)
-      .sort((a, b) => {
-        switch (sort) {
-          case 'date-desc': return new Date(b.watched_at).getTime() - new Date(a.watched_at).getTime()
-          case 'date-asc':  return new Date(a.watched_at).getTime() - new Date(b.watched_at).getTime()
-          case 'rating-desc': return (b.rating ?? 0) - (a.rating ?? 0)
-          case 'rating-asc': return (a.rating ?? 0) - (b.rating ?? 0)
-          case 'title-asc': return a.title.title.localeCompare(b.title.title)
-          case 'title-desc': return b.title.title.localeCompare(a.title.title)
-          case 'year-desc': {
-            const yearA = a.title.release_year || 0;
-            const yearB = b.title.release_year || 0;
-            return yearB - yearA;
-          }
-          case 'year-asc': {
-            const yearA = a.title.release_year || 0;
-            const yearB = b.title.release_year || 0;
-            return yearA - yearB;
-          }
-          default: return 0
-        }
-      })
-  }, [watchLogs, filter, sort])
+      .filter(log => log.episode_number === undefined || log.episode_number === null)
 
-  function handleDelete(id: string, titleName: string) {
-    setWatchLogs(prev => prev.filter(l => l.id !== id))
-    addToast(`"${titleName}" removed from diary.`, 'success')
-  }
+    // 2. Group by title.id
+    const groups: Record<string, WatchLog[]> = {}
+    for (const log of baseLogs) {
+      const key = log.title.id
+      if (!groups[key]) groups[key] = []
+      groups[key].push(log)
+    }
+
+    // 3. For each group, find the latest log (representative)
+    // To make it stable and consistent, we sort the group by watched_at descending,
+    // and if dates are equal, by their original index in the watchLogs array ascending
+    // (since index 0 is the newest, index N is the oldest).
+    const watchLogIndexMap = new Map<string, number>()
+    watchLogs.forEach((log, index) => {
+      watchLogIndexMap.set(log.id, index)
+    })
+
+    const groupedLogs = Object.values(groups).map(group => {
+      const sortedGroup = [...group].sort((a, b) => {
+        const dateDiff = new Date(b.watched_at).getTime() - new Date(a.watched_at).getTime()
+        if (dateDiff !== 0) return dateDiff
+        const idxA = watchLogIndexMap.get(a.id) ?? 0
+        const idxB = watchLogIndexMap.get(b.id) ?? 0
+        return idxA - idxB
+      })
+
+      // The representative log is the latest one
+      return sortedGroup[0]
+    })
+
+    // 4. Sort the grouped logs based on user sort selection
+    return groupedLogs.sort((a, b) => {
+      switch (sort) {
+        case 'date-desc': return new Date(b.watched_at).getTime() - new Date(a.watched_at).getTime()
+        case 'date-asc':  return new Date(a.watched_at).getTime() - new Date(b.watched_at).getTime()
+        case 'rating-desc': {
+          const rA = (a.title.type === 'film' ? (a.rating ?? personalRatings[a.title.id]) : personalRatings[a.title.id]) ?? 0
+          const rB = (b.title.type === 'film' ? (b.rating ?? personalRatings[b.title.id]) : personalRatings[b.title.id]) ?? 0
+          return rB - rA
+        }
+        case 'rating-asc': {
+          const rA = (a.title.type === 'film' ? (a.rating ?? personalRatings[a.title.id]) : personalRatings[a.title.id]) ?? 0
+          const rB = (b.title.type === 'film' ? (b.rating ?? personalRatings[b.title.id]) : personalRatings[b.title.id]) ?? 0
+          return rA - rB
+        }
+        case 'title-asc': return a.title.title.localeCompare(b.title.title)
+        case 'title-desc': return b.title.title.localeCompare(a.title.title)
+        case 'year-desc': {
+          const yearA = a.title.release_year || 0
+          const yearB = b.title.release_year || 0
+          return yearB - yearA
+        }
+        case 'year-asc': {
+          const yearA = a.title.release_year || 0
+          const yearB = b.title.release_year || 0
+          return yearA - yearB
+        }
+        default: return 0
+      }
+    })
+  }, [watchLogs, filter, sort, personalRatings])
+
+
 
   return (
     <div className={styles.page}>
@@ -56,7 +93,7 @@ export default function Diary() {
       <div className={styles.topBar}>
         <div className={styles.topLeft}>
           <h1 className={styles.pageTitle}>Diary</h1>
-          <span className={styles.entryCount}>{watchLogs.length} entries</span>
+          <span className={styles.entryCount}>{filtered.length} entries</span>
         </div>
 
         <div className={styles.controls}>
@@ -173,10 +210,7 @@ export default function Diary() {
                             {log.title.release_year && (
                               <span className={styles.metaYear}>{log.title.release_year}</span>
                             )}
-                            {log.season_number && (
-                              <span className={styles.metaBadge}>Season {log.season_number}</span>
-                            )}
-                            {log.rewatch_count > 0 && (
+                            {log.title.type === 'film' && log.rewatch_count > 0 && (
                               <span className={`${styles.metaBadge} ${styles.metaBadgeViolet}`}>
                                 Rewatch #{log.rewatch_count}
                               </span>
@@ -185,37 +219,19 @@ export default function Diary() {
                         </div>
 
                         <div className={styles.entryRight}>
-                          {log.rating != null && (
+                          {log.title.type === 'film' && log.rating !== undefined && log.rating !== null ? (
                             <div className={styles.ratingBig}>
-                              <Star size={14} fill="currentColor" />
+                              <Star size={14} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
                               <span>{log.rating.toFixed(1)}</span>
                               <span className={styles.ratingMax}>/10</span>
                             </div>
-                          )}
-                          <div className={styles.entryActions}>
-                            <button
-                              className="btn btn-icon btn-ghost"
-                              aria-label={`Collect ${log.title.title}`}
-                              onClick={() => setCollectTitle(log.title)}
-                              title="Add to Collection"
-                            >
-                              <FolderHeart size={14} />
-                            </button>
-                            <button
-                              className="btn btn-icon btn-ghost"
-                              aria-label={`Edit entry ${log.title.title}`}
-                            >
-                              <Edit3 size={14} />
-                            </button>
-                            <button
-                              className="btn btn-icon btn-ghost"
-                              style={{ color: 'var(--color-error)' }}
-                              aria-label={`Delete entry ${log.title.title}`}
-                              onClick={() => handleDelete(log.id, log.title.title)}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+                          ) : personalRatings[log.title.id] !== undefined ? (
+                            <div className={styles.ratingBig}>
+                              <Star size={14} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
+                              <span>{personalRatings[log.title.id].toFixed(1)}</span>
+                              <span className={styles.ratingMax}>/10</span>
+                            </div>
+                          ) : null}
                         </div>
                       </div>
 
@@ -239,10 +255,7 @@ export default function Diary() {
         )}
       </div>
 
-      <CollectModal
-        title={collectTitle}
-        onClose={() => setCollectTitle(null)}
-      />
+
     </div>
   )
 }

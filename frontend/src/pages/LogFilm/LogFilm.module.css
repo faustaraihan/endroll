@@ -265,6 +265,13 @@
   max-width: 200px;
 }
 
+.selectInput {
+  color-scheme: dark;
+  max-width: 200px;
+  cursor: pointer;
+  background: var(--color-bg-card);
+}
+
 /* Rating slider */
 .ratingRow {
   display: flex;
@@ -428,4 +435,55 @@
   .searchForm {
     flex-direction: column;
   }
+}
+
+/* Duplicate Log Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fade-in 0.2s ease-out;
+  padding: 16px;
+}
+
+.modalCard {
+  background: #121214;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scale-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.modalBody {
+  padding: 20px;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.modalFooter {
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--color-border-soft);
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

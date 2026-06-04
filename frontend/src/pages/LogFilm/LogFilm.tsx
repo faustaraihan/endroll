@@ -1,31 +1,59 @@
-import { useState } from 'react'
-import { Search, Film, Star, ChevronLeft, Plus, Check } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Search, Film, Star, ChevronLeft, Plus, Check, X } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
-import { mockSearchResults } from '../../data/mockData'
-import type { SearchResult } from '../../types'
+import { mockSearchResults, mockTitles } from '../../data/mockData'
+import { seriesMockData } from '../../data/seriesMockData'
+import type { SearchResult, WatchLog, Title } from '../../types'
 import styles from './LogFilm.module.css'
 
 type Step = 'search' | 'form'
 
 export default function LogFilm() {
-  const { setWatchLogs, watchLogs } = useApp()
+  const { setWatchLogs, watchLogs, personalRatings, setRatingForTitle } = useApp()
   const { addToast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [step, setStep] = useState<Step>('search')
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [selectedTitle, setSelectedTitle] = useState<SearchResult | null>(null)
+  const [selectedTitle, setSelectedTitle] = useState<SearchResult | Title | null>(null)
 
   // Form state
   const [watchedAt, setWatchedAt] = useState(new Date().toISOString().slice(0, 10))
   const [rating, setRating] = useState<number | null>(null)
   const [ratingInput, setRatingInput] = useState('')
   const [notes, setNotes] = useState('')
-  const [isRewatch, setIsRewatch] = useState(false)
+  const [seasonNumber, setSeasonNumber] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Resolve title ID for metadata lookup
+  const resolvedTitleId = selectedTitle
+    ? (('id' in selectedTitle ? selectedTitle.id : null) ||
+       watchLogs.find(l => l.title.tmdb_id === selectedTitle.tmdb_id)?.title.id ||
+       mockTitles.find(t => t.tmdb_id === selectedTitle.tmdb_id)?.id ||
+       null)
+    : null
+
+  const seasonsList = resolvedTitleId && seriesMockData[resolvedTitleId]
+    ? seriesMockData[resolvedTitleId].seasons
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => ({ season_number: n, title: `Season ${n}` }))
+
+  // Edit / Duplicate state
+  const [editingLogId, setEditingLogId] = useState<string | null>(null)
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false)
+  const [duplicateLog, setDuplicateLog] = useState<WatchLog | null>(null)
+  const [pendingTitle, setPendingTitle] = useState<SearchResult | Title | null>(null)
+
+  // Pre-select title from router state (e.g. from Search page)
+  useEffect(() => {
+    const stateTitle = location.state?.title as SearchResult | Title | undefined
+    if (stateTitle) {
+      handleSelect(stateTitle)
+    }
+  }, [location.state])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -40,19 +68,88 @@ export default function LogFilm() {
     }, 500)
   }
 
-  function handleSelect(result: SearchResult) {
+  function handleSelect(result: SearchResult | Title) {
     // Check if already in diary
-    const existing = watchLogs.find(l => l.title.tmdb_id === result.tmdb_id)
+    const existing = watchLogs.find(l => 
+      ('id' in result && l.title.id === result.id) || 
+      (result.tmdb_id && l.title.tmdb_id === result.tmdb_id)
+    )
     if (existing) {
-      const confirmed = window.confirm(
-        `You already logged "${result.title}" on ${new Date(existing.watched_at).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}.\n\nLog as a new rewatch?`
-      )
-      if (!confirmed) return
-      setIsRewatch(true)
+      setDuplicateLog(existing)
+      setPendingTitle(result)
+      setShowDuplicateModal(true)
+      return
     }
+    startFormForTitle(result)
+  }
+
+  function startFormForTitle(result: SearchResult | Title) {
     setSelectedTitle(result)
+    setEditingLogId(null)
+    setSeasonNumber(1)
+    setWatchedAt(new Date().toISOString().slice(0, 10))
+    
+    // Cari rating global dari film ini
+    const existingWatch = watchLogs.find(l => 
+      ('id' in result && l.title.id === result.id) || 
+      (result.tmdb_id && l.title.tmdb_id === result.tmdb_id)
+    )
+    const existingRating = existingWatch ? (personalRatings[existingWatch.title.id] ?? null) : null
+    
+    setRating(existingRating)
+    setRatingInput(existingRating !== null ? existingRating.toFixed(1) : '')
+    setNotes('')
     setStep('form')
   }
+
+  function handleConfirmRewatch() {
+    if (!pendingTitle) return
+    setSelectedTitle(pendingTitle)
+    setEditingLogId(null)
+    setSeasonNumber(1)
+    setWatchedAt(new Date().toISOString().slice(0, 10))
+    
+    // Cari rating global dari film ini
+    const existingWatch = watchLogs.find(l => 
+      ('id' in pendingTitle && l.title.id === pendingTitle.id) || 
+      (pendingTitle.tmdb_id && l.title.tmdb_id === pendingTitle.tmdb_id)
+    )
+    const existingRating = existingWatch ? (personalRatings[existingWatch.title.id] ?? null) : null
+    
+    setRating(existingRating)
+    setRatingInput(existingRating !== null ? existingRating.toFixed(1) : '')
+    setNotes('')
+    setStep('form')
+    setShowDuplicateModal(false)
+    setDuplicateLog(null)
+    setPendingTitle(null)
+  }
+
+  function handleConfirmEdit() {
+    if (!duplicateLog || !pendingTitle) return
+    setSelectedTitle(pendingTitle)
+    setEditingLogId(duplicateLog.id)
+    setSeasonNumber(duplicateLog.season_number ?? 1)
+    setWatchedAt(duplicateLog.watched_at)
+    
+    // Ambil rating global film
+    const existingRating = personalRatings[duplicateLog.title.id] ?? null
+    setRating(existingRating)
+    setRatingInput(existingRating !== null ? existingRating.toFixed(1) : '')
+    setNotes(duplicateLog.notes ?? '')
+    setStep('form')
+    setShowDuplicateModal(false)
+    setDuplicateLog(null)
+    setPendingTitle(null)
+  }
+
+  function handleCancelDuplicate() {
+    setShowDuplicateModal(false)
+    setDuplicateLog(null)
+    setPendingTitle(null)
+  }
+
+
 
   function handleRatingChange(val: string) {
     setRatingInput(val)
@@ -65,12 +162,10 @@ export default function LogFilm() {
   }
 
   function handleSlider(val: number) {
-    const snapped = Math.round(val * 2) / 2
+    const snapped = Math.round(val * 10) / 10
     setRating(snapped)
     setRatingInput(snapped.toFixed(1))
   }
-
-
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -78,29 +173,69 @@ export default function LogFilm() {
 
     setIsSubmitting(true)
     setTimeout(() => {
-      const newLog = {
-        id: crypto.randomUUID(),
-        user_id: 'u1',
-        title_id: crypto.randomUUID(),
-        title: {
-          id: crypto.randomUUID(),
-          tmdb_id: selectedTitle.tmdb_id,
-          title: selectedTitle.title,
-          type: selectedTitle.type,
-          poster_path: selectedTitle.poster_path,
-          release_year: selectedTitle.release_year,
-          genres: selectedTitle.genres,
-          cast: [],
-          overview: selectedTitle.overview,
-        },
-        watched_at: watchedAt,
-        rating: rating ?? undefined,
-        notes: notes || undefined,
-        rewatch_count: isRewatch ? 1 : 0,
+      // Cari atau buat title ID yang stabil
+      const existingWatch = watchLogs.find(l => 
+        ('id' in selectedTitle && l.title.id === selectedTitle.id) || 
+        (selectedTitle.tmdb_id && l.title.tmdb_id === selectedTitle.tmdb_id)
+      )
+      const titleIdToUse = existingWatch 
+        ? existingWatch.title.id 
+        : ('id' in selectedTitle ? selectedTitle.id : crypto.randomUUID())
+        
+      const titleToUse = existingWatch ? existingWatch.title : {
+        id: titleIdToUse,
+        tmdb_id: selectedTitle.tmdb_id,
+        title: selectedTitle.title,
+        type: selectedTitle.type,
+        poster_path: selectedTitle.poster_path,
+        release_year: selectedTitle.release_year,
+        genres: selectedTitle.genres,
+        cast: 'cast' in selectedTitle ? selectedTitle.cast : [],
+        director: 'director' in selectedTitle ? selectedTitle.director : undefined,
+        runtime_minutes: 'runtime_minutes' in selectedTitle ? selectedTitle.runtime_minutes : undefined,
+        overview: selectedTitle.overview,
       }
 
-      setWatchLogs(prev => [newLog, ...prev])
-      addToast(`"${selectedTitle.title}" logged to your diary! 🎬`, 'success')
+      // Update rating global
+      setRatingForTitle(titleIdToUse, rating)
+
+      if (editingLogId) {
+        // Editing existing log
+        setWatchLogs(prev =>
+          prev.map(l =>
+            l.id === editingLogId
+              ? {
+                  ...l,
+                  watched_at: watchedAt,
+                  notes: notes || undefined,
+                  season_number: selectedTitle.type === 'series' ? seasonNumber : undefined,
+                }
+              : l
+          )
+        )
+        addToast(`Catatan "${selectedTitle.title}" berhasil diperbarui! 🎬`, 'success')
+      } else {
+        // Adding new log
+        // Hitung rewatch secara otomatis
+        const rewatchCount = selectedTitle.type === 'series'
+          ? watchLogs.filter(l => l.title_id === titleIdToUse && l.season_number === seasonNumber).length
+          : watchLogs.filter(l => l.title_id === titleIdToUse).length
+
+        const newLog = {
+          id: crypto.randomUUID(),
+          user_id: 'u1',
+          title_id: titleIdToUse,
+          title: titleToUse,
+          watched_at: watchedAt,
+          notes: notes || undefined,
+          rewatch_count: rewatchCount,
+          season_number: selectedTitle.type === 'series' ? seasonNumber : undefined,
+        }
+
+        setWatchLogs(prev => [newLog, ...prev])
+        addToast(`"${selectedTitle.title}" logged to your diary! 🎬`, 'success')
+      }
+      setIsSubmitting(false)
       navigate('/diary')
     }, 600)
   }
@@ -182,11 +317,8 @@ export default function LogFilm() {
 
           {!isSearching && searchResults.length === 0 && query && (
             <div className={styles.noResults}>
-              <p>No results for "<strong>{query}</strong>".</p>
-              <p className="text-sm text-muted">You can add a title manually.</p>
-              <button className="btn btn-secondary btn-sm">
-                <Plus size={14} /> Add manually
-              </button>
+              <p>Tidak ada hasil pencarian untuk "<strong>{query}</strong>".</p>
+              <p className="text-sm text-muted">Coba periksa kembali ejaan judul, atau cari judul film lainnya.</p>
             </div>
           )}
         </div>
@@ -244,11 +376,52 @@ export default function LogFilm() {
             />
           </div>
 
+          {/* Season selection — only for series */}
+          {selectedTitle.type === 'series' && (
+            <div className={styles.formGroup}>
+              <label htmlFor="season-select" className="input-label">Season</label>
+              <select
+                id="season-select"
+                className={`input ${styles.selectInput}`}
+                value={seasonNumber}
+                onChange={e => setSeasonNumber(parseInt(e.target.value))}
+                required
+              >
+                {seasonsList.map(s => (
+                  <option key={s.season_number} value={s.season_number}>
+                    {s.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Rating */}
           <div className={styles.formGroup}>
-            <label htmlFor="rating-input" className="input-label">
-              Rating
-              <span className={styles.labelHint}>(optional · 0–10)</span>
+            <label htmlFor="rating-input" className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <span>
+                Rating {selectedTitle.type === 'film' ? 'Film' : 'Series'} ini <span className={styles.labelHint}>(global · opsional)</span>
+              </span>
+              {rating !== null && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRating(null)
+                    setRatingInput('')
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--color-text-muted)',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    padding: 0
+                  }}
+                >
+                  Hapus Rating
+                </button>
+              )}
             </label>
             <div className={styles.ratingRow}>
               <input
@@ -256,7 +429,7 @@ export default function LogFilm() {
                 type="range"
                 min={0}
                 max={10}
-                step={0.5}
+                step={0.1}
                 value={rating ?? 5}
                 onChange={e => handleSlider(parseFloat(e.target.value))}
                 className={styles.slider}
@@ -280,21 +453,7 @@ export default function LogFilm() {
             </div>
           </div>
 
-          {/* Rewatch */}
-          <div className={styles.formGroup}>
-            <label className="input-label">Rewatch?</label>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isRewatch}
-              className={`${styles.toggle} ${isRewatch ? styles.toggleOn : ''}`}
-              onClick={() => setIsRewatch(r => !r)}
-              aria-label="Mark as rewatch"
-            >
-              <span className={styles.toggleThumb} />
-              <span className={styles.toggleLabel}>{isRewatch ? 'Yes, this is a rewatch' : 'No, first watch'}</span>
-            </button>
-          </div>
+          {/* Rewatch - otomatis dideteksi dari database */}
 
           {/* Notes */}
           <div className={styles.formGroup}>
@@ -328,6 +487,43 @@ export default function LogFilm() {
             )}
           </button>
         </form>
+      )}
+
+      {showDuplicateModal && duplicateLog && (
+        <div className={styles.modalOverlay} onClick={handleCancelDuplicate} role="dialog" aria-modal="true">
+          <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
+            <header className={styles.modalHeader}>
+              <h3 className={styles.modalTitle} style={{ fontSize: '1.125rem', margin: 0 }}>Sudah Pernah Dicatat</h3>
+              <button type="button" className="btn btn-icon btn-ghost" onClick={handleCancelDuplicate} aria-label="Tutup modal" style={{ minHeight: '32px', minWidth: '32px', padding: '4px' }}>
+                <X size={16} />
+              </button>
+            </header>
+            <div className={styles.modalBody}>
+              <p>
+                Kamu sudah mencatat <strong>{duplicateLog.title.title}</strong> pada{' '}
+                <strong>
+                  {new Date(duplicateLog.watched_at).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </strong>
+                . Ini rewatch baru, atau ingin mengedit catatan lama?
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button type="button" className="btn btn-primary" onClick={handleConfirmRewatch} style={{ width: '100%' }}>
+                Catat sebagai rewatch baru
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={handleConfirmEdit} style={{ width: '100%' }}>
+                Edit catatan lama
+              </button>
+              <button type="button" className="btn btn-ghost" onClick={handleCancelDuplicate} style={{ width: '100%' }}>
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

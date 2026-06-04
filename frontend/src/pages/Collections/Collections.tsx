@@ -213,7 +213,7 @@ export default function Collections() {
                       )}
                     </div>
                     <p className={styles.cardDesc}>
-                      {col.description || 'No description provided.'}
+                      {col.description || 'Belum ada deskripsi untuk koleksi ini.'}
                     </p>
                   </div>
                 </div>
@@ -378,7 +378,7 @@ export default function Collections() {
                   </div>
                 </div>
                 <p className={styles.detailDesc}>
-                  {activeCollection?.description || 'No description provided.'}
+                  {activeCollection?.description || 'Belum ada deskripsi untuk koleksi ini.'}
                 </p>
                 <span className={styles.detailMetaCount}>
                   {activeItems.length} titles logged
