@@ -123,8 +123,8 @@ export const mockTitles: Title[] = [
 // ---------------------------------------------------------------------------
 export const mockUser: UserProfile = {
   id: 'u1',
-  email: 'dara@example.com',
-  username: 'dara',
+  email: 'fausta@example.com',
+  username: 'Fausta',
   avatar_url: undefined,
   created_at: '2026-01-15T10:00:00Z',
   preferences: {
@@ -382,8 +382,195 @@ export const mockSearchResults = [
 ]
 
 // ---------------------------------------------------------------------------
+// Mock Explore Lists
+// ---------------------------------------------------------------------------
+export const mockTrendingThisWeek = [
+  {
+    tmdb_id: 823464,
+    title: 'Godzilla x Kong: The New Empire',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/bxi2geLM6Hj5RwBNxl58A406zoB.jpg',
+    release_year: 2024,
+    overview: 'Following their explosive showdown, Godzilla and Kong must reunite against a colossal undiscovered threat hidden within our world.',
+    genres: ['Action', 'Sci-Fi', 'Adventure'],
+  },
+  {
+    tmdb_id: 653346,
+    title: 'Kingdom of the Planet of the Apes',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/gKkl37Ep4Jk7yQ36SSrK7J6VCrj.jpg',
+    release_year: 2024,
+    overview: 'Many years after the reign of Caesar, a young ape goes on a journey that will lead him to question everything.',
+    genres: ['Sci-Fi', 'Adventure', 'Action'],
+  },
+  {
+    tmdb_id: 937278,
+    title: 'A Quiet Place: Day One',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/yrp107n1j145tWqcxFzwn4gvG8v.jpg',
+    release_year: 2024,
+    overview: 'Experience the day the world went quiet.',
+    genres: ['Horror', 'Sci-Fi', 'Thriller'],
+  },
+  {
+    tmdb_id: 1022789,
+    title: 'Inside Out 2',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmFJj4j4t4efcl4Hj.jpg',
+    release_year: 2024,
+    overview: "Teenager Riley's mind headquarters is undergoing a sudden demolition to make room for something entirely unexpected: new Emotions!",
+    genres: ['Animation', 'Comedy', 'Family'],
+  },
+  {
+    tmdb_id: 762441,
+    title: 'A Quiet Place Part II',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/4q2hz2m8hub4D50Hz4R6Jd2J85r.jpg',
+    release_year: 2020,
+    overview: 'Following the events at home, the Abbott family must now face the terrors of the outside world.',
+    genres: ['Horror', 'Sci-Fi', 'Thriller'],
+  },
+  {
+    tmdb_id: 573435,
+    title: 'Spider-Man: Beyond the Spider-Verse',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/8tK53T71pE1Hk4Gle80yD770T0g.jpg',
+    release_year: 2025,
+    overview: "The spectacular conclusion to Miles Morales' multiversal journey.",
+    genres: ['Animation', 'Action', 'Sci-Fi'],
+  }
+]
+
+export const mockNowPlaying = [
+  {
+    tmdb_id: 693134,
+    title: 'Dune: Part Two',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/czembw72Gj4y7VwnRUXRz5C61wI.jpg',
+    release_year: 2024,
+    overview: 'Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen.',
+    genres: ['Sci-Fi', 'Adventure'],
+  },
+  {
+    tmdb_id: 1022796,
+    title: 'Challengers',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/872k44nZ2n4CY6tJ4v9v4v7m1n.jpg',
+    release_year: 2024,
+    overview: 'Three players who knew each other when they were teenagers compete in a tennis tournament.',
+    genres: ['Drama', 'Romance'],
+  },
+  {
+    tmdb_id: 786892,
+    title: 'Furiosa: A Mad Max Saga',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/iADOOC62nwjoPLY6Fr271ZhTJD6.jpg',
+    release_year: 2024,
+    overview: 'The origin story of renegade warrior Furiosa before her encounter and team-up with Mad Max.',
+    genres: ['Action', 'Adventure', 'Sci-Fi'],
+  },
+  {
+    tmdb_id: 967847,
+    title: 'Ghostbusters: Frozen Empire',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/5v5a19clV0H51g71t6Wc9ZqV5sK.jpg',
+    release_year: 2024,
+    overview: 'The Spengler family returns to where it all started – the iconic New York City firehouse.',
+    genres: ['Adventure', 'Fantasy', 'Comedy'],
+  },
+  {
+    tmdb_id: 872585,
+    title: 'Oppenheimer',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/8Gxv2wSbsysmtJd7zvcglRTee1q.jpg',
+    release_year: 2023,
+    overview: "The story of J. Robert Oppenheimer's role in the development of the atomic bomb.",
+    genres: ['Drama', 'History'],
+  }
+]
+
+export const mockTopRatedClassics = [
+  {
+    tmdb_id: 278,
+    title: 'The Shawshank Redemption',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/9cqN02USHw21bsnmwV1kclTIJbY.jpg',
+    release_year: 1994,
+    overview: 'Framed in the 1940s for the double murder of his wife and her lover, Andy Dufresne begins a new life.',
+    genres: ['Drama', 'Crime'],
+  },
+  {
+    tmdb_id: 238,
+    title: 'The Godfather',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
+    release_year: 1972,
+    overview: 'Don Vito Corleone transfers control to his reluctant son Michael.',
+    genres: ['Drama', 'Crime'],
+  },
+  {
+    tmdb_id: 122,
+    title: 'The Lord of the Rings: The Return of the King',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/rCzpDGLbOo2asL6r09j4lWLOj2K.jpg',
+    release_year: 2003,
+    overview: 'Aragorn is revealed as the heir to the ancient kings as he, Gandalf and the other members of the broken fellowship struggle to save Gondor.',
+    genres: ['Adventure', 'Fantasy', 'Action'],
+  },
+  {
+    tmdb_id: 680,
+    title: 'Pulp Fiction',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/d5iIlvfjmjeO02xyR0ee4zbeOI1.jpg',
+    release_year: 1994,
+    overview: "A burger-loving hit man, his philosophical partner, a drug-addled gangster's moll and a washed-up boxer converge.",
+    genres: ['Thriller', 'Crime'],
+  },
+  {
+    tmdb_id: 424,
+    title: "Schindler's List",
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/sF1U4EUgIXTv3hcgz1gr0QR60zM.jpg',
+    release_year: 1993,
+    overview: 'The true story of Oskar Schindler who saved over 1,100 Jews during the Holocaust.',
+    genres: ['Drama', 'History'],
+  }
+]
+
+export const mockUpcomingClassics = [
+  {
+    tmdb_id: 615656,
+    title: 'Gladiator II',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/h43TfJ7sL0Ld87tD7XFpB7T5R.jpg',
+    release_year: 2024,
+    overview: 'Years after witnessing the death of the revered hero Maximus, Lucius is forced to enter the Colosseum.',
+    genres: ['Action', 'Drama', 'Adventure'],
+  },
+  {
+    tmdb_id: 533535,
+    title: 'Deadpool & Wolverine',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/8cdWv6G3hSTFjclvSCkG54w4asS.jpg',
+    release_year: 2024,
+    overview: 'A listless Wade Wilson toils in civilian life. Deadpool must team up with Wolverine.',
+    genres: ['Action', 'Comedy', 'Sci-Fi'],
+  },
+  {
+    tmdb_id: 698687,
+    title: 'Nosferatu',
+    type: 'film' as const,
+    poster_path: 'https://image.tmdb.org/t/p/w500/NosferatuPosterPlaceholder.jpg',
+    release_year: 2024,
+    overview: 'A gothic tale of obsession between a haunted young woman and the terrifying vampire infatuated with her.',
+    genres: ['Horror', 'Fantasy', 'Drama'],
+  }
+]
+
+// ---------------------------------------------------------------------------
 // Genres for Onboarding Taste Profiling
 // ---------------------------------------------------------------------------
+
 export const allGenres = [
   'Drama',
   'Thriller',

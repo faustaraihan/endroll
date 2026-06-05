@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Search } from 'lucide-react'
+import { Film, Compass } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
 import { EmptyState, CollectModal, TitleCard } from '../../components'
@@ -28,8 +28,8 @@ export default function Watchlist() {
           <h1 className={styles.pageTitle}>Watchlist</h1>
           <span className={styles.count}>{watchlist.length} titles</span>
         </div>
-        <Link to="/search" className="btn btn-secondary btn-sm">
-          <Search size={14} /> Search film
+        <Link to="/explore" className="btn btn-secondary btn-sm">
+          <Compass size={14} /> Explore films
         </Link>
       </div>
 
@@ -39,8 +39,8 @@ export default function Watchlist() {
           title="Your watchlist is empty."
           description="Add films you want to watch later from the search page."
           actionLabel="Find films"
-          actionLink="/search"
-          actionIcon={<Film size={16} />}
+          actionLink="/explore"
+          actionIcon={<Compass size={16} />}
         />
       ) : (
         <div className={styles.content}>

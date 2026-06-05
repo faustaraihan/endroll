@@ -37,28 +37,31 @@ export default function TitleDetail() {
   const [isEditingRating, setIsEditingRating] = useState(false)
   const [tempRating, setTempRating] = useState<number | null>(null)
 
-  // Find the title
+  // Find the title by local ID or TMDB ID
   const title = useMemo(
-    () => mockTitles.find((t) => t.id === id),
+    () => mockTitles.find((t) => t.id === id || String(t.tmdb_id) === id),
     [id]
   )
+
+  // Use the resolved title's canonical ID for database queries to avoid ID mismatches
+  const canonicalId = title?.id || id
 
   // Get user's watch logs for this title (excluding episode-level logs for clean journal)
   const titleLogs = useMemo(
     () =>
       watchLogs
-        .filter((log) => log.title_id === id && (log.episode_number === undefined || log.episode_number === null))
+        .filter((log) => log.title_id === canonicalId && (log.episode_number === undefined || log.episode_number === null))
         .sort(
           (a, b) =>
             new Date(b.watched_at).getTime() - new Date(a.watched_at).getTime()
         ),
-    [watchLogs, id]
+    [watchLogs, canonicalId]
   )
 
   // Check watchlist status
   const isInWatchlist = useMemo(
-    () => watchlist.some((item) => item.title_id === id),
-    [watchlist, id]
+    () => watchlist.some((item) => item.title_id === canonicalId),
+    [watchlist, canonicalId]
   )
 
   // Compute personal stats
@@ -79,17 +82,17 @@ export default function TitleDetail() {
     () =>
       new Set(
         collectionItems
-          .filter((item) => item.title_id === id)
+          .filter((item) => item.title_id === canonicalId)
           .map((item) => item.collection_id)
       ).size,
-    [collectionItems, id]
+    [collectionItems, canonicalId]
   )
 
   // Toggle watchlist
   const handleWatchlistToggle = () => {
     if (!title) return
     if (isInWatchlist) {
-      setWatchlist((prev) => prev.filter((item) => item.title_id !== id))
+      setWatchlist((prev) => prev.filter((item) => item.title_id !== canonicalId))
       addToast(`${title.title} removed from watchlist`, 'info')
     } else {
       setWatchlist((prev) => [
@@ -140,6 +143,18 @@ export default function TitleDetail() {
 
   return (
     <div className={styles.page}>
+      {/* Sticky Top Header with Back Button */}
+      <div className={styles.stickyHeader}>
+        <button
+          className={styles.backBtn}
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </button>
+      </div>
+
       {/* ══════════ HERO ══════════ */}
       <section className={styles.hero} aria-label={`Details for ${title.title}`}>
         {/* Blurred backdrop */}
@@ -176,15 +191,6 @@ export default function TitleDetail() {
 
           {/* Title info */}
           <div className={styles.titleInfo}>
-            <button
-              className={styles.backBtn}
-              onClick={() => navigate(-1)}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={14} />
-              Back
-            </button>
-
             <h1 className={styles.titleName}>{title.title}</h1>
 
             <div className={styles.titleMeta}>
@@ -367,12 +373,12 @@ export default function TitleDetail() {
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 {!isEditingRating ? (
                   <>
-                    {id && personalRatings[id] !== undefined ? (
+                    {canonicalId && personalRatings[canonicalId] !== undefined ? (
                       <>
                         <button
                           type="button"
                           onClick={() => {
-                            setTempRating(personalRatings[id])
+                            setTempRating(personalRatings[canonicalId])
                             setIsEditingRating(true)
                           }}
                           style={{
@@ -390,7 +396,7 @@ export default function TitleDetail() {
                         <button
                           type="button"
                           onClick={() => {
-                            setRatingForTitle(id, null)
+                            setRatingForTitle(canonicalId, null)
                             setIsEditingRating(false)
                           }}
                           style={{
@@ -432,8 +438,8 @@ export default function TitleDetail() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (id && tempRating !== null) {
-                          setRatingForTitle(id, tempRating)
+                        if (canonicalId && tempRating !== null) {
+                          setRatingForTitle(canonicalId, tempRating)
                         }
                         setIsEditingRating(false)
                       }}
@@ -475,13 +481,13 @@ export default function TitleDetail() {
               <div className={styles.ratingInteractiveMain} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Star
                   size={16}
-                  fill={(isEditingRating ? tempRating : (id ? personalRatings[id] : null)) !== null ? 'var(--color-amber-400)' : 'none'}
+                  fill={(isEditingRating ? tempRating : (canonicalId ? personalRatings[canonicalId] : null)) !== null ? 'var(--color-amber-400)' : 'none'}
                   color="var(--color-amber-400)"
                 />
                 <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {isEditingRating 
                     ? (tempRating !== null ? tempRating.toFixed(1) : '—') 
-                    : (id && personalRatings[id] !== undefined ? personalRatings[id].toFixed(1) : '—')
+                    : (canonicalId && personalRatings[canonicalId] !== undefined ? personalRatings[canonicalId].toFixed(1) : '—')
                   }
                   <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'rgba(255,255,255,0.35)', marginLeft: '3px', letterSpacing: 0 }}>/10</span>
                 </span>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Film, Plus, X, CheckCircle2, FolderHeart } from 'lucide-react'
+import { Film, Plus, X, CheckCircle2, FolderHeart, Bookmark } from 'lucide-react'
 import type { Title } from '../../types'
 import styles from './TitleCard.module.css'
 
@@ -15,6 +15,8 @@ export interface TitleCardProps {
   onCollect?: () => void
   onRemove?: () => void
   removeTooltip?: string
+  onToggleWatchlist?: () => void
+  inWatchlist?: boolean
 }
 
 export function TitleCard({
@@ -25,7 +27,9 @@ export function TitleCard({
   showMetaType = false,
   onCollect,
   onRemove,
-  removeTooltip = 'Remove'
+  removeTooltip = 'Remove',
+  onToggleWatchlist,
+  inWatchlist = false
 }: TitleCardProps) {
   return (
     <article
@@ -83,6 +87,17 @@ export function TitleCard({
                 title={removeTooltip}
               >
                 <X size={14} />
+              </button>
+            )}
+
+            {onToggleWatchlist && (
+              <button
+                className={`${styles.watchlistBtn} ${inWatchlist ? styles.watchlistBtnActive : ''}`}
+                onClick={(e) => { stopNav(e); onToggleWatchlist() }}
+                aria-label={inWatchlist ? `Remove from watchlist ${title.title}` : `Add to watchlist ${title.title}`}
+                title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+              >
+                <Bookmark size={14} fill={inWatchlist ? "currentColor" : "none"} />
               </button>
             )}
           </div>

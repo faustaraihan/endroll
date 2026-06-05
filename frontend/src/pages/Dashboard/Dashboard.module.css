@@ -8,14 +8,17 @@
   gap: 0;
   min-height: 100dvh;
   animation: fade-in 0.4s ease;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ── Left column ── */
 .left {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 40px 40px 60px;
+  gap: 32px;
+  padding: 40px 32px 48px;
   border-right: 1px solid var(--color-border-soft);
   min-width: 0;
 }
@@ -31,7 +34,7 @@
 .greetingBlock {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .greeting {
@@ -58,54 +61,73 @@
 .streakBanner {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   padding: 16px 20px;
-  background: linear-gradient(105deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.18);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-lg);
+  transition: border-color var(--transition-fast);
+}
+
+.streakBanner:hover {
+  border-color: var(--color-border);
+}
+
+.streakSecured {
+  /* Unaltered card style to resemble standard cards */
 }
 
 .streakFlame {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background: rgba(245,158,11,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-amber-400);
+  color: var(--color-text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all var(--transition-base);
   flex-shrink: 0;
 }
 
-.streakBody {
+.streakSecured .streakFlame {
+  color: var(--color-amber-400);
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.15);
+}
+
+.streakContent {
   flex: 1;
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-.streakNum {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--color-amber-300);
-  letter-spacing: -0.04em;
-  line-height: 1;
+.streakTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-.streakText {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
+.streakStatus {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
 }
 
 .streakBest {
   font-size: 0.8125rem;
   color: var(--color-text-muted);
+  font-weight: 500;
   flex-shrink: 0;
 }
 
 .streakBest strong {
-  color: var(--color-amber-400);
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
@@ -114,7 +136,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .sectionTitle {
@@ -142,7 +164,7 @@
 .logList {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
   list-style: none;
 }
 
@@ -270,8 +292,8 @@
 .right {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 40px 28px 60px;
+  gap: 32px;
+  padding: 40px 32px 48px;
   position: sticky;
   top: 0;
   height: 100dvh;
@@ -285,7 +307,7 @@
 .statStack {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* Watchlist preview */
@@ -298,7 +320,7 @@
 .watchlistPosters {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 8px;
 }
 
 .wlPosterWrap {
@@ -367,7 +389,7 @@
 .genrePills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 /* Stats link */

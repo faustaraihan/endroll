@@ -6,7 +6,7 @@ import {
   BarChart2,
   User,
   Film,
-  Search,
+  Compass,
   Plus,
   Library,
 } from 'lucide-react'
@@ -16,7 +16,7 @@ const navItems = [
   { to: '/dashboard',   label: 'Home',        icon: LayoutDashboard },
   { to: '/diary',       label: 'Diary',       icon: BookOpen },
   { to: '/collections', label: 'Collections', icon: Library },
-  { to: '/search',      label: 'Search',      icon: Search },
+  { to: '/explore',     label: 'Explore',     icon: Compass },
   { to: '/watchlist',   label: 'Watchlist',   icon: Bookmark },
   { to: '/stats',       label: 'Stats',       icon: BarChart2 },
   { to: '/profile',     label: 'Profile',     icon: User },

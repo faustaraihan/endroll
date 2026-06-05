@@ -1,2 +1,0 @@
-﻿export { GenrePill } from './GenrePill'
-

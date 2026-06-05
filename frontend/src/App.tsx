@@ -4,16 +4,16 @@ import { AppProvider, ToastProvider } from './contexts'
 import { AppLayout } from './components'
 
 // Lazy loaded page components to enable code splitting
-const Landing = lazy(() => import('./pages/Landing'))
-const Dashboard = lazy(() => import('./pages/Dashboard'))
-const Diary = lazy(() => import('./pages/Diary'))
-const Search = lazy(() => import('./pages/Search'))
-const Watchlist = lazy(() => import('./pages/Watchlist'))
-const Stats = lazy(() => import('./pages/Stats'))
-const Profile = lazy(() => import('./pages/Profile'))
-const LogFilm = lazy(() => import('./pages/LogFilm'))
-const Collections = lazy(() => import('./pages/Collections'))
-const TitleDetail = lazy(() => import('./pages/TitleDetail'))
+const Landing = lazy(() => import('./pages/Landing/Landing'))
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'))
+const Diary = lazy(() => import('./pages/Diary/Diary'))
+const Explore = lazy(() => import('./pages/Explore/Explore'))
+const Watchlist = lazy(() => import('./pages/Watchlist/Watchlist'))
+const Stats = lazy(() => import('./pages/Stats/Stats'))
+const Profile = lazy(() => import('./pages/Profile/Profile'))
+const LogFilm = lazy(() => import('./pages/LogFilm/LogFilm'))
+const Collections = lazy(() => import('./pages/Collections/Collections'))
+const TitleDetail = lazy(() => import('./pages/TitleDetail/TitleDetail'))
 
 // Cinematic page loader fallback for Suspense
 function PageLoader() {
@@ -51,7 +51,7 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route path="/dashboard"  element={<Dashboard />} />
                 <Route path="/diary"      element={<Diary />} />
-                <Route path="/search"     element={<Search />} />
+                <Route path="/explore"    element={<Explore />} />
                 <Route path="/watchlist"  element={<Watchlist />} />
                 <Route path="/collections" element={<Collections />} />
               <Route path="/title/:id" element={<TitleDetail />} />

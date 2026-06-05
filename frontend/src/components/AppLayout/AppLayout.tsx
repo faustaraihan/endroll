@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
-import { Navigation } from '../Navigation'
-import { Toast } from '../Toast'
+import { Navigation } from '../Navigation/Navigation'
+import { Toast } from '../Toast/Toast'
 import styles from './AppLayout.module.css'
 
 export function AppLayout() {

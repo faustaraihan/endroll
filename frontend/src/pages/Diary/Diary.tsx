@@ -1,29 +1,39 @@
 import { useState, useMemo } from 'react'
-import { Film, Star, Plus, ChevronDown, LayoutGrid, List, AlignJustify } from 'lucide-react'
+import { Film, Plus, LayoutGrid, List, AlignJustify } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../contexts'
-import { formatDate } from '../../utils'
 import { EmptyState } from '../../components'
 import styles from './Diary.module.css'
 import type { WatchLog } from '../../types'
 
-type SortOption = 'date-desc' | 'date-asc' | 'rating-desc' | 'rating-asc' | 'title-asc' | 'title-desc' | 'year-desc' | 'year-asc'
+import { SortDropdown } from './components/SortDropdown'
+import type { SortField, SortDirection, GroupField } from './components/SortDropdown'
+import { DiaryEntry } from './components/DiaryEntry'
+
 type FilterType = 'all' | 'film' | 'series'
 type ViewMode = 'list' | 'grid' | 'compact'
 
+interface GroupedSection {
+  key: string
+  title: string
+  logs: WatchLog[]
+}
+
 export default function Diary() {
   const { watchLogs, personalRatings } = useApp()
-  const [sort, setSort] = useState<SortOption>('date-desc')
+  const [sortField, setSortField] = useState<SortField>('date')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [groupBy, setGroupBy] = useState<GroupField>('none')
   const [filter, setFilter] = useState<FilterType>('all')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
 
-  const filtered = useMemo(() => {
+  const sortedLogs = useMemo(() => {
     // 1. Filter out episode logs (if any) and filter by type (film / series)
     const baseLogs = watchLogs
       .filter(log => filter === 'all' || log.title.type === filter)
       .filter(log => log.episode_number === undefined || log.episode_number === null)
 
-    // 2. Group by title.id
+    // 2. Group by title.id to find representatives (latest log per title)
     const groups: Record<string, WatchLog[]> = {}
     for (const log of baseLogs) {
       const key = log.title.id
@@ -31,10 +41,6 @@ export default function Diary() {
       groups[key].push(log)
     }
 
-    // 3. For each group, find the latest log (representative)
-    // To make it stable and consistent, we sort the group by watched_at descending,
-    // and if dates are equal, by their original index in the watchLogs array ascending
-    // (since index 0 is the newest, index N is the oldest).
     const watchLogIndexMap = new Map<string, number>()
     watchLogs.forEach((log, index) => {
       watchLogIndexMap.set(log.id, index)
@@ -48,44 +54,141 @@ export default function Diary() {
         const idxB = watchLogIndexMap.get(b.id) ?? 0
         return idxA - idxB
       })
-
-      // The representative log is the latest one
       return sortedGroup[0]
     })
 
-    // 4. Sort the grouped logs based on user sort selection
+    // 3. Sort the representatives
     return groupedLogs.sort((a, b) => {
-      switch (sort) {
-        case 'date-desc': return new Date(b.watched_at).getTime() - new Date(a.watched_at).getTime()
-        case 'date-asc':  return new Date(a.watched_at).getTime() - new Date(b.watched_at).getTime()
-        case 'rating-desc': {
+      let comparison = 0
+      switch (sortField) {
+        case 'date': {
+          comparison = new Date(a.watched_at).getTime() - new Date(b.watched_at).getTime()
+          break
+        }
+        case 'title': {
+          comparison = a.title.title.localeCompare(b.title.title)
+          break
+        }
+        case 'year': {
+          const yearA = a.title.release_year ?? 0
+          const yearB = b.title.release_year ?? 0
+          comparison = yearA - yearB
+          break
+        }
+        case 'rating': {
           const rA = (a.title.type === 'film' ? (a.rating ?? personalRatings[a.title.id]) : personalRatings[a.title.id]) ?? 0
           const rB = (b.title.type === 'film' ? (b.rating ?? personalRatings[b.title.id]) : personalRatings[b.title.id]) ?? 0
-          return rB - rA
+          comparison = rA - rB
+          break
         }
-        case 'rating-asc': {
-          const rA = (a.title.type === 'film' ? (a.rating ?? personalRatings[a.title.id]) : personalRatings[a.title.id]) ?? 0
-          const rB = (b.title.type === 'film' ? (b.rating ?? personalRatings[b.title.id]) : personalRatings[b.title.id]) ?? 0
-          return rA - rB
+        case 'runtime': {
+          const runA = a.title.runtime_minutes ?? 0
+          const runB = b.title.runtime_minutes ?? 0
+          comparison = runA - runB
+          break
         }
-        case 'title-asc': return a.title.title.localeCompare(b.title.title)
-        case 'title-desc': return b.title.title.localeCompare(a.title.title)
-        case 'year-desc': {
-          const yearA = a.title.release_year || 0
-          const yearB = b.title.release_year || 0
-          return yearB - yearA
+        case 'rewatch': {
+          comparison = a.rewatch_count - b.rewatch_count
+          break
         }
-        case 'year-asc': {
-          const yearA = a.title.release_year || 0
-          const yearB = b.title.release_year || 0
-          return yearA - yearB
-        }
-        default: return 0
       }
+      return sortDirection === 'asc' ? comparison : -comparison
     })
-  }, [watchLogs, filter, sort, personalRatings])
+  }, [watchLogs, filter, sortField, sortDirection, personalRatings])
 
+  const groupedSections = useMemo<GroupedSection[]>(() => {
+    if (groupBy === 'none') {
+      return [{ key: 'all', title: '', logs: sortedLogs }]
+    }
 
+    const sectionsMap: Record<string, WatchLog[]> = {}
+    const sectionLabels: Record<string, string> = {}
+
+    for (const log of sortedLogs) {
+      let key = 'other'
+      let label = 'Other'
+
+      if (groupBy === 'type') {
+        key = log.title.type
+        label = log.title.type === 'film' ? 'Film' : 'Series'
+      } else if (groupBy === 'month') {
+        if (log.watched_at) {
+          const d = new Date(log.watched_at)
+          const y = d.getFullYear()
+          const m = d.getMonth()
+          key = `${y}-${String(m + 1).padStart(2, '0')}`
+          
+          const monthsEn = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ]
+          label = `${monthsEn[m]} ${y}`
+        }
+      } else if (groupBy === 'decade') {
+        const year = log.title.release_year
+        if (year) {
+          const dec = Math.floor(year / 10) * 10
+          key = String(dec)
+          label = `${dec}s`
+        } else {
+          key = 'unknown'
+          label = 'Unknown Release Year'
+        }
+      } else if (groupBy === 'rating') {
+        const r = (log.title.type === 'film' ? (log.rating ?? personalRatings[log.title.id]) : personalRatings[log.title.id])
+        if (r === undefined || r === null) {
+          key = '5_unrated'
+          label = 'Unrated'
+        } else if (r >= 9.0) {
+          key = '1_outstanding'
+          label = 'Outstanding (9.0 - 10.0)'
+        } else if (r >= 7.0) {
+          key = '2_good'
+          label = 'Good (7.0 - 8.9)'
+        } else if (r >= 5.0) {
+          key = '3_average'
+          label = 'Average (5.0 - 6.9)'
+        } else {
+          key = '4_poor'
+          label = 'Poor (< 5.0)'
+        }
+      }
+
+      if (!sectionsMap[key]) {
+        sectionsMap[key] = []
+      }
+      sectionsMap[key].push(log)
+      sectionLabels[key] = label
+    }
+
+    const sections = Object.keys(sectionsMap).map(key => ({
+      key,
+      title: sectionLabels[key],
+      logs: sectionsMap[key]
+    }))
+
+    sections.sort((a, b) => {
+      if (groupBy === 'month') {
+        return sortDirection === 'asc' ? a.key.localeCompare(b.key) : b.key.localeCompare(a.key)
+      }
+      if (groupBy === 'decade') {
+        if (a.key === 'unknown') return 1
+        if (b.key === 'unknown') return -1
+        const numA = parseInt(a.key, 10)
+        const numB = parseInt(b.key, 10)
+        return sortDirection === 'asc' ? numA - numB : numB - numA
+      }
+      if (groupBy === 'rating') {
+        return sortDirection === 'asc' ? b.key.localeCompare(a.key) : a.key.localeCompare(b.key)
+      }
+      if (groupBy === 'type') {
+        return sortDirection === 'asc' ? a.key.localeCompare(b.key) : b.key.localeCompare(a.key)
+      }
+      return 0
+    })
+
+    return sections
+  }, [sortedLogs, groupBy, sortDirection, personalRatings])
 
   return (
     <div className={styles.page}>
@@ -93,7 +196,7 @@ export default function Diary() {
       <div className={styles.topBar}>
         <div className={styles.topLeft}>
           <h1 className={styles.pageTitle}>Diary</h1>
-          <span className={styles.entryCount}>{filtered.length} entries</span>
+          <span className={styles.entryCount}>{sortedLogs.length} entries</span>
         </div>
 
         <div className={styles.controls}>
@@ -135,25 +238,15 @@ export default function Diary() {
             ))}
           </div>
 
-          {/* Sort */}
-          <div className={styles.sortWrap}>
-            <select
-              className={styles.sortSelect}
-              value={sort}
-              onChange={e => setSort(e.target.value as SortOption)}
-              aria-label="Urutkan berdasarkan"
-            >
-              <option value="date-desc">Watched: Newest</option>
-              <option value="date-asc">Watched: Oldest</option>
-              <option value="rating-desc">Rating: Highest</option>
-              <option value="rating-asc">Rating: Lowest</option>
-              <option value="title-asc">Title: A–Z</option>
-              <option value="title-desc">Title: Z–A</option>
-              <option value="year-desc">Release Year: Newest</option>
-              <option value="year-asc">Release Year: Oldest</option>
-            </select>
-            <ChevronDown size={14} className={styles.sortIcon} />
-          </div>
+          {/* Custom Sort Dropdown */}
+          <SortDropdown
+            sortField={sortField}
+            setSortField={setSortField}
+            sortDirection={sortDirection}
+            setSortDirection={setSortDirection}
+            groupBy={groupBy}
+            setGroupBy={setGroupBy}
+          />
 
           <Link to="/log" className="btn btn-primary btn-sm">
             <Plus size={14} /> Log
@@ -163,7 +256,7 @@ export default function Diary() {
 
       {/* ── Content ── */}
       <div className={styles.content}>
-        {filtered.length === 0 ? (
+        {sortedLogs.length === 0 ? (
           <EmptyState
             icon={<Film size={40} strokeWidth={1.5} />}
             title={<>No entries yet.<br />What did you watch recently?</>}
@@ -173,90 +266,44 @@ export default function Diary() {
           />
         ) : (
           <div className={styles.timeline}>
-            <ul className={`${styles.diaryList} ${styles[viewMode]}`} role="list">
-              {filtered.map((log, i) => (
-                <li key={log.id}>
-                  <article
-                    className={styles.entry}
-                    style={{ '--i': i } as React.CSSProperties}
-                  >
-                    {/* Poster */}
-                    <Link to={`/title/${log.title.id}`} className={styles.entryPosterLink}>
-                      {log.title.poster_path ? (
-                        <img
-                          src={log.title.poster_path}
-                          alt={`Poster film ${log.title.title} (${log.title.release_year})`}
-                          className={styles.posterImg}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className={styles.posterFallback}>
-                          <Film size={24} />
-                        </div>
-                      )}
-                    </Link>
-
-                    {/* Body */}
-                    <div className={styles.entryBody}>
-                      <div className={styles.entryRow}>
-                        <div className={styles.entryLeft}>
-                          <Link to={`/title/${log.title.id}`} className={styles.entryTitleLink}>
-                            <h2 className={styles.entryTitle}>{log.title.title}</h2>
-                          </Link>
-                          <div className={styles.entryMeta}>
-                            <span className={styles.metaType}>
-                              {log.title.type === 'film' ? 'Film' : 'Series'}
-                            </span>
-                            {log.title.release_year && (
-                              <span className={styles.metaYear}>{log.title.release_year}</span>
-                            )}
-                            {log.title.type === 'film' && log.rewatch_count > 0 && (
-                              <span className={`${styles.metaBadge} ${styles.metaBadgeViolet}`}>
-                                Rewatch #{log.rewatch_count}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className={styles.entryRight}>
-                          {log.title.type === 'film' && log.rating !== undefined && log.rating !== null ? (
-                            <div className={styles.ratingBig}>
-                              <Star size={14} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
-                              <span>{log.rating.toFixed(1)}</span>
-                              <span className={styles.ratingMax}>/10</span>
-                            </div>
-                          ) : personalRatings[log.title.id] !== undefined ? (
-                            <div className={styles.ratingBig}>
-                              <Star size={14} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
-                              <span>{personalRatings[log.title.id].toFixed(1)}</span>
-                              <span className={styles.ratingMax}>/10</span>
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      {log.notes && (
-                        <blockquote className={styles.notes}>
-                          "{log.notes}"
-                        </blockquote>
-                      )}
-
-                      <div className={styles.entryFooter}>
-                        <time className={styles.date} dateTime={log.watched_at}>
-                          {formatDate(log.watched_at)}
-                        </time>
-                      </div>
-                    </div>
-                  </article>
-                </li>
-              ))}
-            </ul>
+            {groupBy === 'none' ? (
+              <ul className={`${styles.diaryList} ${styles[viewMode]}`} role="list">
+                {groupedSections[0]?.logs.map((log, i) => (
+                  <li key={log.id}>
+                    <DiaryEntry
+                      log={log}
+                      index={i}
+                      personalRating={personalRatings[log.title.id]}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className={styles.groupedTimeline}>
+                {groupedSections.map((section) => (
+                  <section key={section.key} className={styles.groupSection}>
+                    <h3 className={styles.groupHeader}>
+                      <span>{section.title}</span>
+                      <span className={styles.groupCount}>{section.logs.length}</span>
+                    </h3>
+                    <ul className={`${styles.diaryList} ${styles[viewMode]}`} role="list">
+                      {section.logs.map((log, i) => (
+                        <li key={log.id}>
+                          <DiaryEntry
+                            log={log}
+                            index={i}
+                            personalRating={personalRatings[log.title.id]}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
-
-
     </div>
   )
 }
-

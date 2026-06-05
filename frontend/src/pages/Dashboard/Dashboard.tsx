@@ -9,6 +9,26 @@ export default function Dashboard() {
   const { user, stats, watchLogs, streak, watchlist, personalRatings } = useApp()
   const recentLogs = watchLogs.slice(0, 5)
 
+  // Calculate if the user has logged a title this week (Monday to Sunday)
+  const isSecured = (() => {
+    const now = new Date()
+    const day = now.getDay() // 0 = Sunday, 1 = Monday, etc.
+    const mondayOffset = day === 0 ? -6 : 1 - day
+    
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() + mondayOffset)
+    startOfWeek.setHours(0, 0, 0, 0)
+    
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 6)
+    endOfWeek.setHours(23, 59, 59, 999)
+    
+    return watchLogs.some(log => {
+      const logDate = new Date(log.watched_at)
+      return logDate >= startOfWeek && logDate <= endOfWeek
+    })
+  })()
+
   return (
     <div className={styles.page}>
       {/* ── Left column ── */}
@@ -26,14 +46,25 @@ export default function Dashboard() {
         </header>
 
         {/* Streak bar — full width */}
-        <section className={styles.streakBanner} aria-label="Weekly streak">
+        <section 
+          className={`${styles.streakBanner} ${isSecured ? styles.streakSecured : styles.streakPending}`} 
+          aria-label="Weekly streak"
+        >
           <div className={styles.streakFlame}>
-            <Flame size={22} />
+            <Flame size={20} fill={isSecured ? "var(--color-amber-400)" : "none"} />
           </div>
-          <div className={styles.streakBody}>
-            <span className={styles.streakNum}>{streak.current_streak_weeks}</span>
-            <span className={styles.streakText}>weeks streak of watching something.</span>
+          
+          <div className={styles.streakContent}>
+            <h2 className={styles.streakTitle}>
+              {streak.current_streak_weeks}-Week Streak
+            </h2>
+            <p className={styles.streakStatus}>
+              {isSecured 
+                ? "Secured for this week" 
+                : "Log a watch this week to keep it going"}
+            </p>
           </div>
+          
           <div className={styles.streakBest}>
             Best: <strong>{streak.longest_streak_weeks}w</strong>
           </div>
