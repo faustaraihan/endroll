@@ -125,12 +125,16 @@ export const mockUser: UserProfile = {
   id: 'u1',
   email: 'fausta@example.com',
   username: 'Fausta',
+  bio: 'Obsessed with 90s neo-noir and slow cinema.',
   avatar_url: undefined,
   created_at: '2026-01-15T10:00:00Z',
   preferences: {
     favorite_genres: ['Drama', 'Thriller', 'Sci-Fi'],
     theme: 'dark',
     notifications_enabled: true,
+    rating_step: 0.5,
+    start_of_week: 'Monday',
+    favorites_board: ['t1', 't6', 't7'],
   },
 }
 

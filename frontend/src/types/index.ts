@@ -75,12 +75,16 @@ export interface UserProfile {
   id: string
   email: string
   username: string
+  bio?: string
   avatar_url?: string
   created_at: string
   preferences: {
     favorite_genres?: string[]
     theme?: string
     notifications_enabled?: boolean
+    rating_step?: number
+    start_of_week?: string
+    favorites_board?: string[] // array of up to 4 title_ids
   }
 }
 

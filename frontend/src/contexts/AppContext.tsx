@@ -13,6 +13,7 @@ import {
 
 interface AppContextValue {
   user: UserProfile
+  setUser: React.Dispatch<React.SetStateAction<UserProfile>>
   stats: UserStats
   watchLogs: WatchLog[]
   watchlist: WatchlistItem[]
@@ -37,6 +38,7 @@ interface AppContextValue {
 const AppContext = createContext<AppContextValue | null>(null)
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<UserProfile>(mockUser)
   const [watchLogs, setWatchLogs] = useState<WatchLog[]>(mockWatchLogs)
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(mockWatchlist)
   const [collections, setCollections] = useState<Collection[]>(mockCollections)
@@ -154,7 +156,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
-        user: mockUser,
+        user,
+        setUser,
         stats: {
           ...mockStats,
           average_rating: dynamicAverageRating,

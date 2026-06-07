@@ -10,7 +10,7 @@ const Diary = lazy(() => import('./pages/Diary/Diary'))
 const Explore = lazy(() => import('./pages/Explore/Explore'))
 const Watchlist = lazy(() => import('./pages/Watchlist/Watchlist'))
 const Stats = lazy(() => import('./pages/Stats/Stats'))
-const Profile = lazy(() => import('./pages/Profile/Profile'))
+const Settings = lazy(() => import('./pages/Settings/Settings'))
 const LogFilm = lazy(() => import('./pages/LogFilm/LogFilm'))
 const Collections = lazy(() => import('./pages/Collections/Collections'))
 const TitleDetail = lazy(() => import('./pages/TitleDetail/TitleDetail'))
@@ -56,7 +56,7 @@ export default function App() {
                 <Route path="/collections" element={<Collections />} />
               <Route path="/title/:id" element={<TitleDetail />} />
                 <Route path="/stats"      element={<Stats />} />
-                <Route path="/profile"    element={<Profile />} />
+                <Route path="/settings"   element={<Settings />} />
                 <Route path="/log"        element={<LogFilm />} />
               </Route>
 

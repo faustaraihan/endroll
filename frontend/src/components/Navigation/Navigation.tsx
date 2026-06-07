@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Bookmark,
   BarChart2,
-  User,
+  Settings,
   Film,
   Compass,
   Plus,
@@ -19,7 +19,7 @@ const navItems = [
   { to: '/explore',     label: 'Explore',     icon: Compass },
   { to: '/watchlist',   label: 'Watchlist',   icon: Bookmark },
   { to: '/stats',       label: 'Stats',       icon: BarChart2 },
-  { to: '/profile',     label: 'Profile',     icon: User },
+  { to: '/settings',    label: 'Settings',    icon: Settings },
 ]
 
 export function Navigation() {
