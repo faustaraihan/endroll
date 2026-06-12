@@ -15,6 +15,28 @@ interface SortDropdownProps {
   setGroupBy: (group: GroupField) => void
 }
 
+const sortOptions: { value: SortField; label: string }[] = [
+  { value: 'date',    label: 'Date Watched' },
+  { value: 'title',   label: 'Title' },
+  { value: 'year',    label: 'Release Year' },
+  { value: 'rating',  label: 'Rating' },
+  { value: 'runtime', label: 'Runtime' },
+  { value: 'rewatch', label: 'Rewatch Count' },
+]
+
+const directionOptions: { value: SortDirection; label: string }[] = [
+  { value: 'asc',  label: 'Ascending (A–Z, oldest)' },
+  { value: 'desc', label: 'Descending (Z–A, newest)' },
+]
+
+const groupOptions: { value: GroupField; label: string }[] = [
+  { value: 'none',   label: 'None' },
+  { value: 'type',   label: 'Type' },
+  { value: 'month',  label: 'Month Watched' },
+  { value: 'decade', label: 'Release Decade' },
+  { value: 'rating', label: 'Rating' },
+]
+
 export const SortDropdown: React.FC<SortDropdownProps> = ({
   sortField,
   setSortField,
@@ -25,6 +47,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -38,158 +61,66 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
     }
   }, [])
 
-  const getSortLabel = (field: SortField) => {
-    switch (field) {
-      case 'date': return 'Date Watched'
-      case 'title': return 'Title'
-      case 'year': return 'Release Year'
-      case 'rating': return 'Rating'
-      case 'runtime': return 'Runtime'
-      case 'rewatch': return 'Rewatch'
-      default: return 'Sort'
+  useEffect(() => {
+    if (!isOpen) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+        triggerRef.current?.focus()
+      }
     }
-  }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
+
+  const currentSortLabel =
+    sortOptions.find(o => o.value === sortField)?.label ?? 'Sort'
+
+  const renderItem = <T extends string>(
+    option: { value: T; label: string },
+    current: T,
+    onSelect: (value: T) => void
+  ) => (
+    <button
+      key={option.value}
+      className={`${styles.sortMenuItem} ${current === option.value ? styles.sortMenuItemActive : ''}`}
+      onClick={() => { onSelect(option.value); setIsOpen(false) }}
+      role="menuitemradio"
+      aria-checked={current === option.value}
+    >
+      <span className={styles.menuCheck}>{current === option.value && <Check size={14} />}</span>
+      <span>{option.label}</span>
+    </button>
+  )
 
   return (
     <div className={styles.sortDropdownWrap} ref={dropdownRef}>
       <button
+        ref={triggerRef}
         className={styles.sortTriggerBtn}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
+        aria-label={`Sort by ${currentSortLabel}`}
       >
         <ArrowUpDown size={14} />
-        <span>{getSortLabel(sortField)}</span>
+        <span>{currentSortLabel}</span>
         <ChevronDown size={14} className={`${styles.sortChevron} ${isOpen ? styles.sortChevronOpen : ''}`} />
       </button>
 
       {isOpen && (
         <div className={styles.sortMenu} role="menu">
           <div className={styles.sortMenuSectionHeader}>Sort by</div>
-          <button
-            className={`${styles.sortMenuItem} ${sortField === 'date' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortField('date'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortField === 'date'}
-          >
-            <span className={styles.menuCheck}>{sortField === 'date' && <Check size={14} />}</span>
-            <span>Date Watched</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${sortField === 'title' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortField('title'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortField === 'title'}
-          >
-            <span className={styles.menuCheck}>{sortField === 'title' && <Check size={14} />}</span>
-            <span>Title</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${sortField === 'year' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortField('year'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortField === 'year'}
-          >
-            <span className={styles.menuCheck}>{sortField === 'year' && <Check size={14} />}</span>
-            <span>Release Year</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${sortField === 'rating' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortField('rating'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortField === 'rating'}
-          >
-            <span className={styles.menuCheck}>{sortField === 'rating' && <Check size={14} />}</span>
-            <span>Rating</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${sortField === 'runtime' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortField('runtime'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortField === 'runtime'}
-          >
-            <span className={styles.menuCheck}>{sortField === 'runtime' && <Check size={14} />}</span>
-            <span>Runtime</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${sortField === 'rewatch' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortField('rewatch'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortField === 'rewatch'}
-          >
-            <span className={styles.menuCheck}>{sortField === 'rewatch' && <Check size={14} />}</span>
-            <span>Rewatch Count</span>
-          </button>
+          {sortOptions.map(o => renderItem(o, sortField, setSortField))}
 
           <div className={styles.sortMenuDivider} />
 
-          <button
-            className={`${styles.sortMenuItem} ${sortDirection === 'asc' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortDirection('asc'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortDirection === 'asc'}
-          >
-            <span className={styles.menuCheck}>{sortDirection === 'asc' && <Check size={14} />}</span>
-            <span>Ascending</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${sortDirection === 'desc' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setSortDirection('desc'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={sortDirection === 'desc'}
-          >
-            <span className={styles.menuCheck}>{sortDirection === 'desc' && <Check size={14} />}</span>
-            <span>Descending</span>
-          </button>
+          {directionOptions.map(o => renderItem(o, sortDirection, setSortDirection))}
 
           <div className={styles.sortMenuDivider} />
 
           <div className={styles.sortMenuSectionHeader}>Group by</div>
-          <button
-            className={`${styles.sortMenuItem} ${groupBy === 'none' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setGroupBy('none'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={groupBy === 'none'}
-          >
-            <span className={styles.menuCheck}>{groupBy === 'none' && <Check size={14} />}</span>
-            <span>None</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${groupBy === 'type' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setGroupBy('type'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={groupBy === 'type'}
-          >
-            <span className={styles.menuCheck}>{groupBy === 'type' && <Check size={14} />}</span>
-            <span>Type</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${groupBy === 'month' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setGroupBy('month'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={groupBy === 'month'}
-          >
-            <span className={styles.menuCheck}>{groupBy === 'month' && <Check size={14} />}</span>
-            <span>Month Watched</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${groupBy === 'decade' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setGroupBy('decade'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={groupBy === 'decade'}
-          >
-            <span className={styles.menuCheck}>{groupBy === 'decade' && <Check size={14} />}</span>
-            <span>Release Decade</span>
-          </button>
-          <button
-            className={`${styles.sortMenuItem} ${groupBy === 'rating' ? styles.sortMenuItemActive : ''}`}
-            onClick={() => { setGroupBy('rating'); setIsOpen(false); }}
-            role="menuitemradio"
-            aria-checked={groupBy === 'rating'}
-          >
-            <span className={styles.menuCheck}>{groupBy === 'rating' && <Check size={14} />}</span>
-            <span>Rating</span>
-          </button>
+          {groupOptions.map(o => renderItem(o, groupBy, setGroupBy))}
         </div>
       )}
     </div>

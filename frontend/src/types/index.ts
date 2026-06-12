@@ -104,10 +104,16 @@ export interface UserStats {
 
 export type ToastType = 'success' | 'error' | 'info'
 
+export interface ToastAction {
+  label: string
+  onClick: () => void
+}
+
 export interface ToastMessage {
   id: string
   message: string
   type: ToastType
+  action?: ToastAction
 }
 
 export interface SearchResult {

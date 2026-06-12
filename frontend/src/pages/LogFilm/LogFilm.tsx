@@ -1,13 +1,43 @@
-import { useState, useEffect } from 'react'
-import { Search, Film, Star, ChevronLeft, Plus, Check, X } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, Star, ChevronLeft, Plus, Check, X, PenLine } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
 import { mockSearchResults, mockTitles } from '../../data/mockData'
 import { seriesMockData } from '../../data/seriesMockData'
-import type { SearchResult, WatchLog, Title } from '../../types'
+import { Poster } from '../../components'
+import { formatDate } from '../../utils'
+import type { SearchResult, WatchLog, Title, TitleType } from '../../types'
 import styles from './LogFilm.module.css'
 
-type Step = 'search' | 'form'
+type Step = 'search' | 'manual' | 'form'
+
+const DRAFT_KEY = 'endroll:log-draft'
+
+interface LogDraft {
+  selectedTitle: SearchResult | Title
+  watchedAt: string
+  rating: number | null
+  notes: string
+  seasonNumber: number
+  editingLogId: string | null
+  savedAt: string
+}
+
+function readDraft(): LogDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as LogDraft
+    if (!parsed.selectedTitle?.title) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY)
+}
 
 export default function LogFilm() {
   const { setWatchLogs, watchLogs, personalRatings, setRatingForTitle } = useApp()
@@ -19,6 +49,7 @@ export default function LogFilm() {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
   const [selectedTitle, setSelectedTitle] = useState<SearchResult | Title | null>(null)
 
   // Form state
@@ -28,6 +59,17 @@ export default function LogFilm() {
   const [notes, setNotes] = useState('')
   const [seasonNumber, setSeasonNumber] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Manual add state
+  const [manualTitle, setManualTitle] = useState('')
+  const [manualType, setManualType] = useState<TitleType>('film')
+  const [manualYear, setManualYear] = useState('')
+
+  // Draft (catatan belum tersimpan) — hanya ditawarkan jika tidak datang
+  // membawa judul dari halaman lain
+  const [pendingDraft, setPendingDraft] = useState<LogDraft | null>(() =>
+    location.state?.title ? null : readDraft()
+  )
 
   // Resolve title ID for metadata lookup
   const resolvedTitleId = selectedTitle
@@ -46,32 +88,96 @@ export default function LogFilm() {
   const [showDuplicateModal, setShowDuplicateModal] = useState(false)
   const [duplicateLog, setDuplicateLog] = useState<WatchLog | null>(null)
   const [pendingTitle, setPendingTitle] = useState<SearchResult | Title | null>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
 
-  // Pre-select title from router state (e.g. from Search page)
-  useEffect(() => {
-    const stateTitle = location.state?.title as SearchResult | Title | undefined
-    if (stateTitle) {
-      handleSelect(stateTitle)
+  // Pre-select title from router state (e.g. from Search page) —
+  // penyesuaian state saat render, bukan effect
+  const stateTitle = location.state?.title as SearchResult | Title | undefined
+  const [handledStateTitle, setHandledStateTitle] = useState<SearchResult | Title | null>(null)
+  if (stateTitle && stateTitle !== handledStateTitle) {
+    setHandledStateTitle(stateTitle)
+    handleSelect(stateTitle)
+  }
+
+  // Live search dengan debounce — tanpa perlu menekan tombol
+  function handleQueryChange(value: string) {
+    setQuery(value)
+    if (!value.trim()) {
+      setSearchResults([])
+      setHasSearched(false)
+      setIsSearching(false)
+    } else {
+      setIsSearching(true)
     }
-  }, [location.state])
+  }
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
+  useEffect(() => {
     if (!query.trim()) return
-    setIsSearching(true)
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const filtered = mockSearchResults.filter(r =>
         r.title.toLowerCase().includes(query.toLowerCase())
       )
       setSearchResults(filtered)
+      setHasSearched(true)
       setIsSearching(false)
-    }, 500)
+    }, 350)
+    return () => clearTimeout(timer)
+  }, [query])
+
+  // Simpan draft otomatis selama mengisi form, agar catatan tidak pernah hilang
+  useEffect(() => {
+    if (step !== 'form' || !selectedTitle) return
+    const draft: LogDraft = {
+      selectedTitle,
+      watchedAt,
+      rating,
+      notes,
+      seasonNumber,
+      editingLogId,
+      savedAt: new Date().toISOString(),
+    }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+  }, [step, selectedTitle, watchedAt, rating, notes, seasonNumber, editingLogId])
+
+  // Aksesibilitas modal: fokus masuk ke modal, Escape menutup, Tab terkunci di dalam
+  useEffect(() => {
+    if (!showDuplicateModal) return
+    const modal = modalRef.current
+    if (!modal) return
+
+    const focusables = modal.querySelectorAll<HTMLElement>('button, [href], input, select, textarea')
+    focusables[0]?.focus()
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCancelDuplicate()
+        return
+      }
+      if (e.key === 'Tab' && focusables.length > 0) {
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [showDuplicateModal])
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    // Pencarian sudah berjalan otomatis; Enter hanya mencegah reload
   }
 
   function handleSelect(result: SearchResult | Title) {
     // Check if already in diary
-    const existing = watchLogs.find(l => 
-      ('id' in result && l.title.id === result.id) || 
+    const existing = watchLogs.find(l =>
+      ('id' in result && l.title.id === result.id) ||
       (result.tmdb_id && l.title.tmdb_id === result.tmdb_id)
     )
     if (existing) {
@@ -88,41 +194,72 @@ export default function LogFilm() {
     setEditingLogId(null)
     setSeasonNumber(1)
     setWatchedAt(new Date().toISOString().slice(0, 10))
-    
+
     // Cari rating global dari film ini
-    const existingWatch = watchLogs.find(l => 
-      ('id' in result && l.title.id === result.id) || 
+    const existingWatch = watchLogs.find(l =>
+      ('id' in result && l.title.id === result.id) ||
       (result.tmdb_id && l.title.tmdb_id === result.tmdb_id)
     )
     const existingRating = existingWatch ? (personalRatings[existingWatch.title.id] ?? null) : null
-    
+
     setRating(existingRating)
     setRatingInput(existingRating !== null ? existingRating.toFixed(1) : '')
     setNotes('')
+    setPendingDraft(null)
     setStep('form')
+  }
+
+  function handleResumeDraft() {
+    if (!pendingDraft) return
+    setSelectedTitle(pendingDraft.selectedTitle)
+    setEditingLogId(pendingDraft.editingLogId)
+    setSeasonNumber(pendingDraft.seasonNumber)
+    setWatchedAt(pendingDraft.watchedAt)
+    setRating(pendingDraft.rating)
+    setRatingInput(pendingDraft.rating !== null ? pendingDraft.rating.toFixed(1) : '')
+    setNotes(pendingDraft.notes)
+    setPendingDraft(null)
+    setStep('form')
+  }
+
+  function handleDiscardDraft() {
+    clearDraft()
+    setPendingDraft(null)
+  }
+
+  function handleBack() {
+    if (notes.trim()) {
+      // The draft is already saved automatically — reassure the user
+      addToast('Your note has been saved as a draft.', 'info')
+      setPendingDraft(readDraft())
+    } else {
+      clearDraft()
+    }
+    setStep('search')
+  }
+
+  function handleManualSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!manualTitle.trim()) return
+    const year = parseInt(manualYear, 10)
+    const title: Title = {
+      id: crypto.randomUUID(),
+      title: manualTitle.trim(),
+      type: manualType,
+      release_year: Number.isFinite(year) ? year : undefined,
+      genres: [],
+      cast: [],
+    }
+    startFormForTitle(title)
   }
 
   function handleConfirmRewatch() {
     if (!pendingTitle) return
-    setSelectedTitle(pendingTitle)
-    setEditingLogId(null)
-    setSeasonNumber(1)
-    setWatchedAt(new Date().toISOString().slice(0, 10))
-    
-    // Cari rating global dari film ini
-    const existingWatch = watchLogs.find(l => 
-      ('id' in pendingTitle && l.title.id === pendingTitle.id) || 
-      (pendingTitle.tmdb_id && l.title.tmdb_id === pendingTitle.tmdb_id)
-    )
-    const existingRating = existingWatch ? (personalRatings[existingWatch.title.id] ?? null) : null
-    
-    setRating(existingRating)
-    setRatingInput(existingRating !== null ? existingRating.toFixed(1) : '')
-    setNotes('')
-    setStep('form')
     setShowDuplicateModal(false)
     setDuplicateLog(null)
+    const title = pendingTitle
     setPendingTitle(null)
+    startFormForTitle(title)
   }
 
   function handleConfirmEdit() {
@@ -131,12 +268,13 @@ export default function LogFilm() {
     setEditingLogId(duplicateLog.id)
     setSeasonNumber(duplicateLog.season_number ?? 1)
     setWatchedAt(duplicateLog.watched_at)
-    
+
     // Ambil rating global film
     const existingRating = personalRatings[duplicateLog.title.id] ?? null
     setRating(existingRating)
     setRatingInput(existingRating !== null ? existingRating.toFixed(1) : '')
     setNotes(duplicateLog.notes ?? '')
+    setPendingDraft(null)
     setStep('form')
     setShowDuplicateModal(false)
     setDuplicateLog(null)
@@ -149,8 +287,6 @@ export default function LogFilm() {
     setPendingTitle(null)
   }
 
-
-
   function handleRatingChange(val: string) {
     setRatingInput(val)
     const num = parseFloat(val)
@@ -162,7 +298,8 @@ export default function LogFilm() {
   }
 
   function handleSlider(val: number) {
-    const snapped = Math.round(val * 10) / 10
+    // Sesuai PRD: slider snap ke 0.5 terdekat (input angka tetap presisi 0.1)
+    const snapped = Math.round(val * 2) / 2
     setRating(snapped)
     setRatingInput(snapped.toFixed(1))
   }
@@ -174,14 +311,14 @@ export default function LogFilm() {
     setIsSubmitting(true)
     setTimeout(() => {
       // Cari atau buat title ID yang stabil
-      const existingWatch = watchLogs.find(l => 
-        ('id' in selectedTitle && l.title.id === selectedTitle.id) || 
+      const existingWatch = watchLogs.find(l =>
+        ('id' in selectedTitle && l.title.id === selectedTitle.id) ||
         (selectedTitle.tmdb_id && l.title.tmdb_id === selectedTitle.tmdb_id)
       )
-      const titleIdToUse = existingWatch 
-        ? existingWatch.title.id 
+      const titleIdToUse = existingWatch
+        ? existingWatch.title.id
         : ('id' in selectedTitle ? selectedTitle.id : crypto.randomUUID())
-        
+
       const titleToUse = existingWatch ? existingWatch.title : {
         id: titleIdToUse,
         tmdb_id: selectedTitle.tmdb_id,
@@ -213,7 +350,7 @@ export default function LogFilm() {
               : l
           )
         )
-        addToast(`Catatan "${selectedTitle.title}" berhasil diperbarui! 🎬`, 'success')
+        addToast(`Entry for "${selectedTitle.title}" updated 🎬`, 'success')
       } else {
         // Adding new log
         // Hitung rewatch secara otomatis
@@ -233,8 +370,9 @@ export default function LogFilm() {
         }
 
         setWatchLogs(prev => [newLog, ...prev])
-        addToast(`"${selectedTitle.title}" logged to your diary! 🎬`, 'success')
+        addToast(`"${selectedTitle.title}" logged to your diary 🎬`, 'success')
       }
+      clearDraft()
       setIsSubmitting(false)
       navigate('/diary')
     }, 600)
@@ -246,37 +384,60 @@ export default function LogFilm() {
         <div className={styles.searchStep} style={{ animationName: 'fade-in' }}>
           <header className={styles.header}>
             <h1 className={styles.pageTitle}>Log a Film</h1>
-            <p className={styles.pageSub}>Search for the film or series you watched</p>
+            <p className={styles.pageSub}>Search for the film or series you just watched</p>
           </header>
 
-          <form onSubmit={handleSearch} className={styles.searchForm}>
+          {/* Unsaved draft */}
+          {pendingDraft && (
+            <div className={styles.draftBanner} role="status">
+              <PenLine size={16} className={styles.draftIcon} />
+              <div className={styles.draftText}>
+                <strong>{pendingDraft.selectedTitle.title}</strong> is still waiting —
+                your note was saved on {formatDate(pendingDraft.savedAt)}.
+              </div>
+              <div className={styles.draftActions}>
+                <button type="button" className="btn btn-primary btn-sm" onClick={handleResumeDraft}>
+                  Resume
+                </button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={handleDiscardDraft}>
+                  Discard
+                </button>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSearchSubmit} className={styles.searchForm} role="search">
             <div className={styles.searchBox}>
               <Search size={18} className={styles.searchIcon} />
               <input
                 id="log-search"
                 type="search"
                 className={styles.searchInput}
-                placeholder="Search TMDb…"
+                placeholder="Type a film or series title…"
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={e => handleQueryChange(e.target.value)}
                 aria-label="Search for a film or series"
                 autoFocus
                 autoComplete="off"
               />
             </div>
-            <button type="submit" className="btn btn-primary" disabled={!query.trim()}>
-              Search
-            </button>
           </form>
 
           {isSearching && (
-            <div className={styles.loadingState}>
-              <div className={styles.spinner} aria-label="Searching..." />
-              <p>Searching…</p>
-            </div>
+            <ul className={styles.resultList} role="list" aria-label="Loading search results" aria-busy="true">
+              {[0, 1, 2, 3].map(i => (
+                <li key={i} className={styles.skeletonRow}>
+                  <div className={`skeleton ${styles.skeletonPoster}`} />
+                  <div className={styles.skeletonLines}>
+                    <div className={`skeleton ${styles.skeletonLine}`} />
+                    <div className={`skeleton ${styles.skeletonLineShort}`} />
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
 
-          {!isSearching && searchResults.length > 0 && (
+          {!isSearching && hasSearched && searchResults.length > 0 && (
             <ul className={styles.resultList} role="list" aria-label="Search results">
               {searchResults.map(result => (
                 <li key={result.tmdb_id}>
@@ -285,18 +446,15 @@ export default function LogFilm() {
                     onClick={() => handleSelect(result)}
                     aria-label={`Select ${result.title} (${result.release_year})`}
                   >
-                    {result.poster_path ? (
-                      <img
+                    <div className={styles.resultPosterWrap}>
+                      <Poster
+                        title={result.title}
                         src={result.poster_path}
-                        alt={`Poster for ${result.title}`}
+                        alt={`Poster ${result.title}`}
                         className={styles.resultPoster}
-                        loading="lazy"
+                        size="sm"
                       />
-                    ) : (
-                      <div className={styles.resultPosterPlaceholder}>
-                        <Film size={20} />
-                      </div>
-                    )}
+                    </div>
                     <div className={styles.resultInfo}>
                       <div className={styles.resultTitle}>{result.title}</div>
                       <div className={styles.resultMeta}>
@@ -315,13 +473,113 @@ export default function LogFilm() {
             </ul>
           )}
 
-          {!isSearching && searchResults.length === 0 && query && (
+          {!isSearching && hasSearched && searchResults.length === 0 && (
             <div className={styles.noResults}>
-              <p>Tidak ada hasil pencarian untuk "<strong>{query}</strong>".</p>
-              <p className="text-sm text-muted">Coba periksa kembali ejaan judul, atau cari judul film lainnya.</p>
+              <p>No results for "<strong>{query}</strong>".</p>
+              <p className="text-sm text-muted">
+                Try checking the spelling — or just add it manually.
+              </p>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  setManualTitle(query)
+                  setStep('manual')
+                }}
+              >
+                <PenLine size={14} /> Add manually
+              </button>
             </div>
           )}
+
+          {!isSearching && !hasSearched && !pendingDraft && (
+            <p className={styles.manualHint}>
+              Can't find the title in search?{' '}
+              <button
+                type="button"
+                className={styles.manualLink}
+                onClick={() => setStep('manual')}
+              >
+                Add manually
+              </button>
+            </p>
+          )}
         </div>
+      )}
+
+      {step === 'manual' && (
+        <form onSubmit={handleManualSubmit} className={styles.formStep} aria-label="Add title manually">
+          <button
+            type="button"
+            className={`btn btn-ghost btn-sm ${styles.backBtn}`}
+            onClick={() => setStep('search')}
+          >
+            <ChevronLeft size={16} /> Back
+          </button>
+
+          <header className={styles.header}>
+            <h1 className={styles.pageTitle}>Add Manually</h1>
+            <p className={styles.pageSub}>
+              Not every title is on TMDb — just log it yourself.
+            </p>
+          </header>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="manual-title" className="input-label">Title</label>
+            <input
+              id="manual-title"
+              type="text"
+              className="input"
+              placeholder="Film or series title"
+              value={manualTitle}
+              onChange={e => setManualTitle(e.target.value)}
+              maxLength={200}
+              required
+              autoFocus
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <span className="input-label" id="manual-type-label">Type</span>
+            <div className={styles.typeToggle} role="group" aria-labelledby="manual-type-label">
+              {(['film', 'series'] as TitleType[]).map(t => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`${styles.typeToggleBtn} ${manualType === t ? styles.typeToggleBtnActive : ''}`}
+                  onClick={() => setManualType(t)}
+                  aria-pressed={manualType === t}
+                >
+                  {t === 'film' ? 'Film' : 'Series'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="manual-year" className="input-label">
+              Release year <span className={styles.labelHint}>(optional)</span>
+            </label>
+            <input
+              id="manual-year"
+              type="number"
+              className={`input ${styles.dateInput}`}
+              placeholder="2026"
+              min={1888}
+              max={new Date().getFullYear() + 5}
+              value={manualYear}
+              onChange={e => setManualYear(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className={`btn btn-primary btn-lg ${styles.submitBtn}`}
+            disabled={!manualTitle.trim()}
+          >
+            <Check size={18} /> Continue to notes
+          </button>
+        </form>
       )}
 
       {step === 'form' && selectedTitle && (
@@ -333,20 +591,22 @@ export default function LogFilm() {
           <button
             type="button"
             className={`btn btn-ghost btn-sm ${styles.backBtn}`}
-            onClick={() => setStep('search')}
+            onClick={handleBack}
           >
             <ChevronLeft size={16} /> Back
           </button>
 
           {/* Title preview */}
           <div className={styles.titlePreview}>
-            {selectedTitle.poster_path && (
-              <img
+            <div className={styles.previewPosterWrap}>
+              <Poster
+                title={selectedTitle.title}
                 src={selectedTitle.poster_path}
-                alt={`Poster for ${selectedTitle.title} (${selectedTitle.release_year})`}
+                alt={`Poster ${selectedTitle.title} (${selectedTitle.release_year})`}
                 className={styles.previewPoster}
+                size="sm"
               />
-            )}
+            </div>
             <div>
               <h1 className={styles.previewTitle}>{selectedTitle.title}</h1>
               <div className={styles.previewMeta}>
@@ -400,26 +660,18 @@ export default function LogFilm() {
           <div className={styles.formGroup}>
             <label htmlFor="rating-input" className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
               <span>
-                Rating {selectedTitle.type === 'film' ? 'Film' : 'Series'} ini <span className={styles.labelHint}>(global · opsional)</span>
+                Rating for this {selectedTitle.type === 'film' ? 'film' : 'series'} <span className={styles.labelHint}>(global · optional)</span>
               </span>
               {rating !== null && (
                 <button
                   type="button"
+                  className={styles.clearRatingBtn}
                   onClick={() => {
                     setRating(null)
                     setRatingInput('')
                   }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--color-text-muted)',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    padding: 0
-                  }}
                 >
-                  Hapus Rating
+                  Clear rating
                 </button>
               )}
             </label>
@@ -429,11 +681,12 @@ export default function LogFilm() {
                 type="range"
                 min={0}
                 max={10}
-                step={0.1}
+                step={0.5}
                 value={rating ?? 5}
                 onChange={e => handleSlider(parseFloat(e.target.value))}
-                className={styles.slider}
-                aria-label="Rating slider 0 to 10"
+                className={`${styles.slider} ${rating === null ? styles.sliderUnrated : ''}`}
+                aria-label="Drag to rate from 0 to 10"
+                aria-valuetext={rating !== null ? rating.toFixed(1) : 'Not rated yet'}
               />
               <div className={styles.ratingInputWrap}>
                 <Star size={14} fill={rating != null ? 'var(--color-amber-400)' : 'none'} color="var(--color-amber-400)" />
@@ -453,8 +706,6 @@ export default function LogFilm() {
             </div>
           </div>
 
-          {/* Rewatch - otomatis dideteksi dari database */}
-
           {/* Notes */}
           <div className={styles.formGroup}>
             <label htmlFor="notes" className="input-label">
@@ -464,15 +715,13 @@ export default function LogFilm() {
             <textarea
               id="notes"
               className={`input ${styles.textarea}`}
-              placeholder="How did it make you feel? Any thoughts…"
+              placeholder="How did it make you feel? Jot down anything you want to remember…"
               value={notes}
               onChange={e => setNotes(e.target.value)}
               maxLength={1000}
             />
             <div className={styles.charCount}>{notes.length}/1000</div>
           </div>
-
-
 
           {/* Submit */}
           <button
@@ -490,36 +739,37 @@ export default function LogFilm() {
       )}
 
       {showDuplicateModal && duplicateLog && (
-        <div className={styles.modalOverlay} onClick={handleCancelDuplicate} role="dialog" aria-modal="true">
-          <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalOverlay} onClick={handleCancelDuplicate} role="presentation">
+          <div
+            ref={modalRef}
+            className={styles.modalCard}
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="duplicate-modal-title"
+          >
             <header className={styles.modalHeader}>
-              <h3 className={styles.modalTitle} style={{ fontSize: '1.125rem', margin: 0 }}>Sudah Pernah Dicatat</h3>
-              <button type="button" className="btn btn-icon btn-ghost" onClick={handleCancelDuplicate} aria-label="Tutup modal" style={{ minHeight: '32px', minWidth: '32px', padding: '4px' }}>
+              <h3 id="duplicate-modal-title" className={styles.modalTitle} style={{ fontSize: '1.125rem', margin: 0 }}>Already Logged</h3>
+              <button type="button" className="btn btn-icon btn-ghost" onClick={handleCancelDuplicate} aria-label="Close dialog" style={{ minHeight: '32px', minWidth: '32px', padding: '4px' }}>
                 <X size={16} />
               </button>
             </header>
             <div className={styles.modalBody}>
               <p>
-                Kamu sudah mencatat <strong>{duplicateLog.title.title}</strong> pada{' '}
-                <strong>
-                  {new Date(duplicateLog.watched_at).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </strong>
-                . Ini rewatch baru, atau ingin mengedit catatan lama?
+                You already logged <strong>{duplicateLog.title.title}</strong> on{' '}
+                <strong>{formatDate(duplicateLog.watched_at)}</strong>
+                . Is this a new rewatch, or do you want to edit the old entry?
               </p>
             </div>
             <div className={styles.modalFooter}>
               <button type="button" className="btn btn-primary" onClick={handleConfirmRewatch} style={{ width: '100%' }}>
-                Catat sebagai rewatch baru
+                Log as a new rewatch
               </button>
               <button type="button" className="btn btn-secondary" onClick={handleConfirmEdit} style={{ width: '100%' }}>
-                Edit catatan lama
+                Edit the old entry
               </button>
               <button type="button" className="btn btn-ghost" onClick={handleCancelDuplicate} style={{ width: '100%' }}>
-                Batal
+                Cancel
               </button>
             </div>
           </div>

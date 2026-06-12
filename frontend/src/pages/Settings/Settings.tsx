@@ -12,7 +12,6 @@ export default function Settings() {
     setWatchLogs,
     watchlist,
     setWatchlist,
-    collections,
     setCollections,
     personalRatings,
     setRatingForTitle

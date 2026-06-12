@@ -1,7 +1,17 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AppProvider, ToastProvider } from './contexts'
 import { AppLayout } from './components'
+
+// React Router does not reset scroll on navigation; without this, users
+// land mid-page when moving between long pages (e.g. Diary -> detail)
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 
 // Lazy loaded page components to enable code splitting
 const Landing = lazy(() => import('./pages/Landing/Landing'))
@@ -31,7 +41,7 @@ function PageLoader() {
       letterSpacing: '0.05em',
     }}>
       <div style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
-        Loading Endroll...
+        Loading Endroll…
       </div>
     </div>
   )
@@ -40,6 +50,7 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <ToastProvider>
         <AppProvider>
           <Suspense fallback={<PageLoader />}>

@@ -30,6 +30,17 @@ export function Toast() {
             {icons[toast.type]}
           </span>
           <span style={{ flex: 1 }}>{toast.message}</span>
+          {toast.action && (
+            <button
+              className={styles.actionBtn}
+              onClick={() => {
+                toast.action?.onClick()
+                removeToast(toast.id)
+              }}
+            >
+              {toast.action.label}
+            </button>
+          )}
           <button
             className="btn btn-icon btn-ghost"
             style={{ minHeight: 28, minWidth: 28, padding: 4 }}

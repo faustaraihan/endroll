@@ -2,7 +2,7 @@ import { Film, Star, Flame, ArrowRight, Plus, Clock, Tv } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../contexts'
 import { formatDate, getGreeting } from '../../utils'
-import { StatBox, EmptyState, GenrePill } from '../../components'
+import { StatBox, EmptyState, GenrePill, Poster } from '../../components'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
@@ -59,12 +59,12 @@ export default function Dashboard() {
               {streak.current_streak_weeks}-Week Streak
             </h2>
             <p className={styles.streakStatus}>
-              {isSecured 
-                ? "Secured for this week" 
-                : "Log a watch this week to keep it going"}
+              {isSecured
+                ? 'Secured for this week'
+                : 'Log a watch this week to keep it going'}
             </p>
           </div>
-          
+
           <div className={styles.streakBest}>
             Best: <strong>{streak.longest_streak_weeks}w</strong>
           </div>
@@ -95,18 +95,13 @@ export default function Dashboard() {
                   <article className={styles.logCard} style={{ '--stagger': i } as React.CSSProperties}>
                     {/* Poster */}
                     <div className={styles.posterCol}>
-                      {log.title.poster_path ? (
-                        <img
-                          src={log.title.poster_path}
-                          alt={`Poster film ${log.title.title} (${log.title.release_year})`}
-                          className={styles.poster}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className={styles.posterFallback}>
-                          <Film size={20} />
-                        </div>
-                      )}
+                      <Poster
+                        title={log.title.title}
+                        src={log.title.poster_path}
+                        alt={`Poster ${log.title.type === 'film' ? 'film' : 'series'} ${log.title.title} (${log.title.release_year})`}
+                        className={styles.poster}
+                        size="sm"
+                      />
                     </div>
 
                     {/* Info */}
@@ -174,18 +169,13 @@ export default function Dashboard() {
             <div className={styles.watchlistPosters}>
               {watchlist.slice(0, 4).map(item => (
                 <div key={item.id} className={styles.wlPosterWrap}>
-                  {item.title.poster_path ? (
-                    <img
-                      src={item.title.poster_path}
-                      alt={`Poster ${item.title.title}`}
-                      className={styles.wlPoster}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className={styles.wlPosterFallback}>
-                      <Film size={16} />
-                    </div>
-                  )}
+                  <Poster
+                    title={item.title.title}
+                    src={item.title.poster_path}
+                    alt={`Poster ${item.title.title}`}
+                    className={styles.wlPoster}
+                    size="sm"
+                  />
                   <div className={styles.wlPosterOverlay}>
                     <span className={styles.wlTitle}>{item.title.title}</span>
                   </div>

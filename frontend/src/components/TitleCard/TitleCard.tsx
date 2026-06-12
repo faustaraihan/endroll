@@ -1,5 +1,7 @@
-import { Link } from 'react-router-dom'
-import { Film, Plus, X, CheckCircle2, FolderHeart, Bookmark } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Plus, X, CheckCircle2, FolderHeart, Bookmark } from 'lucide-react'
+import { PosterPlaceholder } from '../PosterPlaceholder/PosterPlaceholder'
 import type { Title } from '../../types'
 import styles from './TitleCard.module.css'
 
@@ -31,6 +33,9 @@ export function TitleCard({
   onToggleWatchlist,
   inWatchlist = false
 }: TitleCardProps) {
+  const [imgError, setImgError] = useState(false)
+  const navigate = useNavigate()
+
   return (
     <article
       className={`${styles.posterCard} ${watched ? styles.posterCardWatched : ''}`}
@@ -39,17 +44,16 @@ export function TitleCard({
       <Link to={`/title/${title.id}`} className={styles.cardLink}>
         {/* Poster */}
         <div className={styles.posterWrap}>
-          {title.poster_path ? (
+          {title.poster_path && !imgError ? (
             <img
               src={title.poster_path}
               alt={`Poster ${title.title} (${title.release_year})`}
               className={styles.poster}
               loading="lazy"
+              onError={() => setImgError(true)}
             />
           ) : (
-            <div className={styles.posterFallback}>
-              <Film size={28} />
-            </div>
+            <PosterPlaceholder title={title.title} size="md" />
           )}
 
           {/* Hover overlay */}
@@ -61,10 +65,15 @@ export function TitleCard({
               </div>
             ) : (
               showLogAction && (
-                <Link to="/log" state={{ title }} className="btn btn-primary btn-sm" aria-label={`Log ${title.title}`} onClick={stopNav}>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  aria-label={`Log ${title.title}`}
+                  onClick={(e) => { stopNav(e); navigate('/log', { state: { title } }) }}
+                >
                   <Plus size={14} />
                   Log now
-                </Link>
+                </button>
               )
             )}
 
@@ -72,8 +81,8 @@ export function TitleCard({
               <button
                 className={styles.collectBtn}
                 onClick={(e) => { stopNav(e); onCollect() }}
-                aria-label={`Collect ${title.title}`}
-                title="Add to Collection"
+                aria-label={`Add ${title.title} to collection`}
+                title="Add to collection"
               >
                 <FolderHeart size={14} />
               </button>
@@ -94,10 +103,11 @@ export function TitleCard({
               <button
                 className={`${styles.watchlistBtn} ${inWatchlist ? styles.watchlistBtnActive : ''}`}
                 onClick={(e) => { stopNav(e); onToggleWatchlist() }}
-                aria-label={inWatchlist ? `Remove from watchlist ${title.title}` : `Add to watchlist ${title.title}`}
-                title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+                aria-label={inWatchlist ? `Remove ${title.title} from watchlist` : `Add ${title.title} to watchlist`}
+                aria-pressed={inWatchlist}
+                title={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
-                <Bookmark size={14} fill={inWatchlist ? "currentColor" : "none"} />
+                <Bookmark size={14} fill={inWatchlist ? 'currentColor' : 'none'} />
               </button>
             )}
           </div>

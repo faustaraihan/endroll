@@ -76,7 +76,8 @@
   transition: opacity var(--transition-base);
 }
 
-.posterWrap:hover .overlay {
+.posterWrap:hover .overlay,
+.posterWrap:focus-within .overlay {
   opacity: 1;
 }
 

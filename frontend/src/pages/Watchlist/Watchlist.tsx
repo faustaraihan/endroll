@@ -12,8 +12,16 @@ export default function Watchlist() {
   const [collectTitle, setCollectTitle] = useState<Title | null>(null)
 
   function handleRemove(id: string, titleName: string) {
+    const removed = watchlist.find(item => item.id === id)
     setWatchlist(prev => prev.filter(item => item.id !== id))
-    addToast(`"${titleName}" removed from watchlist.`, 'info')
+    addToast(`"${titleName}" removed from watchlist.`, 'info', {
+      action: removed
+        ? {
+            label: 'Undo',
+            onClick: () => setWatchlist(prev => [removed, ...prev]),
+          }
+        : undefined,
+    })
   }
 
   function isWatched(titleId: string) {
@@ -37,7 +45,7 @@ export default function Watchlist() {
         <EmptyState
           icon={<Film size={40} strokeWidth={1.5} />}
           title="Your watchlist is empty."
-          description="Add films you want to watch later from the search page."
+          description="Add films you want to watch later from the Explore page."
           actionLabel="Find films"
           actionLink="/explore"
           actionIcon={<Compass size={16} />}

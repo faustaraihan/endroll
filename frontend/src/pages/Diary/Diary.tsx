@@ -201,37 +201,44 @@ export default function Diary() {
 
         <div className={styles.controls}>
           {/* View Mode Toggle */}
-          <div className={styles.viewToggleGroup} role="group" aria-label="Tampilan">
+          <div className={styles.viewToggleGroup} role="group" aria-label="View mode">
             <button
               className={`${styles.viewToggleBtn} ${viewMode === 'list' ? styles.viewToggleBtnActive : ''}`}
               onClick={() => setViewMode('list')}
-              title="Details View"
+              title="Details view"
+              aria-label="Details view"
+              aria-pressed={viewMode === 'list'}
             >
               <List size={16} />
             </button>
             <button
               className={`${styles.viewToggleBtn} ${viewMode === 'grid' ? styles.viewToggleBtnActive : ''}`}
               onClick={() => setViewMode('grid')}
-              title="Large Icons View"
+              title="Grid view"
+              aria-label="Grid view"
+              aria-pressed={viewMode === 'grid'}
             >
               <LayoutGrid size={16} />
             </button>
             <button
               className={`${styles.viewToggleBtn} ${viewMode === 'compact' ? styles.viewToggleBtnActive : ''}`}
               onClick={() => setViewMode('compact')}
-              title="Compact / Tiles View"
+              title="Compact view"
+              aria-label="Compact view"
+              aria-pressed={viewMode === 'compact'}
             >
               <AlignJustify size={16} />
             </button>
           </div>
 
           {/* Filter pills */}
-          <div className={styles.filterGroup} role="group" aria-label="Filter tipe">
+          <div className={styles.filterGroup} role="group" aria-label="Filter by type">
             {(['all', 'film', 'series'] as FilterType[]).map(f => (
               <button
                 key={f}
                 className={`${styles.filterPill} ${filter === f ? styles.filterPillActive : ''}`}
                 onClick={() => setFilter(f)}
+                aria-pressed={filter === f}
               >
                 {f === 'all' ? 'All' : f === 'film' ? 'Film' : 'Series'}
               </button>

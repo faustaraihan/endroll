@@ -15,9 +15,41 @@ import {
 import { useApp } from '../../contexts'
 import { useToast } from '../../contexts'
 import { formatRuntime, getInitials } from '../../utils'
-import { GenrePill, CollectModal, SeriesTracker } from '../../components'
-import { mockTitles } from '../../data/mockData'
+import { GenrePill, CollectModal, SeriesTracker, Poster } from '../../components'
+import {
+  mockTitles,
+  mockTrendingThisWeek,
+  mockNowPlaying,
+  mockTopRatedClassics,
+  mockUpcomingClassics,
+  mockSearchResults,
+} from '../../data/mockData'
+import type { Title } from '../../types'
 import styles from './TitleDetail.module.css'
+
+// Explore lists are SearchResult[] (no local id/cast). Index them by tmdb_id
+// so a title opened straight from Explore still resolves to a real detail page.
+const exploreTitles: Title[] = Array.from(
+  new Map(
+    [
+      ...mockTrendingThisWeek,
+      ...mockNowPlaying,
+      ...mockTopRatedClassics,
+      ...mockUpcomingClassics,
+      ...mockSearchResults,
+    ].map((r) => [r.tmdb_id, r])
+  ).values()
+).map((r) => ({
+  id: String(r.tmdb_id),
+  tmdb_id: r.tmdb_id,
+  title: r.title,
+  type: r.type,
+  poster_path: r.poster_path,
+  release_year: r.release_year,
+  genres: r.genres,
+  cast: [],
+  overview: r.overview,
+}))
 
 export default function TitleDetail() {
   const { id } = useParams<{ id: string }>()
@@ -37,11 +69,20 @@ export default function TitleDetail() {
   const [isEditingRating, setIsEditingRating] = useState(false)
   const [tempRating, setTempRating] = useState<number | null>(null)
 
-  // Find the title by local ID or TMDB ID
-  const title = useMemo(
-    () => mockTitles.find((t) => t.id === id || String(t.tmdb_id) === id),
-    [id]
-  )
+  // Find the title by local ID or TMDB ID — check mock data first, then
+  // everything the user created themselves (logs, watchlist, collections),
+  // so self-logged titles never dead-end on "not found"
+  const title = useMemo(() => {
+    const matches = (t: { id: string; tmdb_id?: number }) =>
+      t.id === id || (t.tmdb_id !== undefined && String(t.tmdb_id) === id)
+    return (
+      mockTitles.find(matches) ||
+      watchLogs.find((l) => matches(l.title))?.title ||
+      watchlist.find((item) => matches(item.title))?.title ||
+      collectionItems.find((item) => matches(item.title))?.title ||
+      exploreTitles.find(matches)
+    )
+  }, [id, watchLogs, watchlist, collectionItems])
 
   // Use the resolved title's canonical ID for database queries to avoid ID mismatches
   const canonicalId = title?.id || id
@@ -92,8 +133,14 @@ export default function TitleDetail() {
   const handleWatchlistToggle = () => {
     if (!title) return
     if (isInWatchlist) {
+      const removed = watchlist.filter((item) => item.title_id === canonicalId)
       setWatchlist((prev) => prev.filter((item) => item.title_id !== canonicalId))
-      addToast(`${title.title} removed from watchlist`, 'info')
+      addToast(`"${title.title}" removed from watchlist.`, 'info', {
+        action: {
+          label: 'Undo',
+          onClick: () => setWatchlist((prev) => [...removed, ...prev]),
+        },
+      })
     } else {
       setWatchlist((prev) => [
         ...prev,
@@ -106,7 +153,7 @@ export default function TitleDetail() {
           priority: prev.length + 1,
         },
       ])
-      addToast(`${title.title} added to watchlist`, 'success')
+      addToast(`"${title.title}" added to watchlist.`, 'success')
     }
   }
 
@@ -134,7 +181,7 @@ export default function TitleDetail() {
             className="btn btn-primary"
             onClick={() => navigate('/dashboard')}
           >
-            Back to Dashboard
+            Back to Home
           </button>
         </div>
       </div>
@@ -156,7 +203,7 @@ export default function TitleDetail() {
       </div>
 
       {/* ══════════ HERO ══════════ */}
-      <section className={styles.hero} aria-label={`Details for ${title.title}`}>
+      <section className={styles.hero} aria-label={`Detail ${title.title}`}>
         {/* Blurred backdrop */}
         <div className={styles.heroBackdrop}>
           {title.poster_path ? (
@@ -176,17 +223,13 @@ export default function TitleDetail() {
         <div className={styles.heroContent}>
           {/* Poster */}
           <div className={styles.posterWrap}>
-            {title.poster_path ? (
-              <img
-                src={title.poster_path}
-                alt={`Poster ${title.title} (${title.release_year})`}
-                className={styles.poster}
-              />
-            ) : (
-              <div className={styles.posterFallback}>
-                <Film size={40} strokeWidth={1.5} />
-              </div>
-            )}
+            <Poster
+              title={title.title}
+              src={title.poster_path}
+              alt={`Poster ${title.title} (${title.release_year})`}
+              className={styles.poster}
+              size="lg"
+            />
           </div>
 
           {/* Title info */}
@@ -301,7 +344,7 @@ export default function TitleDetail() {
               </div>
               <h3 className={styles.emptyTitle}>No entries yet</h3>
               <p className={styles.emptySubtitle}>
-                You haven't logged this title. Ready to watch?
+                You haven't logged this title yet. Ready to watch?
               </p>
               <Link to="/log" state={{ title }} className="btn btn-primary btn-sm">
                 <Plus size={14} />
@@ -497,10 +540,10 @@ export default function TitleDetail() {
                   type="range"
                   min={0}
                   max={10}
-                  step={0.1}
+                  step={0.5}
                   value={tempRating ?? 5}
                   onChange={(e) => {
-                    setTempRating(parseFloat(e.target.value))
+                    setTempRating(Math.round(parseFloat(e.target.value) * 2) / 2)
                   }}
                   style={{
                     width: '100%',
@@ -540,8 +583,7 @@ export default function TitleDetail() {
             <div className={styles.detailBlock}>
               <span className={styles.detailLabel}>Collections</span>
               <p className={styles.detailValue}>
-                In {collectionsCount}{' '}
-                {collectionsCount === 1 ? 'collection' : 'collections'}
+                In {collectionsCount} {collectionsCount === 1 ? 'collection' : 'collections'}
               </p>
             </div>
           )}

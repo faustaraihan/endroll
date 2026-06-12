@@ -1,0 +1,23 @@
+.placeholder {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 2/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-soft);
+  overflow: hidden;
+}
+
+.initials {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+.sm .initials { font-size: 0.875rem; }
+.md .initials { font-size: 1.25rem; }
+.lg .initials { font-size: 2rem; }

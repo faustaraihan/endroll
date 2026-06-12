@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { FolderPlus, Trash2, ChevronLeft, Plus, Film, Search, X, FolderHeart, Folder, Edit3 } from 'lucide-react'
 import { useApp, useToast } from '../../contexts'
 import { TitleCard } from '../../components'
+import type { Title } from '../../types'
 import styles from './Collections.module.css'
 
 export default function Collections() {
@@ -86,7 +87,7 @@ export default function Collections() {
     }
   }
 
-  function handleAddTitle(title: any) {
+  function handleAddTitle(title: Title) {
     if (!selectedColId) return
     addTitleToCollection(selectedColId, title)
     addToast(`"${title.title}" added to collection.`, 'success')
@@ -213,7 +214,7 @@ export default function Collections() {
                       )}
                     </div>
                     <p className={styles.cardDesc}>
-                      {col.description || 'Belum ada deskripsi untuk koleksi ini.'}
+                      {col.description || 'No description for this collection yet.'}
                     </p>
                   </div>
                 </div>
@@ -378,7 +379,7 @@ export default function Collections() {
                   </div>
                 </div>
                 <p className={styles.detailDesc}>
-                  {activeCollection?.description || 'Belum ada deskripsi untuk koleksi ini.'}
+                  {activeCollection?.description || 'No description for this collection yet.'}
                 </p>
                 <span className={styles.detailMetaCount}>
                   {activeItems.length} titles logged

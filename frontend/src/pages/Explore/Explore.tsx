@@ -9,8 +9,8 @@ import {
   mockUpcomingClassics,
   mockSearchResults
 } from '../../data/mockData'
-import { EmptyState, GenrePill, TitleCard } from '../../components'
-import type { SearchResult, Title } from '../../types'
+import { EmptyState, GenrePill, TitleCard, PosterPlaceholder } from '../../components'
+import type { SearchResult, Title, WatchlistItem } from '../../types'
 import styles from './Explore.module.css'
 
 // Combine all mock data to have a large pool of items to filter dynamically
@@ -35,19 +35,30 @@ export default function Explore() {
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
+  // Live search dengan debounce — hasil muncul sambil mengetik
+  function handleQueryChange(value: string) {
+    setQuery(value)
+    if (!value.trim()) {
+      setResults([])
+      setHasSearched(false)
+      setIsSearching(false)
+    } else {
+      setIsSearching(true)
+    }
+  }
+
+  useEffect(() => {
     if (!query.trim()) return
-    setIsSearching(true)
-    setHasSearched(true)
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const filtered = allMockTitles.filter(r =>
         r.title.toLowerCase().includes(query.toLowerCase())
       )
       setResults(filtered)
+      setHasSearched(true)
       setIsSearching(false)
-    }, 600)
-  }
+    }, 350)
+    return () => clearTimeout(timer)
+  }, [query])
 
   function isInWatchlist(tmdbId: number) {
     return watchlist.some(item => item.title.tmdb_id === tmdbId)
@@ -55,15 +66,22 @@ export default function Explore() {
 
   function handleToggleWatchlist(result: SearchResult) {
     if (isInWatchlist(result.tmdb_id)) {
+      const removed: WatchlistItem[] = watchlist.filter(item => item.title.tmdb_id === result.tmdb_id)
       setWatchlist(prev => prev.filter(item => item.title.tmdb_id !== result.tmdb_id))
-      addToast(`"${result.title}" removed from watchlist.`, 'info')
+      addToast(`"${result.title}" removed from watchlist.`, 'info', {
+        action: {
+          label: 'Undo',
+          onClick: () => setWatchlist(prev => [...removed, ...prev]),
+        },
+      })
     } else {
+      const titleId = crypto.randomUUID()
       const newItem = {
         id: crypto.randomUUID(),
         user_id: 'u1',
-        title_id: crypto.randomUUID(),
+        title_id: titleId,
         title: {
-          id: crypto.randomUUID(),
+          id: titleId,
           tmdb_id: result.tmdb_id,
           title: result.title,
           type: result.type,
@@ -99,16 +117,16 @@ export default function Explore() {
           </p>
         </div>
 
-        <form onSubmit={handleSearch} className={styles.searchForm} role="search">
+        <form onSubmit={e => e.preventDefault()} className={styles.searchForm} role="search">
           <div className={styles.searchBox}>
             <SearchIcon size={16} className={styles.searchIcon} aria-hidden="true" />
             <input
               type="text"
               id="search-input"
               className={styles.searchInput}
-              placeholder="Search movies or series..."
+              placeholder="Search movies or series…"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={e => handleQueryChange(e.target.value)}
               aria-label="Search film or series"
               autoComplete="off"
             />
@@ -116,29 +134,29 @@ export default function Explore() {
               <button
                 type="button"
                 className={styles.clearBtn}
-                onClick={() => { setQuery(''); setResults([]); setHasSearched(false) }}
+                onClick={() => handleQueryChange('')}
                 aria-label="Clear search"
               >
                 <X size={14} />
               </button>
             )}
           </div>
-          <button type="submit" className="btn btn-primary btn-sm" disabled={!query.trim()}>
-            Search
-          </button>
         </form>
       </header>
 
       {/* ── Search Mode States ── */}
       {isSearching && (
-        <div className={styles.loadingState} aria-live="polite">
-          <div className={styles.spinnerWrap}>
-            {[0, 1, 2].map(i => (
-              <div key={i} className={styles.spinnerDot} style={{ '--d': i } as React.CSSProperties} />
-            ))}
-          </div>
-          <p>Searching catalog...</p>
-        </div>
+        <ul className={styles.resultGrid} role="list" aria-label="Loading search results" aria-busy="true">
+          {[0, 1, 2, 3].map(i => (
+            <li key={i}>
+              <div className={styles.skeletonCard}>
+                <div className={`skeleton ${styles.skeletonPoster}`} />
+                <div className={`skeleton ${styles.skeletonLine}`} />
+                <div className={`skeleton ${styles.skeletonLineShort}`} />
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
 
       {!isSearching && hasSearched && results.length === 0 && (
@@ -152,7 +170,7 @@ export default function Explore() {
       {/* ── Search Results Grid ── */}
       {!isSearching && hasSearched && results.length > 0 && (
         <section className={styles.resultsSection} aria-label="Search results">
-          <p className={styles.resultCount}>
+          <p className={styles.resultCount} aria-live="polite">
             <strong>{results.length}</strong> results for "{query}"
           </p>
           <ul className={styles.resultGrid} role="list">
@@ -173,9 +191,8 @@ export default function Explore() {
       )}
 
       {/* ── Explore Recommendation Rows (Visible when not actively searched) ── */}
-      {!hasSearched && (
+      {!hasSearched && !isSearching && (
         <div className={styles.exploreContent}>
-          {/* Trending Row */}
           <ExploreRow
             title="Trending This Week"
             items={mockTrendingThisWeek}
@@ -183,7 +200,6 @@ export default function Explore() {
             isInWatchlist={isInWatchlist}
           />
 
-          {/* Now Playing Row */}
           <ExploreRow
             title="Now Playing in Theatres"
             items={mockNowPlaying}
@@ -191,7 +207,6 @@ export default function Explore() {
             isInWatchlist={isInWatchlist}
           />
 
-          {/* Top Rated Row */}
           <ExploreRow
             title="Top Rated Classics"
             items={mockTopRatedClassics}
@@ -199,7 +214,6 @@ export default function Explore() {
             isInWatchlist={isInWatchlist}
           />
 
-          {/* Upcoming Row */}
           <ExploreRow
             title="Upcoming Releases"
             items={mockUpcomingClassics}
@@ -238,7 +252,12 @@ function SearchResultCard({
       className={styles.resultCard}
       style={{ '--i': index } as React.CSSProperties}
     >
-      <div className={styles.posterWrap} onClick={() => onNavigateDetail(result.tmdb_id)}>
+      <button
+        type="button"
+        className={styles.posterWrap}
+        onClick={() => onNavigateDetail(result.tmdb_id)}
+        aria-label={`View details for ${result.title}`}
+      >
         {result.poster_path && !imgError ? (
           <img
             src={result.poster_path}
@@ -248,21 +267,25 @@ function SearchResultCard({
             loading="lazy"
           />
         ) : (
-          <div className={styles.posterFallback}>
-            <Film size={20} />
-          </div>
+          <PosterPlaceholder title={result.title} size="md" />
         )}
         <div className={styles.typePill}>
           {result.type === 'film' ? <Film size={8} /> : <Tv size={8} />}
           {result.type === 'film' ? 'Film' : 'Series'}
         </div>
-      </div>
+      </button>
 
       <div className={styles.resultInfo}>
         <div>
-          <h2 className={styles.resultTitle} onClick={() => onNavigateDetail(result.tmdb_id)}>
-            {result.title}
-            <span className={styles.resultYear}>({result.release_year})</span>
+          <h2 className={styles.resultTitle}>
+            <button
+              type="button"
+              className={styles.resultTitleBtn}
+              onClick={() => onNavigateDetail(result.tmdb_id)}
+            >
+              {result.title}
+              <span className={styles.resultYear}>({result.release_year})</span>
+            </button>
           </h2>
         </div>
 
@@ -278,9 +301,10 @@ function SearchResultCard({
           <button
             className={`btn btn-sm ${inWatchlist ? 'btn-secondary' : 'btn-ghost'} ${styles.watchlistBtn}`}
             onClick={() => onToggleWatchlist(result)}
-            title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+            aria-pressed={inWatchlist}
+            title={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
           >
-            <Bookmark size={13} fill={inWatchlist ? "currentColor" : "none"} />
+            <Bookmark size={13} fill={inWatchlist ? 'currentColor' : 'none'} />
             <span>{inWatchlist ? 'In Watchlist' : 'Watchlist'}</span>
           </button>
           <button
@@ -294,8 +318,6 @@ function SearchResultCard({
     </article>
   )
 }
-
-
 
 /* ── Reusable Swipeable Horizontal Carousel Row ── */
 interface ExploreRowProps {

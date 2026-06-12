@@ -102,12 +102,14 @@ export function SeriesTracker({ title }: SeriesTrackerProps) {
     return map
   }, [activeSeasonLogs, watchLogIndexMap])
 
-  // Reset on season change
-  useEffect(() => {
+  // Reset on season change — state adjustment during render, not an effect
+  const [prevSeasonIndex, setPrevSeasonIndex] = useState(activeSeasonIndex)
+  if (prevSeasonIndex !== activeSeasonIndex) {
+    setPrevSeasonIndex(activeSeasonIndex)
     setEditingLogId(null)
     setMoreMenuLogId(null)
     setIsEditingSeasonRating(false)
-  }, [activeSeasonIndex])
+  }
 
   // Close more menu on outside click
   useEffect(() => {

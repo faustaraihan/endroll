@@ -1,6 +1,6 @@
 /**
- * Format date string into Indonesian readable format
- * e.g., "12 Maret 2026"
+ * Format date string into a readable format
+ * e.g., "March 12, 2026"
  */
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -12,7 +12,7 @@ export function formatDate(dateStr: string): string {
 
 /**
  * Get just the month and year
- * e.g., "Maret 2026"
+ * e.g., "March 2026"
  */
 export function formatMonth(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -22,11 +22,32 @@ export function formatMonth(dateStr: string): string {
 }
 
 /**
- * Get the first two initials of a string
- * e.g., "John Doe" -> "JO"
+ * Get the first two initials of a string, word-aware
+ * e.g., "The Godfather" -> "TG", "Parasite" -> "PA"
  */
 export function getInitials(name: string): string {
+  const words = name
+    .split(/\s+/)
+    .filter(w => /[a-zA-Z0-9]/.test(w))
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
   return name.slice(0, 2).toUpperCase()
+}
+
+/**
+ * Deterministic hue from a string, for curated-looking poster placeholders.
+ * Same title always yields the same color.
+ */
+export function getColorFromString(str: string): string {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+    hash |= 0
+  }
+  const hue = Math.abs(hash) % 360
+  // Muted saturation/lightness to stay within the dark cinematic palette
+  return `hsl(${hue}, 35%, 24%)`
 }
 
 /**

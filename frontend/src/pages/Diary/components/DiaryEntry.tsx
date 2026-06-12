@@ -1,7 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Film, Star } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { formatDate } from '../../../utils'
+import { Poster } from '../../../components'
 import styles from '../Diary.module.css'
 import type { WatchLog } from '../../../types'
 
@@ -23,18 +24,13 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({
     >
       {/* Poster */}
       <Link to={`/title/${log.title.id}`} className={styles.entryPosterLink}>
-        {log.title.poster_path ? (
-          <img
-            src={log.title.poster_path}
-            alt={`Poster film ${log.title.title} (${log.title.release_year})`}
-            className={styles.posterImg}
-            loading="lazy"
-          />
-        ) : (
-          <div className={styles.posterFallback}>
-            <Film size={24} />
-          </div>
-        )}
+        <Poster
+          title={log.title.title}
+          src={log.title.poster_path}
+          alt={`Poster ${log.title.type === 'film' ? 'film' : 'series'} ${log.title.title} (${log.title.release_year})`}
+          className={styles.posterImg}
+          size="sm"
+        />
       </Link>
 
       {/* Body */}
