@@ -33,12 +33,16 @@ export default function Watchlist() {
       {/* ── Header strip ── */}
       <div className={styles.topBar}>
         <div className={styles.topLeft}>
-          <h1 className={styles.pageTitle}>Watchlist</h1>
-          <span className={styles.count}>{watchlist.length} titles</span>
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 5 }}>To watch · {watchlist.length}</p>
+            <h1 className={styles.pageTitle}>Watchlist</h1>
+          </div>
         </div>
-        <Link to="/explore" className="btn btn-secondary btn-sm">
-          <Compass size={14} /> Explore films
-        </Link>
+        <div className={styles.topRight}>
+          <Link to="/explore" className="btn btn-secondary btn-sm">
+            <Compass size={14} /> Explore
+          </Link>
+        </div>
       </div>
 
       {watchlist.length === 0 ? (

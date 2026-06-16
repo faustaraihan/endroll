@@ -252,19 +252,24 @@ export const mockStreak: Streak = {
 // ---------------------------------------------------------------------------
 function generateDailyActivity(): Record<string, number> {
   const activity: Record<string, number> = {}
-  const today = new Date('2026-06-02')
-  for (let i = 89; i >= 0; i--) {
+  const today = new Date('2026-06-16')
+  for (let i = 364; i >= 0; i--) {
     const d = new Date(today)
     d.setDate(d.getDate() - i)
     const key = d.toISOString().split('T')[0]
-    // Simulate realistic watch activity: ~40% days have watches
+    // Simulate realistic watch activity: ~35% days have watches
     const rand = Math.random()
-    if (rand < 0.12) activity[key] = 3       // watched 3+
-    else if (rand < 0.25) activity[key] = 2  // watched 2
-    else if (rand < 0.45) activity[key] = 1  // watched 1
+    if (rand < 0.05) activity[key] = 3       // watched 3+
+    else if (rand < 0.12) activity[key] = 2  // watched 2
+    else if (rand < 0.35) activity[key] = 1  // watched 1
     // else 0 (no activity)
   }
-  // Force some recent activity to match the streak
+  // Force some recent activity to match the streak and recent logs
+  activity['2026-06-16'] = 2
+  activity['2026-06-15'] = 1
+  activity['2026-06-12'] = 1
+  activity['2026-06-08'] = 1
+  activity['2026-06-02'] = 1
   activity['2026-05-28'] = 2
   activity['2026-05-25'] = 1
   activity['2026-05-20'] = 3

@@ -6,9 +6,9 @@
 
 .main {
   flex: 1;
-  margin-left: 220px;
+  margin-left: 232px;
   min-height: 100dvh;
-  background: var(--color-bg);
+  background: var(--bg, var(--color-bg));
   overflow-x: hidden;
 }
 

@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import { formatDate } from '../../../utils'
-import { Poster } from '../../../components'
+import { Poster, Badge } from '../../../components'
 import styles from '../Diary.module.css'
 import type { WatchLog } from '../../../types'
 
@@ -12,17 +11,27 @@ interface DiaryEntryProps {
   personalRating?: number
 }
 
-export const DiaryEntry: React.FC<DiaryEntryProps> = ({
-  log,
-  index,
-  personalRating
-}) => {
+export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRating }) => {
+  const date = log.watched_at ? new Date(log.watched_at) : null
+  const day = date?.getDate()
+  const month = date?.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+
+  const ratingToShow = log.title.type === 'film'
+    ? (log.rating ?? personalRating)
+    : personalRating
+
   return (
     <article
       className={styles.entry}
       style={{ '--i': index } as React.CSSProperties}
     >
-      {/* Poster */}
+      {/* Date column */}
+      <div className={styles.entryDate}>
+        {day && <span className={styles.entryDateDay}>{day}</span>}
+        {month && <span className={styles.entryDateMonth}>{month}</span>}
+      </div>
+
+      {/* Poster thumb */}
       <Link to={`/title/${log.title.id}`} className={styles.entryPosterLink}>
         <Poster
           title={log.title.title}
@@ -33,56 +42,36 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({
         />
       </Link>
 
-      {/* Body */}
+      {/* Info */}
       <div className={styles.entryBody}>
-        <div className={styles.entryRow}>
-          <div className={styles.entryLeft}>
-            <Link to={`/title/${log.title.id}`} className={styles.entryTitleLink}>
-              <h2 className={styles.entryTitle}>{log.title.title}</h2>
-            </Link>
-            <div className={styles.entryMeta}>
-              {log.title.release_year && (
-                <span className={styles.metaYear}>{log.title.release_year}</span>
-              )}
-              <span className={styles.metaType}>
-                {log.title.type === 'film' ? 'Film' : 'Series'}
-              </span>
-              {log.title.type === 'film' && log.rewatch_count > 0 && (
-                <span className={`${styles.metaBadge} ${styles.metaBadgeViolet}`}>
-                  Rewatch #{log.rewatch_count}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.entryRight}>
-            {log.title.type === 'film' && log.rating !== undefined && log.rating !== null ? (
-              <div className={styles.ratingBig}>
-                <Star size={14} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
-                <span>{log.rating.toFixed(1)}</span>
-                <span className={styles.ratingMax}>/10</span>
-              </div>
-            ) : personalRating !== undefined ? (
-              <div className={styles.ratingBig}>
-                <Star size={14} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
-                <span>{personalRating.toFixed(1)}</span>
-                <span className={styles.ratingMax}>/10</span>
-              </div>
-            ) : null}
-          </div>
+        <Link to={`/title/${log.title.id}`} className={styles.entryTitleLink}>
+          <h2 className={styles.entryTitle}>{log.title.title}</h2>
+        </Link>
+        <div className={styles.entryMeta}>
+          {log.title.release_year && (
+            <span className={styles.metaYear}>{log.title.release_year}</span>
+          )}
+          <span className={styles.metaType}>
+            {log.title.type === 'film' ? 'Film' : 'Series'}
+          </span>
+          {log.rewatch_count > 0 && (
+            <Badge variant="gold">Rewatch ×{log.rewatch_count}</Badge>
+          )}
         </div>
-
         {log.notes && (
-          <blockquote className={styles.notes}>
-            "{log.notes}"
-          </blockquote>
+          <blockquote className={styles.notes}>"{log.notes}"</blockquote>
         )}
+      </div>
 
-        <div className={styles.entryFooter}>
-          <time className={styles.date} dateTime={log.watched_at}>
-            {formatDate(log.watched_at)}
-          </time>
-        </div>
+      {/* Rating */}
+      <div className={styles.entryRight}>
+        {ratingToShow != null && (
+          <span className={styles.ratingBig}>
+            <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
+            {ratingToShow.toFixed(1)}
+            <span className={styles.ratingMax}>/10</span>
+          </span>
+        )}
       </div>
     </article>
   )

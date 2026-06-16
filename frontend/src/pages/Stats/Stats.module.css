@@ -1,6 +1,6 @@
-/* =====================================================================
-   Stats Page — Cinematic dashboard layout
-   ===================================================================== */
+/* ==========================================================================
+   Stats Page — Consistent with Diary/Dashboard layout conventions
+   ========================================================================== */
 
 .page {
   display: flex;
@@ -13,116 +13,367 @@
   width: 100%;
 }
 
-/* ── Header ── */
-.header {
+/* ── Personalized Profile Header ── */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.profileAvatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card-2, #1e1d21);
+  border: 2px solid var(--accent-line, rgba(217, 164, 65, 0.28));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(217, 164, 65, 0.08);
+}
+
+.avatarGradient {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(217, 164, 65, 0.15) 0%, rgba(217, 164, 65, 0.03) 100%);
+}
+
+.profileAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInitial {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--accent-ink, #e7b865);
+  line-height: 1;
+}
+
+.profileInfo {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 4px;
 }
 
 .pageTitle {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-size: clamp(1.625rem, 3vw, 2.125rem);
   font-weight: 400;
-  color: var(--color-text-primary);
+  color: var(--text, var(--color-text-primary));
   letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
-.pageSub {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  max-width: 480px;
+.profileMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-3, var(--color-text-muted));
 }
 
-/* ── Main grid: heatmap left + stat cards right ── */
-.mainGrid {
+.usernameHandle {
+  color: var(--accent-ink, #e7b865);
+  font-weight: 500;
+}
+
+.metaDot {
+  color: var(--text-4, #514e49);
+}
+
+.memberSince {
+  color: var(--text-3, var(--color-text-muted));
+}
+
+/* ── Hero Stats (1x4 on desktop, transitions to 2x2 and 1x1 on smaller screens) ── */
+.heroStats {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border, var(--color-border-soft));
+  border-radius: var(--radius-lg);
+  background: var(--card, var(--color-bg-card));
+  overflow: hidden;
+  width: 100%;
+}
+
+.heroStatBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 24px;
+  border-right: 1px solid var(--border, var(--color-border-soft));
+  transition: background var(--transition-fast);
+}
+
+.heroStatBlock:hover {
+  background: var(--card-hover, rgba(255, 255, 255, 0.02));
+}
+
+.heroStatBlock:last-child {
+  border-right: none;
+}
+
+.heroValue {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text, var(--color-text-primary));
+  letter-spacing: -0.02em;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.heroUnit {
+  font-size: 13px;
+  color: var(--text-3, var(--color-text-muted));
+  font-weight: 500;
+}
+
+.heroValueAccent {
+  color: var(--accent-ink, #e7b865);
+}
+
+.heroLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3, var(--color-text-muted));
+}
+
+/* ── Streak & Heatmap Grid (2 Column) ── */
+.streakGrid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
   gap: 24px;
   align-items: stretch;
 }
 
-/* ── Heatmap card ── */
-.heatmapCard {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
+/* Left: Streak card */
+.streakCard {
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
   border-radius: var(--radius-lg);
-  padding: 24px 28px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  transition: border-color var(--transition-fast);
+}
+
+.streakCard:hover {
+  border-color: var(--border-strong, var(--color-border));
+}
+
+.streakCardSecured {
+  background: var(--accent-soft, rgba(217, 164, 65, 0.12));
+  border-color: var(--accent-line, rgba(217, 164, 65, 0.30));
+}
+
+.streakCardSecured:hover {
+  border-color: var(--accent, #d9a441);
+}
+
+.streakCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.streakFlameSquare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3, var(--color-text-muted));
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid var(--border, var(--color-border-soft));
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.streakCardSecured .streakFlameSquare {
+  color: var(--accent-contrast, #17120a);
+  background: var(--accent, #d9a441);
+  border-color: transparent;
+  box-shadow: 0 0 16px rgba(217, 164, 65, 0.25);
+}
+
+.streakCardInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.heatmapTop {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 32px;
-}
-
-/* Streak info block */
-.streakInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 140px;
-  flex-shrink: 0;
-  padding-right: 32px;
-  border-right: 1px solid var(--color-border-soft);
-}
-
-.streakLabel {
-  font-size: 0.6875rem;
+.streakCardTitle {
+  font-size: 0.9375rem;
   font-weight: 600;
+  color: var(--text, var(--color-text-primary));
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.streakCardStatus {
+  font-family: var(--font-mono);
+  font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-amber-400);
+  color: var(--accent-ink, #e7b865);
+  margin: 0;
 }
 
-.streakValue {
-  font-size: 3.25rem;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
+.streakCardPending .streakCardStatus {
+  color: var(--text-3, var(--color-text-muted));
 }
 
-.streakUnit {
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--color-text-muted);
-  padding-bottom: 6px;
+.streakCardBest {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-3, var(--color-text-muted));
+  font-weight: 500;
+  flex-shrink: 0;
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.streakBest {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  margin-top: 2px;
+.streakCardBest strong {
+  display: block;
+  color: var(--text, var(--color-text-primary));
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  font-weight: 600;
 }
 
-/* Heatmap grid */
-.heatmapWrap {
+.streakCardSecured .streakCardBest strong {
+  color: var(--accent-ink, #e7b865);
+}
+
+/* Weekly tracker inside streak card */
+.weeklyTracker {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  border-top: 1px solid var(--border, var(--color-border-soft));
+  padding-top: 18px;
+}
+
+.streakCardSecured .weeklyTracker {
+  border-color: var(--accent-line, rgba(217, 164, 65, 0.30));
+}
+
+.weeklyTrackerTitle {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3, var(--color-text-muted));
+}
+
+.weeklyTrackerDays {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.weeklyDayCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   flex: 1;
+}
+
+.weeklyDayBubble {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3, var(--color-text-muted));
+  background: transparent;
+  border: 1px solid var(--border, var(--color-border-soft));
+  transition: all var(--transition-fast);
+}
+
+.weeklyDayBubbleLogged {
+  color: var(--accent-contrast, #17120a) !important;
+  background: var(--accent, #d9a441) !important;
+  border-color: transparent !important;
+  box-shadow: 0 0 8px rgba(217, 164, 65, 0.2);
+}
+
+.weeklyDayToday {
+  border-color: var(--accent, #d9a441);
+  color: var(--text, var(--color-text-primary));
+  position: relative;
+}
+
+.weeklyDayToday::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent, #d9a441);
+}
+
+.weeklyDayLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-3, var(--color-text-muted));
+}
+
+/* Right: Heatmap card */
+.heatmapCard {
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+  transition: border-color var(--transition-fast);
   min-width: 0;
 }
 
-.heatmapLegendRow {
+.heatmapCard:hover {
+  border-color: var(--border-strong, var(--color-border));
+}
+
+.heatmapHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .heatmapPeriod {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3, var(--color-text-muted));
 }
 
 .heatmapLegend {
@@ -133,45 +384,45 @@
 
 .legendLabel {
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--text-3, var(--color-text-muted));
 }
 
 .legendDot {
   display: inline-block;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
 }
 
 .heatmapScroll {
   overflow-x: auto;
-  padding-bottom: 8px;
-  /* Hide scrollbar for a cleaner look, but still scrollable */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.heatmapScroll::-webkit-scrollbar {
-  display: none;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
 }
 
-/* The actual heatmap */
+.heatmapScroll::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome/Safari */
+}
+
 .heatmap {
   display: flex;
-  gap: 3px;
+  gap: 2px;
   min-width: max-content;
 }
 
 .heatmapCol {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .heatmapCell {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
-  cursor: default;
   transition: opacity 0.15s ease;
 }
 
@@ -179,71 +430,206 @@
   opacity: 0.75;
 }
 
-/* Activity level colors */
-.cellEmpty {
-  background: rgba(255, 255, 255, 0.03);
+.cellEmpty { background: rgba(255, 255, 255, 0.03); }
+.cellLow { background: var(--accent-soft, rgba(217, 164, 65, 0.18)); }
+.cellMid { background: var(--accent-line, rgba(217, 164, 65, 0.40)); }
+.cellHigh { background: var(--accent-ink, #e7b865); }
+
+/* ── Section Header (matches Dashboard .sectionHeader) ── */
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 14px;
 }
 
-.cellLow {
-  background: #3f3f46;
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text, var(--color-text-primary));
+  letter-spacing: -0.015em;
 }
 
-.cellMid {
-  background: #71717a;
+.sectionBadge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-3, var(--color-text-muted));
 }
 
-.cellHigh {
-  background: #f59e0b; /* Amber highlight */
+/* ── Comfort Cinema (poster row) ── */
+/* ── Comfort Cinema (Compact row below Hero Stats) ── */
+.comfortSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* ── Stat cards (2×2 grid on the right) ── */
-.statCardsGrid {
+.sectionHeaderCompact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sectionTitleCompact {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3, var(--color-text-muted));
+  margin: 0;
+}
+
+.sectionBadgeCompact {
+  font-size: 0.75rem;
+  color: var(--text-4, #514e49);
+}
+
+.comfortList {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
   width: 100%;
 }
 
+.comfortPosterCard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-/* ── Bottom row: genre + eras ── */
-.bottomRow {
+.comfortPosterWrap {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--card-2, var(--color-bg-elevated));
+  position: relative;
+}
+
+.comfortPoster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.comfortPosterCard:hover .comfortPoster {
+  transform: scale(1.04);
+}
+
+.comfortCountBadge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(18, 17, 20, 0.82);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--accent-ink, #e7b865);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 600;
+  border: 1px solid var(--accent-line, rgba(217, 164, 65, 0.25));
+}
+
+/* ── Two-column split ── */
+.splitRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-/* Genre Focus */
-.genreCard,
-.erasCard {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
+/* ── Chart card ── */
+.chartCard {
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
   border-radius: var(--radius-lg);
-  padding: 22px 24px;
-}
-
-.sectionHeader {
+  padding: 24px;
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color var(--transition-fast);
+}
+
+.chartCard:hover {
+  border-color: var(--border-strong, var(--color-border));
+}
+
+.chartWrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 120px;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.chartCol {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
+  gap: 8px;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
 }
 
-.sectionTitle {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  letter-spacing: -0.01em;
+.chartBarWrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px 4px 0 0;
 }
 
-.sectionBadge {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+.chartBar {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.chartBarPeak {
+  background: var(--accent, #d9a441) !important;
+  box-shadow: 0 0 12px var(--accent-soft, rgba(217,164,65,0.12));
+}
+
+.chartLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3, var(--color-text-muted));
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+/* ── Genre rows ── */
+.genreCard {
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color var(--transition-fast);
+}
+
+.genreCard:hover {
+  border-color: var(--border-strong, var(--color-border));
 }
 
 .genreList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .genreRow {
@@ -254,15 +640,16 @@
 
 .genreName {
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  width: 60px;
+  color: var(--text, var(--color-text-primary));
+  width: 72px;
   flex-shrink: 0;
+  font-weight: 500;
 }
 
 .genreTrack {
   flex: 1;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
@@ -270,140 +657,121 @@
 .genreFill {
   height: 100%;
   border-radius: var(--radius-full);
-  /* Clean neutral grey gradients that get lighter/darker */
-  background: linear-gradient(90deg,
-    hsl(240, 5%, calc(30% - var(--bar-index, 0) * 4%)),
-    hsl(240, 5%, calc(45% - var(--bar-index, 0) * 5%))
-  );
+  background: rgba(255, 255, 255, 0.12);
   transition: width 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* First bar: amber highlight */
 .genreRow:first-child .genreFill {
-  background: linear-gradient(90deg, #f59e0b, #fcd34d);
+  background: var(--accent-ink, #e7b865);
 }
 
 .genreCount {
   font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  width: 54px;
+  color: var(--text-3, var(--color-text-muted));
+  width: 60px;
   flex-shrink: 0;
   text-align: right;
 }
 
-/* Eras Explored */
-.erasChart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  height: 100px;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.eraCol {
+/* ── Faces (Directors & Actors) ── */
+.facesCard {
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
+  border-radius: var(--radius-lg);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  height: 100%;
+  gap: 16px;
+  transition: border-color var(--transition-fast);
 }
 
-.eraBarWrap {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  align-items: flex-end;
+.facesCard:hover {
+  border-color: var(--border-strong, var(--color-border));
 }
 
-.eraBar {
-  width: 100%;
-  background: linear-gradient(to top, #27272a, #71717a);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  min-height: 4px;
-  transition: height 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.eraLabel {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
-/* ── Cinematic Flow (Monthly Activity) ── */
-.flowCard {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-lg);
-  padding: 22px 24px;
-}
-
-.flowChart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  height: 120px;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.flowCol {
+.facesList {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  height: 100%;
-  min-width: 0;
+  gap: 16px;
+  margin-top: 4px;
 }
 
-.flowBarWrap {
-  flex: 1;
-  width: 100%;
+.faceItem {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  gap: 14px;
+  transition: transform var(--transition-fast);
 }
 
-.flowBar {
+.faceItem:hover {
+  transform: translateX(4px);
+}
+
+.faceAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--card-2, var(--color-bg-elevated));
+  overflow: hidden;
+  border: 1px solid var(--border, var(--color-border-soft));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast);
+}
+
+.faceItem:hover .faceAvatar {
+  border-color: var(--accent-line, rgba(217, 164, 65, 0.3));
+}
+
+.faceAvatar img {
   width: 100%;
-  background: linear-gradient(to top, #27272a, #71717a);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  min-height: 4px;
-  transition: height 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+  height: 100%;
+  object-fit: cover;
 }
 
-.flowBarPeak {
-  background: linear-gradient(to top, #f59e0b, #fcd34d) !important;
+.faceInitials {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--accent-ink, #e7b865);
 }
 
-.flowLabel {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  white-space: nowrap;
+.faceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-/* ── Bottom Grid (Directors & Actors side-by-side) ── */
-.bottomGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+.faceName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text, var(--color-text-primary));
+  transition: color var(--transition-fast);
 }
 
-/* ── Directors ── */
-.directorsCard {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-lg);
-  padding: 22px 24px;
+.faceItem:hover .faceName {
+  color: var(--accent-ink, #e7b865);
+}
+
+.faceCount {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3, var(--color-text-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .viewAllBtn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.8125rem;
-  color: var(--color-violet-400);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-3, var(--color-text-muted));
   cursor: pointer;
   transition: color var(--transition-fast);
   background: none;
@@ -412,222 +780,55 @@
 }
 
 .viewAllBtn:hover {
-  color: var(--color-violet-300);
-}
-
-.directorsList {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-
-.directorItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: default;
-}
-
-.directorAvatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #27272a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-  border: 2px solid var(--color-border-soft);
-}
-
-.directorAvatarImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.directorInitials {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.02em;
-}
-
-.directorInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.directorName {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.directorCount {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-}
-
-/* ── Actors ── */
-.actorsCard {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-lg);
-  padding: 22px 24px;
-}
-
-.actorsList {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-
-.actorItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: default;
-}
-
-.actorAvatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #27272a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-  border: 2px solid var(--color-border-soft);
-}
-
-.actorAvatarImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.actorInitials {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.02em;
-}
-
-.actorInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.actorName {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.actorCount {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--accent-ink, #e7b865);
 }
 
 /* ── Responsive ── */
+@media (max-width: 1024px) {
+  .streakGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .page {
     padding: 24px 16px 100px;
     gap: 24px;
   }
 
-  .mainGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .statCardsGrid {
-    width: 100%;
-  }
-
-  .heatmapCard {
-    padding: 20px;
-  }
-
-  .heatmapTop {
+  .profileHeader {
     flex-direction: column;
-    align-items: stretch;
-    gap: 24px;
-  }
-
-  .streakInfo {
-    border-right: none;
-    padding-right: 0;
-    border-bottom: 1px solid var(--color-border-soft);
-    padding-bottom: 20px;
-    align-items: center;
     text-align: center;
+    gap: 16px;
   }
 
-  .streakValue {
+  .profileMeta {
     justify-content: center;
   }
 
-  .heatmapCell {
-    width: 9px;
-    height: 9px;
+  .heroStats {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .legendDot {
-    width: 9px;
-    height: 9px;
+  .heroStatBlock {
+    padding: 16px 20px;
   }
 
-  .bottomRow {
+  .heroStatBlock:nth-child(even) {
+    border-right: none;
+  }
+
+  .heroStatBlock:nth-child(1),
+  .heroStatBlock:nth-child(2) {
+    border-bottom: 1px solid var(--border, var(--color-border-soft));
+  }
+
+  .splitRow {
     grid-template-columns: 1fr;
     gap: 20px;
   }
 
-  .bottomGrid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .directorsList,
-  .actorsList {
-    gap: 16px;
-  }
 }
 
-@media (max-width: 600px) {
-  .flowChart {
-    gap: 6px;
-    height: 100px;
-  }
-  .flowLabel {
-    font-size: 0.625rem;
-    transform: rotate(-45deg);
-    margin-top: 8px;
-    padding-right: 4px;
-    white-space: nowrap;
-  }
-}
 
-@media (max-width: 480px) {
-  .heatmapCell {
-    width: 8px;
-    height: 8px;
-  }
-
-  .heatmap {
-    gap: 2px;
-  }
-
-  .heatmapCol {
-    gap: 2px;
-  }
-}

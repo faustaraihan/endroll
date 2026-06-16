@@ -27,6 +27,7 @@ export function Poster({ title, src, alt, className, size = 'md' }: PosterProps)
       alt={alt}
       className={className}
       loading="lazy"
+      draggable={false}
       onError={() => setImgError(true)}
     />
   )

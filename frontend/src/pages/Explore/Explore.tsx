@@ -1,64 +1,103 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search as SearchIcon, Film, Tv, Plus, X, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search as SearchIcon, Plus, X, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
-import {
-  mockTrendingThisWeek,
-  mockNowPlaying,
-  mockTopRatedClassics,
-  mockUpcomingClassics,
-  mockSearchResults
-} from '../../data/mockData'
-import { EmptyState, GenrePill, TitleCard, PosterPlaceholder } from '../../components'
+import { EmptyState, TitleCard, Poster } from '../../components'
 import type { SearchResult, Title, WatchlistItem } from '../../types'
 import styles from './Explore.module.css'
 
-// Combine all mock data to have a large pool of items to filter dynamically
-const allMockTitles = Array.from(
-  new Map(
-    [
-      ...mockTrendingThisWeek,
-      ...mockNowPlaying,
-      ...mockTopRatedClassics,
-      ...mockUpcomingClassics,
-      ...mockSearchResults
-    ].map(item => [item.tmdb_id, item])
-  ).values()
-)
-
 export default function Explore() {
-  const { watchlist, setWatchlist } = useApp()
+  const { watchlist, setWatchlist, exploreData } = useApp()
   const { addToast } = useToast()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
+  const [dropdownResults, setDropdownResults] = useState<SearchResult[]>([])
+  const [pageResults, setPageResults] = useState<SearchResult[]>([])
+  
+  const [isSearchingDropdown, setIsSearchingDropdown] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  
+  const [isSearchingPage, setIsSearchingPage] = useState(false)
+  const [hasSearchedPage, setHasSearchedPage] = useState(false)
 
-  // Live search dengan debounce — hasil muncul sambil mengetik
-  function handleQueryChange(value: string) {
-    setQuery(value)
-    if (!value.trim()) {
-      setResults([])
-      setHasSearched(false)
-      setIsSearching(false)
-    } else {
-      setIsSearching(true)
-    }
-  }
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+  const debounceTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  function handleQueryChange(value: string) {
+    setQuery(value)
+    
+    if (debounceTimerRef.current) {
+      window.clearTimeout(debounceTimerRef.current)
+    }
+
+    if (!value.trim()) {
+      setIsDropdownOpen(false)
+      setDropdownResults([])
+      setIsSearchingDropdown(false)
+      return
+    }
+
+    setIsSearchingDropdown(true)
+    setIsDropdownOpen(true)
+
+    debounceTimerRef.current = window.setTimeout(() => {
+      const allExploreTitles = Array.from(
+        new Map(
+          [
+            ...exploreData.trending,
+            ...exploreData.nowPlaying,
+            ...exploreData.classics,
+            ...exploreData.upcoming,
+            ...exploreData.searchResults
+          ].map(item => [item.tmdb_id, item])
+        ).values()
+      )
+      const filtered = allExploreTitles.filter(r =>
+        r.title.toLowerCase().includes(value.toLowerCase())
+      )
+      setDropdownResults(filtered)
+      setIsSearchingDropdown(false)
+    }, 350)
+  }
+
+  function handleSearchSubmit(e?: React.FormEvent) {
+    if (e) e.preventDefault()
     if (!query.trim()) return
-    const timer = setTimeout(() => {
-      const filtered = allMockTitles.filter(r =>
+
+    setIsDropdownOpen(false)
+    setIsSearchingPage(true)
+    setHasSearchedPage(true)
+
+    // Simulate search loading for full page
+    setTimeout(() => {
+      const allExploreTitles = Array.from(
+        new Map(
+          [
+            ...exploreData.trending,
+            ...exploreData.nowPlaying,
+            ...exploreData.classics,
+            ...exploreData.upcoming,
+            ...exploreData.searchResults
+          ].map(item => [item.tmdb_id, item])
+        ).values()
+      )
+      const filtered = allExploreTitles.filter(r =>
         r.title.toLowerCase().includes(query.toLowerCase())
       )
-      setResults(filtered)
-      setHasSearched(true)
-      setIsSearching(false)
-    }, 350)
-    return () => clearTimeout(timer)
-  }, [query])
+      setPageResults(filtered)
+      setIsSearchingPage(false)
+    }, 400)
+  }
 
   function isInWatchlist(tmdbId: number) {
     return watchlist.some(item => item.title.tmdb_id === tmdbId)
@@ -102,51 +141,110 @@ export default function Explore() {
     navigate(`/title/${tmdbId}`)
   }
 
-  const handleLog = (result: SearchResult) => {
-    navigate('/log', { state: { title: result } })
-  }
 
   return (
     <div className={styles.page}>
       {/* ── Page Header (Consistent layout) ── */}
       <header className={styles.header}>
         <div className={styles.headerText}>
+          <p className="eyebrow" style={{ marginBottom: 7 }}>Discover</p>
           <h1 className={styles.pageTitle}>Explore</h1>
           <p className={styles.pageSub}>
             Discover new cinema, television, or search for titles to log.
           </p>
         </div>
 
-        <form onSubmit={e => e.preventDefault()} className={styles.searchForm} role="search">
-          <div className={styles.searchBox}>
-            <SearchIcon size={16} className={styles.searchIcon} aria-hidden="true" />
-            <input
-              type="text"
-              id="search-input"
-              className={styles.searchInput}
-              placeholder="Search movies or series…"
-              value={query}
-              onChange={e => handleQueryChange(e.target.value)}
-              aria-label="Search film or series"
-              autoComplete="off"
-            />
-            {query && (
-              <button
-                type="button"
-                className={styles.clearBtn}
-                onClick={() => handleQueryChange('')}
-                aria-label="Clear search"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-        </form>
+        <div className={styles.searchContainer} ref={searchContainerRef}>
+          <form onSubmit={handleSearchSubmit} className={styles.searchForm} role="search">
+            <div className={styles.searchBox}>
+              <input
+                type="text"
+                id="search-input"
+                className={styles.searchInput}
+                placeholder="Search movies or series…"
+                value={query}
+                onChange={e => handleQueryChange(e.target.value)}
+                onFocus={() => {
+                  if (query.trim().length > 0) setIsDropdownOpen(true)
+                }}
+                aria-label="Search film or series"
+                autoComplete="off"
+              />
+              {query && (
+                <button
+                  type="button"
+                  className={styles.clearBtn}
+                  onClick={() => {
+                    setQuery('')
+                    setHasSearchedPage(false)
+                    setIsDropdownOpen(false)
+                  }}
+                  aria-label="Clear search"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+            <button type="submit" className={styles.searchSubmitBtn} aria-label="Submit search">
+              <SearchIcon size={16} />
+            </button>
+          </form>
+
+          {isDropdownOpen && query.trim().length > 0 && (
+            <div className={styles.dropdownMenu}>
+              {isSearchingDropdown ? (
+                <div className={styles.dropdownLoading}>Searching...</div>
+              ) : dropdownResults.length > 0 ? (
+                <ul className={styles.dropdownList}>
+                  {dropdownResults.slice(0, 5).map(result => (
+                    <li key={result.tmdb_id}>
+                      <button 
+                        type="button"
+                        className={styles.dropdownItem}
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                          handleNavigateDetail(result.tmdb_id)
+                        }}
+                      >
+                        <Poster 
+                          title={result.title}
+                          src={result.poster_path} 
+                          alt="" 
+                          className={styles.dropdownPoster} 
+                          size="sm"
+                        />
+                        <div className={styles.dropdownInfo}>
+                          <span className={styles.dropdownTitle}>{result.title}</span>
+                          <span className={styles.dropdownYear}>
+                            {result.release_year} • {result.type === 'film' ? 'Film' : 'Series'}
+                          </span>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                  {dropdownResults.length > 5 && (
+                    <li className={styles.dropdownViewAllWrap}>
+                       <button 
+                          type="button" 
+                          className={styles.dropdownViewAll}
+                          onClick={handleSearchSubmit}
+                       >
+                         View all {dropdownResults.length} results
+                       </button>
+                    </li>
+                  )}
+                </ul>
+              ) : (
+                <div className={styles.dropdownEmpty}>No results found for "{query}"</div>
+              )}
+            </div>
+          )}
+        </div>
       </header>
 
       {/* ── Search Mode States ── */}
-      {isSearching && (
-        <ul className={styles.resultGrid} role="list" aria-label="Loading search results" aria-busy="true">
+      {isSearchingPage && (
+        <ul className={styles.resultList} role="list" aria-label="Loading search results" aria-busy="true">
           {[0, 1, 2, 3].map(i => (
             <li key={i}>
               <div className={styles.skeletonCard}>
@@ -159,7 +257,7 @@ export default function Explore() {
         </ul>
       )}
 
-      {!isSearching && hasSearched && results.length === 0 && (
+      {!isSearchingPage && hasSearchedPage && pageResults.length === 0 && (
         <EmptyState
           icon={<SearchIcon size={36} strokeWidth={1.5} />}
           title={<>No results for "<strong>{query}</strong>"</>}
@@ -168,19 +266,18 @@ export default function Explore() {
       )}
 
       {/* ── Search Results Grid ── */}
-      {!isSearching && hasSearched && results.length > 0 && (
+      {!isSearchingPage && hasSearchedPage && pageResults.length > 0 && (
         <section className={styles.resultsSection} aria-label="Search results">
           <p className={styles.resultCount} aria-live="polite">
-            <strong>{results.length}</strong> results for "{query}"
+            <strong>{pageResults.length}</strong> results for "{query}"
           </p>
-          <ul className={styles.resultGrid} role="list">
-            {results.map((result, i) => (
+          <ul className={styles.resultList} role="list">
+            {pageResults.map((result, i) => (
               <li key={result.tmdb_id}>
                 <SearchResultCard
                   result={result}
                   index={i}
                   onToggleWatchlist={handleToggleWatchlist}
-                  onLog={handleLog}
                   isInWatchlist={isInWatchlist}
                   onNavigateDetail={handleNavigateDetail}
                 />
@@ -191,32 +288,32 @@ export default function Explore() {
       )}
 
       {/* ── Explore Recommendation Rows (Visible when not actively searched) ── */}
-      {!hasSearched && !isSearching && (
+      {!hasSearchedPage && !isSearchingPage && (
         <div className={styles.exploreContent}>
           <ExploreRow
             title="Trending This Week"
-            items={mockTrendingThisWeek}
+            items={exploreData.trending}
             onAddToWatchlist={handleToggleWatchlist}
             isInWatchlist={isInWatchlist}
           />
 
           <ExploreRow
             title="Now Playing in Theatres"
-            items={mockNowPlaying}
+            items={exploreData.nowPlaying}
             onAddToWatchlist={handleToggleWatchlist}
             isInWatchlist={isInWatchlist}
           />
 
           <ExploreRow
             title="Top Rated Classics"
-            items={mockTopRatedClassics}
+            items={exploreData.classics}
             onAddToWatchlist={handleToggleWatchlist}
             isInWatchlist={isInWatchlist}
           />
 
           <ExploreRow
             title="Upcoming Releases"
-            items={mockUpcomingClassics}
+            items={exploreData.upcoming}
             onAddToWatchlist={handleToggleWatchlist}
             isInWatchlist={isInWatchlist}
           />
@@ -231,7 +328,6 @@ interface SearchResultCardProps {
   result: SearchResult
   index: number
   onToggleWatchlist: (item: SearchResult) => void
-  onLog: (item: SearchResult) => void
   isInWatchlist: (tmdbId: number) => boolean
   onNavigateDetail: (tmdbId: number) => void
 }
@@ -240,11 +336,9 @@ function SearchResultCard({
   result,
   index,
   onToggleWatchlist,
-  onLog,
   isInWatchlist,
   onNavigateDetail
 }: SearchResultCardProps) {
-  const [imgError, setImgError] = useState(false)
   const inWatchlist = isInWatchlist(result.tmdb_id)
 
   return (
@@ -252,66 +346,59 @@ function SearchResultCard({
       className={styles.resultCard}
       style={{ '--i': index } as React.CSSProperties}
     >
-      <button
-        type="button"
-        className={styles.posterWrap}
-        onClick={() => onNavigateDetail(result.tmdb_id)}
-        aria-label={`View details for ${result.title}`}
-      >
-        {result.poster_path && !imgError ? (
-          <img
+      <div className={styles.posterWrap}>
+        <button
+          type="button"
+          className={styles.posterImgBtn}
+          onClick={() => onNavigateDetail(result.tmdb_id)}
+          aria-label={`View details for ${result.title}`}
+        >
+          <Poster
+            title={result.title}
             src={result.poster_path}
             alt=""
             className={styles.posterImg}
-            onError={() => setImgError(true)}
-            loading="lazy"
+            size="sm"
           />
-        ) : (
-          <PosterPlaceholder title={result.title} size="md" />
-        )}
-        <div className={styles.typePill}>
-          {result.type === 'film' ? <Film size={8} /> : <Tv size={8} />}
-          {result.type === 'film' ? 'Film' : 'Series'}
-        </div>
-      </button>
+        </button>
+      </div>
 
       <div className={styles.resultInfo}>
-        <div>
-          <h2 className={styles.resultTitle}>
-            <button
-              type="button"
-              className={styles.resultTitleBtn}
-              onClick={() => onNavigateDetail(result.tmdb_id)}
-            >
-              {result.title}
-              <span className={styles.resultYear}>({result.release_year})</span>
-            </button>
-          </h2>
+        <div className={styles.resultTitleRow}>
+          <button
+            type="button"
+            className={styles.resultTitleBtn}
+            onClick={() => onNavigateDetail(result.tmdb_id)}
+          >
+            {result.title}
+          </button>
         </div>
 
-        {result.genres.length > 0 && (
-          <div className={styles.genrePills}>
-            {result.genres.slice(0, 2).map(g => (
-              <GenrePill key={g} genre={g} />
-            ))}
-          </div>
-        )}
+        <div className={styles.resultMeta}>
+          {result.release_year && <span>{result.release_year}</span>}
+          {result.release_year && <span className={styles.metaDot}>•</span>}
+          <span>{result.type === 'film' ? 'Film' : 'Series'}</span>
+          {result.genres.length > 0 && (
+            <>
+              <span className={styles.metaDot}>•</span>
+              <span className={styles.resultGenres}>{result.genres.join(', ')}</span>
+            </>
+          )}
+        </div>
 
-        <div className={styles.resultActions}>
+        <div className={styles.resultActionsClean}>
           <button
-            className={`btn btn-sm ${inWatchlist ? 'btn-secondary' : 'btn-ghost'} ${styles.watchlistBtn}`}
+            className={styles.cleanActionBtn}
             onClick={() => onToggleWatchlist(result)}
-            aria-pressed={inWatchlist}
-            title={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
           >
-            <Bookmark size={13} fill={inWatchlist ? 'currentColor' : 'none'} />
-            <span>{inWatchlist ? 'In Watchlist' : 'Watchlist'}</span>
-          </button>
-          <button
-            className="btn btn-primary btn-sm flex-1"
-            onClick={() => onLog(result)}
-          >
-            <Plus size={13} /> Log
+            <Bookmark 
+              size={14} 
+              fill={inWatchlist ? "var(--accent-ink, #e7b865)" : "none"} 
+              color={inWatchlist ? "var(--accent-ink, #e7b865)" : "currentColor"} 
+            />
+            <span style={{ color: inWatchlist ? "var(--accent-ink, #e7b865)" : "inherit" }}>
+              {inWatchlist ? 'In Watchlist' : 'Watchlist'}
+            </span>
           </button>
         </div>
       </div>
@@ -383,7 +470,7 @@ function ExploreRow({
             onClick={() => handleScroll('left')}
             aria-label="Scroll left"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={32} />
           </button>
         )}
 
@@ -407,7 +494,7 @@ function ExploreRow({
                 <TitleCard
                   title={titleObj}
                   index={i}
-                  showLogAction={true}
+                  showLogAction={false}
                   showMetaType={true}
                   onToggleWatchlist={() => onAddToWatchlist(item)}
                   inWatchlist={inWatchlist}
@@ -423,7 +510,7 @@ function ExploreRow({
             onClick={() => handleScroll('right')}
             aria-label="Scroll right"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={32} />
           </button>
         )}
       </div>

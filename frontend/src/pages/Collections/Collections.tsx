@@ -123,13 +123,14 @@ export default function Collections() {
         <div style={{ animation: 'fade-in 0.3s ease' }}>
           <header className={styles.header}>
             <div>
+              <p className="eyebrow" style={{ marginBottom: 7 }}>Your library</p>
               <h1 className={styles.pageTitle}>Collections</h1>
               <p className={styles.pageSub}>
                 Group your watchlist by mood, genre, or personal custom lists.
               </p>
             </div>
             <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-              <FolderPlus size={16} /> Create Collection
+              <FolderPlus size={16} /> New collection
             </button>
           </header>
 
@@ -140,8 +141,7 @@ export default function Collections() {
               console.log('COLLECTION:', col.name, 'ITEMS:', colItems.map(i => i.title.title))
               const count = Math.min(colItems.length, 4)
               const gridStyle: React.CSSProperties = {
-                gridTemplateColumns: count === 1 ? '1fr' : count === 2 ? '1fr 1fr' : count === 3 ? '1.2fr 1fr' : '1fr 1fr',
-                gridTemplateRows: (count === 3 || count === 4) ? '1fr 1fr' : undefined,
+                gridTemplateColumns: `repeat(${Math.max(count, 1)}, 1fr)`,
               }
               return (
                 <div
@@ -160,20 +160,17 @@ export default function Collections() {
                         className={styles.coverGrid}
                         style={gridStyle}
                       >
-                        {colItems.slice(0, count).map((item, idx) => {
-                          const isFirstChildAndCount3 = idx === 0 && count === 3
-                          const childStyle: React.CSSProperties = isFirstChildAndCount3 ? { gridRow: 'span 2' } : {}
+                        {colItems.slice(0, count).map((item) => {
                           return item.title.poster_path ? (
                             <img
                               key={item.id}
                               src={item.title.poster_path}
                               alt={`Poster ${item.title.title}`}
                               className={styles.coverGridImg}
-                              style={childStyle}
                               loading="lazy"
                             />
                           ) : (
-                            <div key={item.id} className={styles.coverGridPlaceholder} style={childStyle}>
+                            <div key={item.id} className={styles.coverGridPlaceholder}>
                               <Film size={16} />
                             </div>
                           )

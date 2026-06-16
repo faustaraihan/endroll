@@ -157,13 +157,13 @@
 
 .watchlistBtn:hover {
   background: rgba(167, 139, 250, 0.2);
-  color: var(--color-violet-400);
+  color: var(--accent-ink, #e7b865);
   border-color: rgba(167, 139, 250, 0.35);
 }
 
 .watchlistBtnActive {
   background: rgba(167, 139, 250, 0.25);
-  color: var(--color-violet-400);
+  color: var(--accent-ink, #e7b865);
   border-color: rgba(167, 139, 250, 0.4);
 }
 

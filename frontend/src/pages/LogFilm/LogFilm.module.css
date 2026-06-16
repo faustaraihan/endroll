@@ -22,10 +22,13 @@
 }
 
 .pageTitle {
+  font-family: var(--font-serif);
+  font-style: italic;
   font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -0.03em;
+  font-weight: 400;
+  color: var(--text, var(--color-text-primary));
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 .pageSub {
@@ -52,8 +55,8 @@
 }
 
 .searchBox:focus-within {
-  border-color: var(--color-violet-500);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+  border-color: var(--accent-ink, #e7b865);
+  box-shadow: 0 0 0 3px var(--accent-soft, rgba(217,164,65,0.12));
 }
 
 .searchIcon {
@@ -81,14 +84,14 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: rgba(139, 92, 246, 0.08);
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: var(--accent-soft, rgba(217,164,65,0.12));
+  border: 1px solid var(--accent-soft, rgba(217,164,65,0.12));
   border-radius: var(--radius-lg);
   flex-wrap: wrap;
 }
 
 .draftIcon {
-  color: var(--color-violet-400);
+  color: var(--accent-ink, #e7b865);
   flex-shrink: 0;
 }
 
@@ -120,7 +123,7 @@
 .manualLink {
   background: none;
   border: none;
-  color: var(--color-violet-400);
+  color: var(--accent-ink, #e7b865);
   font-size: 0.875rem;
   text-decoration: underline;
   cursor: pointer;
@@ -129,7 +132,7 @@
 }
 
 .manualLink:hover {
-  color: var(--color-violet-300);
+  color: var(--accent-ink, #e7b865);
 }
 
 /* Type toggle (manual add) */
@@ -156,8 +159,8 @@
 }
 
 .typeToggleBtnActive {
-  border-color: var(--color-violet-500);
-  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--accent-ink, #e7b865);
+  background: var(--accent-soft, rgba(217,164,65,0.12));
   color: var(--color-text-primary);
 }
 
@@ -209,7 +212,7 @@
   width: 28px;
   height: 28px;
   border: 3px solid var(--color-border-soft);
-  border-top-color: var(--color-violet-500);
+  border-top-color: var(--accent-ink, #e7b865);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -243,7 +246,7 @@
 
 .resultItem:hover {
   border-color: var(--color-border);
-  background: rgba(139,92,246,0.06);
+  background: var(--accent-soft, rgba(217,164,65,0.12));
 }
 
 .resultPoster {
@@ -306,7 +309,7 @@
 }
 
 .resultItem:hover .resultAdd {
-  color: var(--color-violet-400);
+  color: var(--accent-ink, #e7b865);
 }
 
 .noResults {
@@ -341,35 +344,113 @@
 
 /* Title preview */
 .titlePreview {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.06));
+}
+
+.previewBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-bg-card);
+}
+
+.previewBackdropImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px) saturate(1.2);
+  opacity: 0.3;
+  transform: scale(1.1);
+}
+
+.previewBackdropFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--accent, #d9a441) 0%, var(--bg, var(--color-bg)) 100%);
+  opacity: 0.2;
+}
+
+.previewGradient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to right, rgba(18, 18, 20, 0.9) 0%, rgba(18, 18, 20, 0.4) 100%);
+}
+
+.previewContent {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-lg);
+  gap: 20px;
+  padding: 24px;
+}
+
+.previewPosterWrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 72px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.06));
+}
+
+.previewPosterWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(217, 164, 65, 0.14);
+  pointer-events: none;
 }
 
 .previewPoster {
-  width: 56px;
-  height: 84px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
+  display: block;
+}
+
+.previewInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.previewEyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-ink, #e7b865);
+  margin-bottom: -2px;
+  margin-top: 0;
 }
 
 .previewTitle {
-  font-size: 1.125rem;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
 }
 
 .previewMeta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-2, var(--color-text-secondary));
 }
 
 .formDivider {
@@ -416,7 +497,7 @@
   appearance: none;
   -webkit-appearance: none;
   height: 6px;
-  background: linear-gradient(to right, var(--color-violet-500) 0%, var(--color-amber-400) 100%);
+  background: linear-gradient(to right, var(--accent-ink, #e7b865) 0%, var(--color-amber-400) 100%);
   border-radius: var(--radius-full);
   outline: none;
   cursor: pointer;
@@ -428,7 +509,7 @@
   width: 20px;
   height: 20px;
   background: white;
-  border: 3px solid var(--color-violet-500);
+  border: 3px solid var(--accent-ink, #e7b865);
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -467,11 +548,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 72px;
+  min-width: 76px;
   padding: 8px 12px;
   background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.06));
   border-radius: var(--radius-md);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .ratingText {
@@ -505,8 +587,8 @@
 }
 
 .toggleOn {
-  border-color: var(--color-violet-500);
-  background: rgba(139,92,246,0.08);
+  border-color: var(--accent-ink, #e7b865);
+  background: var(--accent-soft, rgba(217,164,65,0.12));
 }
 
 .toggleThumb {
@@ -527,7 +609,7 @@
 }
 
 .toggleOn .toggleThumb {
-  background: var(--color-violet-600);
+  background: var(--accent, #d9a441);
 }
 
 .toggleThumb::after {

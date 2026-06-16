@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Search, Star, ChevronLeft, Plus, Check, X, PenLine } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
-import { mockSearchResults, mockTitles } from '../../data/mockData'
-import { seriesMockData } from '../../data/seriesMockData'
 import { Poster } from '../../components'
 import { formatDate } from '../../utils'
 import type { SearchResult, WatchLog, Title, TitleType } from '../../types'
@@ -18,7 +16,6 @@ interface LogDraft {
   watchedAt: string
   rating: number | null
   notes: string
-  seasonNumber: number
   editingLogId: string | null
   savedAt: string
 }
@@ -40,7 +37,7 @@ function clearDraft() {
 }
 
 export default function LogFilm() {
-  const { setWatchLogs, watchLogs, personalRatings, setRatingForTitle } = useApp()
+  const { setWatchLogs, watchLogs, personalRatings, setRatingForTitle, exploreData } = useApp()
   const { addToast } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -57,7 +54,6 @@ export default function LogFilm() {
   const [rating, setRating] = useState<number | null>(null)
   const [ratingInput, setRatingInput] = useState('')
   const [notes, setNotes] = useState('')
-  const [seasonNumber, setSeasonNumber] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Manual add state
@@ -71,17 +67,7 @@ export default function LogFilm() {
     location.state?.title ? null : readDraft()
   )
 
-  // Resolve title ID for metadata lookup
-  const resolvedTitleId = selectedTitle
-    ? (('id' in selectedTitle ? selectedTitle.id : null) ||
-       watchLogs.find(l => l.title.tmdb_id === selectedTitle.tmdb_id)?.title.id ||
-       mockTitles.find(t => t.tmdb_id === selectedTitle.tmdb_id)?.id ||
-       null)
-    : null
 
-  const seasonsList = resolvedTitleId && seriesMockData[resolvedTitleId]
-    ? seriesMockData[resolvedTitleId].seasons
-    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => ({ season_number: n, title: `Season ${n}` }))
 
   // Edit / Duplicate state
   const [editingLogId, setEditingLogId] = useState<string | null>(null)
@@ -102,7 +88,7 @@ export default function LogFilm() {
   // Live search dengan debounce — tanpa perlu menekan tombol
   function handleQueryChange(value: string) {
     setQuery(value)
-    if (!value.trim()) {
+    if (value.trim().length < 3) {
       setSearchResults([])
       setHasSearched(false)
       setIsSearching(false)
@@ -112,9 +98,22 @@ export default function LogFilm() {
   }
 
   useEffect(() => {
-    if (!query.trim()) return
+    if (query.trim().length < 3) return
     const timer = setTimeout(() => {
-      const filtered = mockSearchResults.filter(r =>
+      // Simulate API search by checking all explore data
+      const allSearchable = Array.from(
+        new Map(
+          [
+            ...exploreData.trending,
+            ...exploreData.nowPlaying,
+            ...exploreData.classics,
+            ...exploreData.upcoming,
+            ...exploreData.searchResults
+          ].map(item => [item.tmdb_id, item])
+        ).values()
+      )
+      
+      const filtered = allSearchable.filter(r =>
         r.title.toLowerCase().includes(query.toLowerCase())
       )
       setSearchResults(filtered)
@@ -122,7 +121,7 @@ export default function LogFilm() {
       setIsSearching(false)
     }, 350)
     return () => clearTimeout(timer)
-  }, [query])
+  }, [query, exploreData])
 
   // Simpan draft otomatis selama mengisi form, agar catatan tidak pernah hilang
   useEffect(() => {
@@ -132,12 +131,11 @@ export default function LogFilm() {
       watchedAt,
       rating,
       notes,
-      seasonNumber,
       editingLogId,
       savedAt: new Date().toISOString(),
     }
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
-  }, [step, selectedTitle, watchedAt, rating, notes, seasonNumber, editingLogId])
+  }, [step, selectedTitle, watchedAt, rating, notes, editingLogId])
 
   // Aksesibilitas modal: fokus masuk ke modal, Escape menutup, Tab terkunci di dalam
   useEffect(() => {
@@ -192,7 +190,6 @@ export default function LogFilm() {
   function startFormForTitle(result: SearchResult | Title) {
     setSelectedTitle(result)
     setEditingLogId(null)
-    setSeasonNumber(1)
     setWatchedAt(new Date().toISOString().slice(0, 10))
 
     // Cari rating global dari film ini
@@ -213,7 +210,6 @@ export default function LogFilm() {
     if (!pendingDraft) return
     setSelectedTitle(pendingDraft.selectedTitle)
     setEditingLogId(pendingDraft.editingLogId)
-    setSeasonNumber(pendingDraft.seasonNumber)
     setWatchedAt(pendingDraft.watchedAt)
     setRating(pendingDraft.rating)
     setRatingInput(pendingDraft.rating !== null ? pendingDraft.rating.toFixed(1) : '')
@@ -266,7 +262,6 @@ export default function LogFilm() {
     if (!duplicateLog || !pendingTitle) return
     setSelectedTitle(pendingTitle)
     setEditingLogId(duplicateLog.id)
-    setSeasonNumber(duplicateLog.season_number ?? 1)
     setWatchedAt(duplicateLog.watched_at)
 
     // Ambil rating global film
@@ -345,7 +340,7 @@ export default function LogFilm() {
                   ...l,
                   watched_at: watchedAt,
                   notes: notes || undefined,
-                  season_number: selectedTitle.type === 'series' ? seasonNumber : undefined,
+                  season_number: undefined,
                 }
               : l
           )
@@ -354,9 +349,7 @@ export default function LogFilm() {
       } else {
         // Adding new log
         // Hitung rewatch secara otomatis
-        const rewatchCount = selectedTitle.type === 'series'
-          ? watchLogs.filter(l => l.title_id === titleIdToUse && l.season_number === seasonNumber).length
-          : watchLogs.filter(l => l.title_id === titleIdToUse).length
+        const rewatchCount = watchLogs.filter(l => l.title_id === titleIdToUse).length
 
         const newLog = {
           id: crypto.randomUUID(),
@@ -366,7 +359,7 @@ export default function LogFilm() {
           watched_at: watchedAt,
           notes: notes || undefined,
           rewatch_count: rewatchCount,
-          season_number: selectedTitle.type === 'series' ? seasonNumber : undefined,
+          season_number: undefined,
         }
 
         setWatchLogs(prev => [newLog, ...prev])
@@ -383,8 +376,9 @@ export default function LogFilm() {
       {step === 'search' && (
         <div className={styles.searchStep} style={{ animationName: 'fade-in' }}>
           <header className={styles.header}>
-            <h1 className={styles.pageTitle}>Log a Film</h1>
-            <p className={styles.pageSub}>Search for the film or series you just watched</p>
+            <p className="eyebrow" style={{ marginBottom: 8 }}>Capture</p>
+            <h1 className={styles.pageTitle}>Log a film or series</h1>
+            <p className={styles.pageSub}>Search for the title you just watched</p>
           </header>
 
           {/* Unsaved draft */}
@@ -598,24 +592,39 @@ export default function LogFilm() {
 
           {/* Title preview */}
           <div className={styles.titlePreview}>
-            <div className={styles.previewPosterWrap}>
-              <Poster
-                title={selectedTitle.title}
-                src={selectedTitle.poster_path}
-                alt={`Poster ${selectedTitle.title} (${selectedTitle.release_year})`}
-                className={styles.previewPoster}
-                size="sm"
-              />
+            <div className={styles.previewBackdrop}>
+              {selectedTitle.poster_path ? (
+                <img
+                  src={selectedTitle.poster_path}
+                  alt=""
+                  aria-hidden="true"
+                  className={styles.previewBackdropImg}
+                />
+              ) : (
+                <div className={styles.previewBackdropFallback} />
+              )}
             </div>
-            <div>
-              <h1 className={styles.previewTitle}>{selectedTitle.title}</h1>
-              <div className={styles.previewMeta}>
-                <span className="badge badge-violet">
+            <div className={styles.previewGradient} />
+            <div className={styles.previewContent}>
+              <div className={styles.previewPosterWrap}>
+                <Poster
+                  title={selectedTitle.title}
+                  src={selectedTitle.poster_path}
+                  alt={`Poster ${selectedTitle.title} (${selectedTitle.release_year})`}
+                  className={styles.previewPoster}
+                  size="sm"
+                />
+              </div>
+              <div className={styles.previewInfo}>
+                <p className={styles.previewEyebrow}>
                   {selectedTitle.type === 'film' ? 'Film' : 'Series'}
-                </span>
-                {selectedTitle.release_year && (
-                  <span className="text-sm text-muted">{selectedTitle.release_year}</span>
-                )}
+                </p>
+                <h1 className={styles.previewTitle}>{selectedTitle.title}</h1>
+                <div className={styles.previewMeta}>
+                  {selectedTitle.release_year && (
+                    <span>{selectedTitle.release_year}</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -635,26 +644,6 @@ export default function LogFilm() {
               required
             />
           </div>
-
-          {/* Season selection — only for series */}
-          {selectedTitle.type === 'series' && (
-            <div className={styles.formGroup}>
-              <label htmlFor="season-select" className="input-label">Season</label>
-              <select
-                id="season-select"
-                className={`input ${styles.selectInput}`}
-                value={seasonNumber}
-                onChange={e => setSeasonNumber(parseInt(e.target.value))}
-                required
-              >
-                {seasonsList.map(s => (
-                  <option key={s.season_number} value={s.season_number}>
-                    {s.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           {/* Rating */}
           <div className={styles.formGroup}>
@@ -685,6 +674,9 @@ export default function LogFilm() {
                 value={rating ?? 5}
                 onChange={e => handleSlider(parseFloat(e.target.value))}
                 className={`${styles.slider} ${rating === null ? styles.sliderUnrated : ''}`}
+                style={{
+                  background: `linear-gradient(to right, var(--accent, #d9a441) ${(rating ?? 5) * 10}%, var(--border, rgba(255, 255, 255, 0.1)) ${(rating ?? 5) * 10}%)`
+                }}
                 aria-label="Drag to rate from 0 to 10"
                 aria-valuetext={rating !== null ? rating.toFixed(1) : 'Not rated yet'}
               />

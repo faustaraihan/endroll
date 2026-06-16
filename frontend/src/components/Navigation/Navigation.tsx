@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, Link } from 'react-router-dom'
 import {
   BookOpen,
   LayoutDashboard,
   Bookmark,
   BarChart2,
   Settings,
-  Film,
   Compass,
   Plus,
   Library,
   MoreHorizontal,
+  Sun,
+  Moon,
 } from 'lucide-react'
+import { useApp } from '../../contexts'
 import styles from './Navigation.module.css'
 
 const navItems = [
@@ -24,7 +26,6 @@ const navItems = [
   { to: '/settings',    label: 'Settings',    icon: Settings },
 ]
 
-// Mobile: 4 primary items in the bar, the rest behind a "More" menu
 const mobilePrimary = [
   { to: '/dashboard', label: 'Home',      icon: LayoutDashboard },
   { to: '/diary',     label: 'Diary',     icon: BookOpen },
@@ -40,20 +41,27 @@ const mobileMore = [
 
 export function Navigation() {
   const [moreOpen, setMoreOpen] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('endroll-theme')
+    return (saved === 'light' ? 'light' : 'dark') as 'dark' | 'light'
+  })
   const location = useLocation()
   const moreBtnRef = useRef<HTMLButtonElement>(null)
+  const { user } = useApp()
 
   const isMoreActive = mobileMore.some(item => location.pathname.startsWith(item.to))
 
-  // Tutup sheet saat berpindah halaman (penyesuaian state saat render,
-  // bukan effect — lihat react.dev/learn/you-might-not-need-an-effect)
   const [prevPathname, setPrevPathname] = useState(location.pathname)
   if (prevPathname !== location.pathname) {
     setPrevPathname(location.pathname)
     setMoreOpen(false)
   }
 
-  // Tutup dengan Escape, kembalikan fokus ke tombol pemicu
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('endroll-theme', theme)
+  }, [theme])
+
   useEffect(() => {
     if (!moreOpen) return
     const onKeyDown = (e: KeyboardEvent) => {
@@ -66,16 +74,24 @@ export function Navigation() {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [moreOpen])
 
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
+  const initial = (user.username?.[0] ?? 'U').toUpperCase()
+
   return (
     <>
       {/* Sidebar — desktop */}
       <nav className={styles.sidebar} aria-label="Main navigation">
+        {/* Brand */}
         <div className={styles.sidebarLogo}>
-          <Film size={22} color="var(--color-violet-400)" />
+          <span className={styles.brandDot} aria-hidden="true" />
           <span className={styles.logoText}>endroll</span>
         </div>
 
+        {/* Nav items */}
         <ul className={styles.navList} role="list">
+          <li>
+            <span className={styles.navSection} aria-hidden="true">Library</span>
+          </li>
           {navItems.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <NavLink
@@ -84,17 +100,37 @@ export function Navigation() {
                   `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
                 }
               >
-                <Icon size={18} />
+                <Icon size={17} />
                 <span>{label}</span>
               </NavLink>
             </li>
           ))}
         </ul>
 
-        <NavLink to="/log" className={`btn btn-primary ${styles.logBtn}`}>
-          <Plus size={16} />
-          Log a Film
-        </NavLink>
+        {/* Footer */}
+        <div className={styles.sidebarFoot}>
+          <Link to="/log" className={styles.logBtn}>
+            <Plus size={15} />
+            Log a title
+          </Link>
+          <hr className={styles.hairline} />
+          <div className={styles.themeRow}>
+            <div className={styles.userInfo}>
+              <div className={styles.avatar} aria-hidden="true">{initial}</div>
+              <div className={styles.userMeta}>
+                <span className={styles.userName}>{user.username || 'You'}</span>
+                <span className={styles.userHandle}>@{(user.username || 'user').toLowerCase()}</span>
+              </div>
+            </div>
+            <button
+              className={styles.themeToggle}
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+          </div>
+        </div>
       </nav>
 
       {/* Bottom bar — mobile */}
@@ -116,7 +152,7 @@ export function Navigation() {
         <NavLink
           to="/log"
           className={styles.bottomLogBtn}
-          aria-label="Log a film"
+          aria-label="Log a title"
         >
           <Plus size={20} />
         </NavLink>

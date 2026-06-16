@@ -15,41 +15,8 @@ import {
 import { useApp } from '../../contexts'
 import { useToast } from '../../contexts'
 import { formatRuntime, getInitials } from '../../utils'
-import { GenrePill, CollectModal, SeriesTracker, Poster } from '../../components'
-import {
-  mockTitles,
-  mockTrendingThisWeek,
-  mockNowPlaying,
-  mockTopRatedClassics,
-  mockUpcomingClassics,
-  mockSearchResults,
-} from '../../data/mockData'
-import type { Title } from '../../types'
+import { GenrePill, CollectModal, Poster } from '../../components'
 import styles from './TitleDetail.module.css'
-
-// Explore lists are SearchResult[] (no local id/cast). Index them by tmdb_id
-// so a title opened straight from Explore still resolves to a real detail page.
-const exploreTitles: Title[] = Array.from(
-  new Map(
-    [
-      ...mockTrendingThisWeek,
-      ...mockNowPlaying,
-      ...mockTopRatedClassics,
-      ...mockUpcomingClassics,
-      ...mockSearchResults,
-    ].map((r) => [r.tmdb_id, r])
-  ).values()
-).map((r) => ({
-  id: String(r.tmdb_id),
-  tmdb_id: r.tmdb_id,
-  title: r.title,
-  type: r.type,
-  poster_path: r.poster_path,
-  release_year: r.release_year,
-  genres: r.genres,
-  cast: [],
-  overview: r.overview,
-}))
 
 export default function TitleDetail() {
   const { id } = useParams<{ id: string }>()
@@ -61,6 +28,7 @@ export default function TitleDetail() {
     collectionItems,
     personalRatings,
     setRatingForTitle,
+    getTitleById,
   } = useApp()
   const { addToast } = useToast()
 
@@ -69,29 +37,21 @@ export default function TitleDetail() {
   const [isEditingRating, setIsEditingRating] = useState(false)
   const [tempRating, setTempRating] = useState<number | null>(null)
 
-  // Find the title by local ID or TMDB ID — check mock data first, then
-  // everything the user created themselves (logs, watchlist, collections),
-  // so self-logged titles never dead-end on "not found"
+  // Find the title by local ID or TMDB ID — we now use the central getTitleById
+  // Note: id from useParams could be the local UUID or the TMDb ID string.
+  // Our allKnownTitles map inside AppContext handles indexing both.
   const title = useMemo(() => {
-    const matches = (t: { id: string; tmdb_id?: number }) =>
-      t.id === id || (t.tmdb_id !== undefined && String(t.tmdb_id) === id)
-    return (
-      mockTitles.find(matches) ||
-      watchLogs.find((l) => matches(l.title))?.title ||
-      watchlist.find((item) => matches(item.title))?.title ||
-      collectionItems.find((item) => matches(item.title))?.title ||
-      exploreTitles.find(matches)
-    )
-  }, [id, watchLogs, watchlist, collectionItems])
+    return id ? getTitleById(id) : undefined
+  }, [id, getTitleById])
 
   // Use the resolved title's canonical ID for database queries to avoid ID mismatches
   const canonicalId = title?.id || id
 
-  // Get user's watch logs for this title (excluding episode-level logs for clean journal)
+  // Get user's watch logs for this title
   const titleLogs = useMemo(
     () =>
       watchLogs
-        .filter((log) => log.title_id === canonicalId && (log.episode_number === undefined || log.episode_number === null))
+        .filter((log) => log.title_id === canonicalId)
         .sort(
           (a, b) =>
             new Date(b.watched_at).getTime() - new Date(a.watched_at).getTime()
@@ -188,6 +148,8 @@ export default function TitleDetail() {
     )
   }
 
+
+
   return (
     <div className={styles.page}>
       {/* Sticky Top Header with Back Button */}
@@ -234,6 +196,9 @@ export default function TitleDetail() {
 
           {/* Title info */}
           <div className={styles.titleInfo}>
+            <p className={styles.heroEyebrow}>
+              {title.type === 'film' ? 'Film' : 'Series'}
+            </p>
             <h1 className={styles.titleName}>{title.title}</h1>
 
             <div className={styles.titleMeta}>
@@ -244,17 +209,15 @@ export default function TitleDetail() {
                   <span>{formatRuntime(title.runtime_minutes)}</span>
                 </>
               )}
-              <span className={styles.metaDot} />
-              <span className={styles.typeBadge}>
-                {title.type === 'film' ? 'Film' : 'Series'}
-              </span>
+              {title.director && (
+                <>
+                  <span className={styles.metaDot} />
+                  <span>
+                    Directed by <strong>{title.director}</strong>
+                  </span>
+                </>
+              )}
             </div>
-
-            {title.director && (
-              <p className={styles.director}>
-                Directed by <strong>{title.director}</strong>
-              </p>
-            )}
 
             {title.genres.length > 0 && (
               <div className={styles.genreRow}>
@@ -331,11 +294,16 @@ export default function TitleDetail() {
           className={styles.journalSection}
           aria-label="Your journal entries"
         >
-          {title.type === 'series' && (
-            <SeriesTracker title={title} />
-          )}
-
-          <h2 className={styles.sectionTitle}>Your Journal</h2>
+          <div className={styles.journalHeader}>
+            <div>
+              <p className={styles.journalEyebrow}>Your journal</p>
+              {titleLogs.length > 0 && (
+                <h2 className={styles.sectionTitle}>
+                  {`Watched ${titleLogs.length} ${titleLogs.length === 1 ? 'time' : 'times'}`}
+                </h2>
+              )}
+            </div>
+          </div>
 
           {titleLogs.length === 0 ? (
             <div className={styles.emptyJournal}>
@@ -376,7 +344,7 @@ export default function TitleDetail() {
                         <div className={styles.entryHeader}>
                           {log.rating !== undefined && log.rating !== null && (
                             <span className={styles.entryRating}>
-                              <Star size={12} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
+                              <Star size={12} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
                               {log.rating.toFixed(1)}
                               <span style={{ fontSize: '0.75rem', opacity: 0.6, marginLeft: '1px' }}>/10</span>
                             </span>
@@ -384,13 +352,6 @@ export default function TitleDetail() {
                           {log.rewatch_count > 0 && (
                             <span className={styles.entryBadge}>
                               Rewatch #{log.rewatch_count}
-                            </span>
-                          )}
-                          {log.season_number != null && (
-                            <span className={styles.entrySeasonBadge}>
-                              S{log.season_number}
-                              {log.episode_number != null &&
-                                ` E${log.episode_number}`}
                             </span>
                           )}
                         </div>
@@ -427,7 +388,7 @@ export default function TitleDetail() {
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: 'var(--color-violet-400)',
+                            color: 'var(--accent-ink, #e7b865)',
                             fontSize: '0.75rem',
                             cursor: 'pointer',
                             textDecoration: 'underline',
@@ -465,7 +426,7 @@ export default function TitleDetail() {
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: 'var(--color-violet-400)',
+                          color: 'var(--accent-ink, #e7b865)',
                           fontSize: '0.75rem',
                           cursor: 'pointer',
                           textDecoration: 'underline',
@@ -524,15 +485,23 @@ export default function TitleDetail() {
               <div className={styles.ratingInteractiveMain} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Star
                   size={16}
-                  fill={(isEditingRating ? tempRating : (canonicalId ? personalRatings[canonicalId] : null)) !== null ? 'var(--color-amber-400)' : 'none'}
-                  color="var(--color-amber-400)"
+                  fill={(isEditingRating ? tempRating : (canonicalId ? personalRatings[canonicalId] : null)) !== null ? 'var(--accent, #d9a441)' : 'none'}
+                  color="var(--accent, #d9a441)"
                 />
-                <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text, var(--color-text-primary))', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {isEditingRating 
-                    ? (tempRating !== null ? tempRating.toFixed(1) : '—') 
-                    : (canonicalId && personalRatings[canonicalId] !== undefined ? personalRatings[canonicalId].toFixed(1) : '—')
+                    ? (tempRating !== null ? (
+                        tempRating.toFixed(1)
+                      ) : (
+                        <span style={{ color: 'var(--text-3, var(--color-text-muted))', fontWeight: 400 }}>–</span>
+                      )) 
+                    : (canonicalId && personalRatings[canonicalId] !== undefined ? (
+                        personalRatings[canonicalId].toFixed(1)
+                      ) : (
+                        <span style={{ color: 'var(--text-3, var(--color-text-muted))', fontWeight: 400 }}>–</span>
+                      ))
                   }
-                  <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'rgba(255,255,255,0.35)', marginLeft: '3px', letterSpacing: 0 }}>/10</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--text-3, var(--color-text-muted))', marginLeft: '3px', letterSpacing: 0 }}>/10</span>
                 </span>
               </div>
               {isEditingRating && (
@@ -547,11 +516,11 @@ export default function TitleDetail() {
                   }}
                   style={{
                     width: '100%',
-                    accentColor: 'var(--color-amber-400)',
+                    accentColor: 'var(--accent, #d9a441)',
                     cursor: 'pointer',
                     height: '6px',
                     borderRadius: '3px',
-                    background: 'rgba(255,255,255,0.1)',
+                    background: 'var(--border, rgba(255,255,255,0.1))',
                     outline: 'none'
                   }}
                   aria-label="Set rating"

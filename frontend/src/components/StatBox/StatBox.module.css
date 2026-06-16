@@ -1,48 +1,50 @@
 .statBox {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--border-2);
   border-radius: var(--radius-lg);
   transition: border-color var(--transition-fast);
+  height: 100%;
 }
 
 .statBox:hover {
-  border-color: var(--color-border);
+  border-color: var(--border);
 }
 
 .statIcon {
-  color: var(--color-text-secondary);
-  margin-bottom: 2px;
+  color: var(--text-2);
   display: flex;
 }
 
 .statValueWrap {
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 4px;
 }
 
 .statValue {
-  font-size: 1.5rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--text);
   letter-spacing: -0.04em;
   line-height: 1;
 }
 
 .statUnit {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: var(--color-text-muted);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-3);
 }
 
 .statLabel {
+  font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--text-3);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.16em;
 }

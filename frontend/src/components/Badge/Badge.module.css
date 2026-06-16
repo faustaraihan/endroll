@@ -1,0 +1,26 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* Gold — rewatch, accent meta */
+.gold {
+  background: var(--accent-soft, rgba(217, 164, 65, 0.12));
+  color: var(--accent-ink, #e7b865);
+  border: 1px solid var(--accent-line, rgba(217, 164, 65, 0.30));
+}
+
+/* Muted — season, neutral meta */
+.muted {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-3, var(--color-text-muted));
+  border: 1px solid var(--border, var(--color-border-soft));
+}

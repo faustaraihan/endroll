@@ -6,7 +6,10 @@ import type { Title } from '../../types'
 import styles from './TitleCard.module.css'
 
 /** Stop click from reaching the parent Link */
-const stopNav = (e: React.MouseEvent) => e.stopPropagation()
+const stopNav = (e: React.MouseEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+}
 
 export interface TitleCardProps {
   title: Title
@@ -101,13 +104,15 @@ export function TitleCard({
 
             {onToggleWatchlist && (
               <button
-                className={`${styles.watchlistBtn} ${inWatchlist ? styles.watchlistBtnActive : ''}`}
+                type="button"
+                className={`btn btn-sm ${inWatchlist ? 'btn-secondary' : 'btn-primary'}`}
                 onClick={(e) => { stopNav(e); onToggleWatchlist() }}
                 aria-label={inWatchlist ? `Remove ${title.title} from watchlist` : `Add ${title.title} to watchlist`}
                 aria-pressed={inWatchlist}
                 title={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
                 <Bookmark size={14} fill={inWatchlist ? 'currentColor' : 'none'} />
+                {inWatchlist ? 'In Watchlist' : 'Watchlist'}
               </button>
             )}
           </div>

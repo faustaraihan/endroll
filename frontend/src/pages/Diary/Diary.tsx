@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Film, Plus, LayoutGrid, List, AlignJustify } from 'lucide-react'
-import { Link } from 'react-router-dom'
+
 import { useApp } from '../../contexts'
 import { EmptyState } from '../../components'
 import styles from './Diary.module.css'
@@ -194,9 +194,12 @@ export default function Diary() {
     <div className={styles.page}>
       {/* ── Sticky header bar ── */}
       <div className={styles.topBar}>
-        <div className={styles.topLeft}>
-          <h1 className={styles.pageTitle}>Diary</h1>
-          <span className={styles.entryCount}>{sortedLogs.length} entries</span>
+        <div className={styles.headerTitles}>
+          <p className="eyebrow" style={{ marginBottom: 4 }}>Your journal</p>
+          <div className={styles.titleRow}>
+            <h1 className={styles.pageTitle}>Diary</h1>
+            <span className={styles.entryCount}>{sortedLogs.length} entries</span>
+          </div>
         </div>
 
         <div className={styles.controls}>
@@ -245,7 +248,6 @@ export default function Diary() {
             ))}
           </div>
 
-          {/* Custom Sort Dropdown */}
           <SortDropdown
             sortField={sortField}
             setSortField={setSortField}
@@ -254,10 +256,6 @@ export default function Diary() {
             groupBy={groupBy}
             setGroupBy={setGroupBy}
           />
-
-          <Link to="/log" className="btn btn-primary btn-sm">
-            <Plus size={14} /> Log
-          </Link>
         </div>
       </div>
 

@@ -19,10 +19,11 @@
 .pageTitle {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1.75rem;
+  font-size: clamp(1.625rem, 3vw, 2rem);
   font-weight: 400;
-  color: var(--color-text-primary);
-  letter-spacing: -0.01em;
+  color: var(--text, var(--color-text-primary));
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .pageSub {
@@ -42,8 +43,8 @@
 }
 
 .card {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
   border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
@@ -56,30 +57,30 @@
 
 .card:hover {
   transform: translateY(-2px);
-  border-color: var(--color-border);
-  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+  border-color: var(--border-strong, var(--color-border));
+  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.45);
 }
 
 .card:focus-visible {
-  border-color: var(--color-violet-500);
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+  border-color: var(--accent-ink, #e7b865);
+  box-shadow: 0 0 0 2px var(--accent-soft, rgba(217,164,65,0.2));
 }
 
 .cardCover {
   width: 100%;
-  aspect-ratio: 16/10;
+  height: 110px;
   display: flex;
   position: relative;
-  background: #18181b;
+  background: var(--card-2, #18181b);
   overflow: hidden;
-  border-bottom: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--border, var(--color-border-soft));
 }
 
 .coverGrid {
   flex: 1;
   display: grid;
-  gap: 1px;
-  background: var(--color-border-soft);
+  gap: 2px;
+  background: var(--border, var(--color-border-soft));
 }
 
 
@@ -389,8 +390,8 @@
 }
 
 .searchBar:focus-within {
-  border-color: var(--color-violet-500);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-ink, #e7b865);
+  box-shadow: 0 0 0 3px var(--accent-soft, rgba(217,164,65,0.12));
 }
 
 .searchIcon {

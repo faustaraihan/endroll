@@ -1,8 +1,8 @@
-import { Film, Star, Flame, ArrowRight, Plus, Clock, Tv } from 'lucide-react'
+import { Film, Star, Flame, ArrowRight, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../contexts'
-import { formatDate, getGreeting } from '../../utils'
-import { StatBox, EmptyState, GenrePill, Poster } from '../../components'
+import { getGreeting } from '../../utils'
+import { EmptyState, GenrePill, Poster, Badge } from '../../components'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
@@ -36,13 +36,11 @@ export default function Dashboard() {
         {/* Greeting */}
         <header className={styles.header}>
           <div className={styles.greetingBlock}>
-            <p className={styles.greeting}>{getGreeting()}</p>
-            <h1 className={styles.username}>{user.username}</h1>
+            <p className="eyebrow" style={{ marginBottom: 9 }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+            <h1 className={styles.username}>{getGreeting()} {user.username}.</h1>
           </div>
-          <Link to="/log" className={`btn btn-primary ${styles.logBtn}`}>
-            <Plus size={16} />
-            Log Film
-          </Link>
         </header>
 
         {/* Streak bar — full width */}
@@ -51,7 +49,7 @@ export default function Dashboard() {
           aria-label="Weekly streak"
         >
           <div className={styles.streakFlame}>
-            <Flame size={20} fill={isSecured ? "var(--color-amber-400)" : "none"} />
+            <Flame size={20} fill={isSecured ? "var(--accent-contrast, #17120a)" : "none"} color={isSecured ? "var(--accent-contrast, #17120a)" : "currentColor"} />
           </div>
           
           <div className={styles.streakContent}>
@@ -73,9 +71,12 @@ export default function Dashboard() {
         {/* Recent diary */}
         <section aria-label="Recent diary entries">
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Recently watched</h2>
+            <div>
+              <p className="eyebrow" style={{ marginBottom: 5 }}>This week</p>
+              <h2 className={styles.sectionTitle}>Recently watched</h2>
+            </div>
             <Link to="/diary" className={styles.seeAll}>
-              See all <ArrowRight size={14} />
+              All entries <ArrowRight size={13} />
             </Link>
           </div>
 
@@ -83,7 +84,7 @@ export default function Dashboard() {
             <EmptyState
               icon={<Film size={36} strokeWidth={1.5} />}
               title={<>No films here yet.<br />What did you watch recently?</>}
-              actionLabel="Log first film"
+              actionLabel="Log first title"
               actionLink="/log"
               actionIcon={<Plus size={16} />}
             />
@@ -93,6 +94,16 @@ export default function Dashboard() {
                 <li key={log.id}>
                   <Link to={`/title/${log.title_id}`} className={styles.logCardLink}>
                   <article className={styles.logCard} style={{ '--stagger': i } as React.CSSProperties}>
+                    {/* Date column */}
+                    <div className={styles.logDateCol}>
+                      <div className={styles.logDateDay}>
+                        {new Date(log.watched_at).getDate()}
+                      </div>
+                      <div className={styles.logDateMonth}>
+                        {new Date(log.watched_at).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
+                      </div>
+                    </div>
+
                     {/* Poster */}
                     <div className={styles.posterCol}>
                       <Poster
@@ -109,35 +120,29 @@ export default function Dashboard() {
                       <h3 className={styles.logTitle}>{log.title.title}</h3>
                       <div className={styles.logMeta}>
                         <span className={styles.metaYear}>{log.title.release_year}</span>
-                        {log.season_number && (
-                          <span className="badge">Season {log.season_number}</span>
-                        )}
                         {log.rewatch_count > 0 && (
-                          <span className="badge badge-violet">Rewatch</span>
+                          <Badge variant="gold">Rewatch ×{log.rewatch_count}</Badge>
                         )}
                       </div>
-                      {(() => {
-                        const ratingToShow = log.title.type === 'film'
-                          ? (log.rating ?? personalRatings[log.title_id])
-                          : personalRatings[log.title_id];
-                        if (ratingToShow == null) return null;
-                        return (
-                          <div className={styles.ratingBig}>
-                            <Star size={12} fill="var(--color-amber-400)" color="var(--color-amber-400)" />
-                            <span>{ratingToShow.toFixed(1)}</span>
-                            <span className={styles.ratingMax}>/10</span>
-                          </div>
-                        );
-                      })()}
                       {log.notes && (
                         <p className={styles.logNotes}>{log.notes}</p>
                       )}
                     </div>
 
-                    {/* Date */}
-                    <time className={styles.logDate} dateTime={log.watched_at}>
-                      {formatDate(log.watched_at)}
-                    </time>
+                    {/* Rating */}
+                    {(() => {
+                      const ratingToShow = log.title.type === 'film'
+                        ? (log.rating ?? personalRatings[log.title_id])
+                        : personalRatings[log.title_id];
+                      if (ratingToShow == null) return <div />;
+                      return (
+                        <div className={styles.ratingBig} style={{ alignSelf: 'center' }}>
+                          <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
+                          <span>{ratingToShow.toFixed(1)}</span>
+                          <span className={styles.ratingMax}>/10</span>
+                        </div>
+                      );
+                    })()}
                   </article>
                   </Link>
                 </li>
@@ -149,26 +154,41 @@ export default function Dashboard() {
 
       {/* ── Right column ── */}
       <aside className={styles.right} aria-label="Quick stats">
-        {/* Big stats */}
-        <div className={styles.statStack}>
-          <StatBox icon={<Film size={18} />} value={stats.total_films} label="Films" />
-          <StatBox icon={<Tv size={18} />} value={stats.total_series} label="Series" />
-          <StatBox icon={<Clock size={18} />} value={stats.total_watch_hours} label="Hours watched" unit="h" />
-          <StatBox icon={<Star size={18} color="var(--color-amber-400)" fill="var(--color-amber-400)" />} value={stats.average_rating?.toFixed(1) ?? '—'} label="Average rating" />
+        {/* Stat rail — 4 inline stats */}
+        <div className={styles.statRail}>
+          <div className={styles.statCell}>
+            <div className={styles.statVal}>{stats.total_films}</div>
+            <div className={styles.statLbl}>Films</div>
+          </div>
+          <div className={styles.statCell}>
+            <div className={styles.statVal}>{stats.total_series}</div>
+            <div className={styles.statLbl}>Series</div>
+          </div>
+          <div className={styles.statCell}>
+            <div className={styles.statVal}>{stats.total_watch_hours}<span className={styles.statUnit}>h</span></div>
+            <div className={styles.statLbl}>Watched</div>
+          </div>
+          <div className={styles.statCell}>
+            <div className={styles.statVal}>
+              <Star size={18} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" style={{ alignSelf: 'center' }} />
+              {stats.average_rating?.toFixed(1) ?? '—'}
+            </div>
+            <div className={styles.statLbl}>Avg rating</div>
+          </div>
         </div>
 
-        {/* Watchlist preview */}
+        {/* Watchlist preview — 2×2 mini poster grid */}
         {watchlist.length > 0 && (
-          <section className={styles.watchlistPreview} aria-label="Watchlist">
+          <section aria-label="Watchlist">
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Watchlist</h2>
               <Link to="/watchlist" className={styles.seeAll}>
-                See all <ArrowRight size={14} />
+                All <ArrowRight size={13} />
               </Link>
             </div>
-            <div className={styles.watchlistPosters}>
+            <div className={styles.wlGrid}>
               {watchlist.slice(0, 4).map(item => (
-                <div key={item.id} className={styles.wlPosterWrap}>
+                <Link key={item.id} to={`/title/${item.title.id}`} className={styles.wlCell}>
                   <Poster
                     title={item.title.title}
                     src={item.title.poster_path}
@@ -176,10 +196,8 @@ export default function Dashboard() {
                     className={styles.wlPoster}
                     size="sm"
                   />
-                  <div className={styles.wlPosterOverlay}>
-                    <span className={styles.wlTitle}>{item.title.title}</span>
-                  </div>
-                </div>
+                  <div className={styles.wlCap}>{item.title.title}</div>
+                </Link>
               ))}
             </div>
           </section>
@@ -187,10 +205,10 @@ export default function Dashboard() {
 
         {/* Fav genres */}
         {stats.favorite_genres.length > 0 && (
-          <section className={styles.genreWidget} aria-label="Favorite genres">
-            <h2 className={styles.sectionTitle}>Your favorite genres</h2>
+          <section aria-label="Favorite genres">
+            <p className="eyebrow" style={{ marginBottom: 11 }}>Your favourite genres</p>
             <div className={styles.genrePills}>
-              {stats.favorite_genres.slice(0, 4).map(({ genre }) => (
+              {stats.favorite_genres.slice(0, 4).map(({ genre }: { genre: string }) => (
                 <GenrePill key={genre} genre={genre} />
               ))}
             </div>
