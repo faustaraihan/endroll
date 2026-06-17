@@ -347,8 +347,7 @@
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--color-border-soft);
 }
 
 .previewBackdrop {
@@ -378,7 +377,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(to right, rgba(18, 18, 20, 0.9) 0%, rgba(18, 18, 20, 0.4) 100%);
+  background: linear-gradient(to right, color-mix(in srgb, var(--color-bg-card) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-card) 40%, transparent) 100%);
 }
 
 .previewContent {
@@ -397,7 +396,6 @@
   aspect-ratio: 2 / 3;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.06));
 }
 
@@ -678,7 +676,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(9, 9, 11, 0.85);
+  background: var(--bg-blur);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -689,12 +687,12 @@
 }
 
 .modalCard {
-  background: #121214;
+  background: var(--card);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -719,7 +717,7 @@
 .modalFooter {
   padding: 16px 20px 20px;
   border-top: 1px solid var(--color-border-soft);
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   gap: 8px;

@@ -25,6 +25,8 @@ const LogFilm = lazy(() => import('./pages/LogFilm/LogFilm'))
 const Collections = lazy(() => import('./pages/Collections/Collections'))
 const TitleDetail = lazy(() => import('./pages/TitleDetail/TitleDetail'))
 
+import { Loader2 } from 'lucide-react'
+
 // Cinematic page loader fallback for Suspense
 function PageLoader() {
   return (
@@ -34,15 +36,17 @@ function PageLoader() {
       justifyContent: 'center',
       minHeight: '100vh',
       backgroundColor: 'var(--bg, #0b0b0c)',
-      color: 'var(--accent-bright, #ecbe6c)',
-      fontFamily: 'Playfair Display, Georgia, serif',
-      fontStyle: 'italic',
-      fontSize: '1.25rem',
-      letterSpacing: '0.05em',
+      color: 'var(--text-3, #6f6c66)',
     }}>
-      <div style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
-        Loading Endroll…
-      </div>
+      <style>{`
+        @keyframes app-loader-spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+      <Loader2 
+        size={32} 
+        style={{ animation: 'app-loader-spin 1s linear infinite' }} 
+      />
     </div>
   )
 }

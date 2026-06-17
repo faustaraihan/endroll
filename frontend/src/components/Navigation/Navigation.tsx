@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { NavLink, useLocation, Link } from 'react-router-dom'
+import { useState, useEffect, useRef } from "react";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import {
   BookOpen,
   LayoutDashboard,
@@ -12,70 +12,72 @@ import {
   MoreHorizontal,
   Sun,
   Moon,
-} from 'lucide-react'
-import { useApp } from '../../contexts'
-import styles from './Navigation.module.css'
+} from "lucide-react";
+import { useApp } from "../../contexts";
+import styles from "./Navigation.module.css";
 
 const navItems = [
-  { to: '/dashboard',   label: 'Home',        icon: LayoutDashboard },
-  { to: '/diary',       label: 'Diary',       icon: BookOpen },
-  { to: '/collections', label: 'Collections', icon: Library },
-  { to: '/explore',     label: 'Explore',     icon: Compass },
-  { to: '/watchlist',   label: 'Watchlist',   icon: Bookmark },
-  { to: '/stats',       label: 'Stats',       icon: BarChart2 },
-  { to: '/settings',    label: 'Settings',    icon: Settings },
-]
+  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { to: "/diary", label: "Diary", icon: BookOpen },
+  { to: "/collections", label: "Collections", icon: Library },
+  { to: "/explore", label: "Explore", icon: Compass },
+  { to: "/watchlist", label: "Watchlist", icon: Bookmark },
+  { to: "/stats", label: "Stats", icon: BarChart2 },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
 
 const mobilePrimary = [
-  { to: '/dashboard', label: 'Home',      icon: LayoutDashboard },
-  { to: '/diary',     label: 'Diary',     icon: BookOpen },
-  { to: '/explore',   label: 'Explore',   icon: Compass },
-  { to: '/watchlist', label: 'Watchlist', icon: Bookmark },
-]
+  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { to: "/diary", label: "Diary", icon: BookOpen },
+  { to: "/explore", label: "Explore", icon: Compass },
+  { to: "/watchlist", label: "Watchlist", icon: Bookmark },
+];
 
 const mobileMore = [
-  { to: '/collections', label: 'Collections', icon: Library },
-  { to: '/stats',       label: 'Stats',       icon: BarChart2 },
-  { to: '/settings',    label: 'Settings',    icon: Settings },
-]
+  { to: "/collections", label: "Collections", icon: Library },
+  { to: "/stats", label: "Stats", icon: BarChart2 },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
 
 export function Navigation() {
-  const [moreOpen, setMoreOpen] = useState(false)
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    const saved = localStorage.getItem('endroll-theme')
-    return (saved === 'light' ? 'light' : 'dark') as 'dark' | 'light'
-  })
-  const location = useLocation()
-  const moreBtnRef = useRef<HTMLButtonElement>(null)
-  const { user } = useApp()
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem("endroll-theme");
+    return (saved === "light" ? "light" : "dark") as "dark" | "light";
+  });
+  const location = useLocation();
+  const moreBtnRef = useRef<HTMLButtonElement>(null);
+  const { user } = useApp();
 
-  const isMoreActive = mobileMore.some(item => location.pathname.startsWith(item.to))
+  const isMoreActive = mobileMore.some((item) =>
+    location.pathname.startsWith(item.to),
+  );
 
-  const [prevPathname, setPrevPathname] = useState(location.pathname)
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
   if (prevPathname !== location.pathname) {
-    setPrevPathname(location.pathname)
-    setMoreOpen(false)
+    setPrevPathname(location.pathname);
+    setMoreOpen(false);
   }
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('endroll-theme', theme)
-  }, [theme])
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("endroll-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
-    if (!moreOpen) return
+    if (!moreOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMoreOpen(false)
-        moreBtnRef.current?.focus()
+      if (e.key === "Escape") {
+        setMoreOpen(false);
+        moreBtnRef.current?.focus();
       }
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [moreOpen])
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [moreOpen]);
 
-  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
-  const initial = (user.username?.[0] ?? 'U').toUpperCase()
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const initial = (user.username?.[0] ?? "U").toUpperCase();
 
   return (
     <>
@@ -90,14 +92,16 @@ export function Navigation() {
         {/* Nav items */}
         <ul className={styles.navList} role="list">
           <li>
-            <span className={styles.navSection} aria-hidden="true">Library</span>
+            <span className={styles.navSection} aria-hidden="true">
+              Library
+            </span>
           </li>
           {navItems.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 className={({ isActive }) =>
-                  `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
+                  `${styles.navItem} ${isActive ? styles.navItemActive : ""}`
                 }
               >
                 <Icon size={17} />
@@ -116,18 +120,28 @@ export function Navigation() {
           <hr className={styles.hairline} />
           <div className={styles.themeRow}>
             <div className={styles.userInfo}>
-              <div className={styles.avatar} aria-hidden="true">{initial}</div>
+              <div className={styles.avatar} aria-hidden="true">
+                {initial}
+              </div>
               <div className={styles.userMeta}>
-                <span className={styles.userName}>{user.username || 'You'}</span>
-                <span className={styles.userHandle}>@{(user.username || 'user').toLowerCase()}</span>
+                <span className={styles.userName}>
+                  {user.username || "You"}
+                </span>
+                <span className={styles.userHandle}>
+                  @{(user.username || "user").toLowerCase()}
+                </span>
               </div>
             </div>
             <button
               className={styles.themeToggle}
               onClick={toggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
             >
-              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
             </button>
           </div>
         </div>
@@ -140,7 +154,7 @@ export function Navigation() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `${styles.bottomItem} ${isActive ? styles.bottomItemActive : ''}`
+              `${styles.bottomItem} ${isActive ? styles.bottomItemActive : ""}`
             }
             aria-label={label}
           >
@@ -160,8 +174,8 @@ export function Navigation() {
         <button
           ref={moreBtnRef}
           type="button"
-          className={`${styles.bottomItem} ${isMoreActive || moreOpen ? styles.bottomItemActive : ''}`}
-          onClick={() => setMoreOpen(open => !open)}
+          className={`${styles.bottomItem} ${isMoreActive || moreOpen ? styles.bottomItemActive : ""}`}
+          onClick={() => setMoreOpen((open) => !open)}
           aria-label="More menu"
           aria-expanded={moreOpen}
           aria-controls="mobile-more-menu"
@@ -191,7 +205,7 @@ export function Navigation() {
                 to={to}
                 role="menuitem"
                 className={({ isActive }) =>
-                  `${styles.moreItem} ${isActive ? styles.moreItemActive : ''}`
+                  `${styles.moreItem} ${isActive ? styles.moreItemActive : ""}`
                 }
               >
                 <Icon size={18} />
@@ -202,5 +216,5 @@ export function Navigation() {
         </>
       )}
     </>
-  )
+  );
 }

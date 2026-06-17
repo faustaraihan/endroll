@@ -167,6 +167,11 @@ export default function Landing() {
 
           {/* Hero visual — layered film cell + diary card */}
           <div className={styles.heroVisual} aria-hidden="true">
+            <div className={styles.visualDeco}>
+              <span className={styles.decoWatermark}>ARCHIVE</span>
+              <span className={styles.decoLine} />
+              <span className={styles.decoText}>MMXXVI</span>
+            </div>
             <span className={styles.heroSprockets} />
             <div className={styles.posterFrame}>
               <span className={styles.posterRec}><i className={styles.recDot} /> REC</span>
