@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search as SearchIcon, Plus, X, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search as SearchIcon, X, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useApp, useToast } from '../../contexts'
 import { EmptyState, TitleCard, Poster } from '../../components'

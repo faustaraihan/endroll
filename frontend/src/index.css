@@ -17,18 +17,19 @@
   --color-border:       rgba(255, 255, 255, 0.08); /* Clean neutral border */
   --color-border-soft:  rgba(255, 255, 255, 0.04);
 
-  /* Purple / Violet palette (Restored to original purple accents) */
-  --color-violet-900:   #1e1b4b;
-  --color-violet-800:   #2d2a5e;
-  --color-violet-600:   #7c3aed;
-  --color-violet-500:   #8b5cf6;
-  --color-violet-400:   #a78bfa;
-  --color-violet-300:   #c4b5fd;
+  /* Legacy violet aliases → unified onto the single gold accent.
+     Kept so older references resolve to the new palette; prefer --accent. */
+  --color-violet-900:   #1a140a;
+  --color-violet-800:   #241a0c;
+  --color-violet-600:   var(--accent);
+  --color-violet-500:   var(--accent);
+  --color-violet-400:   var(--accent-bright);
+  --color-violet-300:   var(--accent-ink);
 
-  /* Amber accent */
-  --color-amber-500:    #f59e0b;
-  --color-amber-400:    #fbbf24;
-  --color-amber-300:    #fcd34d;
+  /* Legacy amber aliases → unified onto the single gold accent. */
+  --color-amber-500:    var(--accent);
+  --color-amber-400:    var(--accent-bright);
+  --color-amber-300:    var(--accent-ink);
 
   /* Neutral text (Restored to clean neutral zinc colors) */
   --color-text-primary:   #fafafa; /* Zinc-50 clean off-white */
@@ -44,8 +45,8 @@
   /* Gradients */
   --gradient-hero:    linear-gradient(135deg, #09090b 0%, #020202 50%, #111115 100%);
   --gradient-card:    linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(24,24,27,0) 100%);
-  --gradient-violet:  linear-gradient(135deg, #7c3aed, #a78bfa);
-  --gradient-amber:   linear-gradient(135deg, #f59e0b, #fbbf24);
+  --gradient-violet:  linear-gradient(135deg, var(--accent), var(--accent-bright));
+  --gradient-amber:   linear-gradient(135deg, var(--accent), var(--accent-bright));
   --gradient-poster:  linear-gradient(to top, rgba(9,9,11,0.95) 0%, rgba(9,9,11,0.4) 50%, transparent 100%);
 
   /* Shadows */
@@ -53,7 +54,7 @@
   --shadow-md:    0 4px 16px rgba(0,0,0,0.5);
   --shadow-lg:    0 8px 32px rgba(0,0,0,0.6);
   --shadow-glow:  0 0 24px rgba(255,255,255,0.02);
-  --shadow-amber: 0 0 16px rgba(245,158,11,0.15);
+  --shadow-amber: 0 0 16px rgba(217,164,65,0.18);
 
   /* Accent Helpers for transitions & hovers */
   --color-accent-hover:  rgba(255, 255, 255, 0.04);
@@ -654,8 +655,13 @@ input, textarea, select {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 16px rgba(139,92,246,0.2); }
-  50%       { box-shadow: 0 0 32px rgba(139,92,246,0.4); }
+  0%, 100% { box-shadow: 0 0 16px rgba(217,164,65,0.20); }
+  50%       { box-shadow: 0 0 32px rgba(217,164,65,0.40); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
 }
 
 .animate-fade-in  { animation: fade-in 0.4s ease forwards; }
