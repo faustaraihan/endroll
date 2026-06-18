@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Star,
   ChevronLeft,
   Plus,
   Check,
-  X,
   PenLine,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useApp, useToast } from "../../contexts";
+import { useToast } from "../../contexts";
+import { useStore } from "../../store/useStore";
 import { Poster } from "../../components";
 import { formatDate } from "../../utils";
-import type { SearchResult, WatchLog, Title, TitleType } from "../../types";
+import type { SearchResult, Title, TitleType } from "../../types";
 import styles from "./LogFilm.module.css";
 
 type Step = "search" | "manual" | "form";
@@ -45,13 +45,11 @@ function clearDraft() {
 }
 
 export default function LogFilm() {
-  const {
-    setWatchLogs,
-    watchLogs,
-    personalRatings,
-    setRatingForTitle,
-    exploreData,
-  } = useApp();
+  const setWatchLogs = useStore(state => state.setWatchLogs);
+  const watchLogs = useStore(state => state.watchLogs);
+  const personalRatings = useStore(state => state.personalRatings);
+  const setRatingForTitle = useStore(state => state.setRatingForTitle);
+  const exploreData = useStore(state => state.exploreData);
   const { addToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();

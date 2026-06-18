@@ -12,8 +12,9 @@ import {
   CalendarDays,
   BookOpen,
 } from 'lucide-react'
-import { useApp } from '../../contexts'
 import { useToast } from '../../contexts'
+import { useStore } from '../../store/useStore'
+import { useAllKnownTitles } from '../../store/useDerivedState'
 import { formatRuntime, getInitials } from '../../utils'
 import { GenrePill, CollectModal, Poster } from '../../components'
 import styles from './TitleDetail.module.css'
@@ -21,15 +22,13 @@ import styles from './TitleDetail.module.css'
 export default function TitleDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const {
-    watchLogs,
-    watchlist,
-    setWatchlist,
-    collectionItems,
-    personalRatings,
-    setRatingForTitle,
-    getTitleById,
-  } = useApp()
+  const watchLogs = useStore(state => state.watchLogs)
+  const watchlist = useStore(state => state.watchlist)
+  const setWatchlist = useStore(state => state.setWatchlist)
+  const collectionItems = useStore(state => state.collectionItems)
+  const personalRatings = useStore(state => state.personalRatings)
+  const setRatingForTitle = useStore(state => state.setRatingForTitle)
+  const { getTitleById } = useAllKnownTitles()
   const { addToast } = useToast()
 
   const [overviewExpanded, setOverviewExpanded] = useState(false)

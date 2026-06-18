@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
-import { useApp, useToast } from '../../contexts'
+import { useToast } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import styles from './Settings.module.css'
 
 export default function Settings() {
-  const { user, setUser } = useApp()
+  const user = useStore(state => state.user)
+  const setUser = useStore(state => state.setUser)
   const { addToast } = useToast()
 
   // Local state for Preferences

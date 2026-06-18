@@ -13,7 +13,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { useApp } from "../../contexts";
+import { useStore } from "../../store/useStore";
 import styles from "./Navigation.module.css";
 
 const navItems = [
@@ -47,7 +47,7 @@ export function Navigation() {
   });
   const location = useLocation();
   const moreBtnRef = useRef<HTMLButtonElement>(null);
-  const { user } = useApp();
+  const user = useStore(state => state.user);
 
   const isMoreActive = mobileMore.some((item) =>
     location.pathname.startsWith(item.to),

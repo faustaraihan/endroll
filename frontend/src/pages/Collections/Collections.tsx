@@ -1,21 +1,20 @@
 import { useState } from 'react'
 import { FolderPlus, Trash2, ChevronLeft, Plus, Film, Search, X, FolderHeart, Folder, Edit3 } from 'lucide-react'
-import { useApp, useToast } from '../../contexts'
+import { useToast } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import { TitleCard } from '../../components'
 import type { Title } from '../../types'
 import styles from './Collections.module.css'
 
 export default function Collections() {
-  const {
-    collections,
-    setCollections,
-    collectionItems,
-    watchLogs,
-    addCollection,
-    deleteCollection,
-    addTitleToCollection,
-    removeTitleFromCollection,
-  } = useApp()
+  const collections = useStore(state => state.collections)
+  const setCollections = useStore(state => state.setCollections)
+  const collectionItems = useStore(state => state.collectionItems)
+  const watchLogs = useStore(state => state.watchLogs)
+  const addCollection = useStore(state => state.addCollection)
+  const deleteCollection = useStore(state => state.deleteCollection)
+  const addTitleToCollection = useStore(state => state.addTitleToCollection)
+  const removeTitleFromCollection = useStore(state => state.removeTitleFromCollection)
 
   const { addToast } = useToast()
 

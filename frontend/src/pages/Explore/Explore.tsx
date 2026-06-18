@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
 import { Search as SearchIcon, X, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useApp, useToast } from '../../contexts'
+import { useToast } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import { EmptyState, TitleCard, Poster } from '../../components'
 import type { SearchResult, Title, WatchlistItem } from '../../types'
 import styles from './Explore.module.css'
 
 export default function Explore() {
-  const { watchlist, setWatchlist, exploreData } = useApp()
+  const watchlist = useStore(state => state.watchlist)
+  const setWatchlist = useStore(state => state.setWatchlist)
+  const exploreData = useStore(state => state.exploreData)
   const { addToast } = useToast()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')

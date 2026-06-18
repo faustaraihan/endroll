@@ -1,5 +1,6 @@
 import { ArrowRight, Flame, Check, Star } from 'lucide-react'
-import { useApp } from '../../contexts'
+import { useStore } from '../../store/useStore'
+import { useDynamicStreak, useDynamicStats, useDailyActivity } from '../../store/useDerivedState'
 import { Poster } from '../../components'
 import styles from './Stats.module.css'
 
@@ -48,7 +49,12 @@ function initials(name: string): string {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Stats() {
-  const { stats, streak, watchLogs, personalRatings, user, dailyActivity } = useApp()
+  const watchLogs = useStore(state => state.watchLogs)
+  const personalRatings = useStore(state => state.personalRatings)
+  const user = useStore(state => state.user)
+  const dailyActivity = useDailyActivity()
+  const streak = useDynamicStreak()
+  const stats = useDynamicStats()
 
   // Personalized info
   const firstName = user.username.split(' ')[0]

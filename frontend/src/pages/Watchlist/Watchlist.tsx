@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { Film, Compass } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useApp, useToast } from '../../contexts'
+import { useToast } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import { EmptyState, CollectModal, TitleCard } from '../../components'
 import type { Title } from '../../types'
 import styles from './Watchlist.module.css'
 
 export default function Watchlist() {
-  const { watchlist, setWatchlist, watchLogs } = useApp()
+  const watchlist = useStore(state => state.watchlist)
+  const setWatchlist = useStore(state => state.setWatchlist)
+  const watchLogs = useStore(state => state.watchLogs)
   const { addToast } = useToast()
   const [collectTitle, setCollectTitle] = useState<Title | null>(null)
 

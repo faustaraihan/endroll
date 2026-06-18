@@ -2,11 +2,11 @@ import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Navigation } from '../Navigation/Navigation'
 import { Toast } from '../Toast/Toast'
-import { useApp } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import styles from './AppLayout.module.css'
 
 export function AppLayout() {
-  const { user } = useApp()
+  const user = useStore(state => state.user)
 
   useEffect(() => {
     if (user?.preferences?.theme) {

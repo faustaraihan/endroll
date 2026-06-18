@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Plus, Check, FolderHeart, Folder } from 'lucide-react'
-import { useApp } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import type { Title } from '../../types'
 import styles from './CollectModal.module.css'
 
@@ -10,13 +10,11 @@ interface CollectModalProps {
 }
 
 export function CollectModal({ title, onClose }: CollectModalProps) {
-  const {
-    collections,
-    collectionItems,
-    addCollection,
-    addTitleToCollection,
-    removeTitleFromCollection,
-  } = useApp()
+  const collections = useStore(state => state.collections)
+  const collectionItems = useStore(state => state.collectionItems)
+  const addCollection = useStore(state => state.addCollection)
+  const addTitleToCollection = useStore(state => state.addTitleToCollection)
+  const removeTitleFromCollection = useStore(state => state.removeTitleFromCollection)
 
   const [newCollectionName, setNewCollectionName] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false)

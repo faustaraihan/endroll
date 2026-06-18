@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Film, Plus, LayoutGrid, List, AlignJustify } from 'lucide-react'
 
-import { useApp } from '../../contexts'
+import { useStore } from '../../store/useStore'
 import { EmptyState } from '../../components'
 import styles from './Diary.module.css'
 import type { WatchLog } from '../../types'
@@ -20,7 +20,8 @@ interface GroupedSection {
 }
 
 export default function Diary() {
-  const { watchLogs, personalRatings } = useApp()
+  const watchLogs = useStore(state => state.watchLogs)
+  const personalRatings = useStore(state => state.personalRatings)
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [groupBy, setGroupBy] = useState<GroupField>('none')

@@ -1,12 +1,18 @@
 import { Film, Star, Flame, ArrowRight, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useApp } from '../../contexts'
+import { useStore } from '../../store/useStore'
+import { useDynamicStreak, useDynamicStats } from '../../store/useDerivedState'
 import { getGreeting } from '../../utils'
 import { EmptyState, GenrePill, Poster, Badge } from '../../components'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
-  const { user, stats, watchLogs, streak, watchlist, personalRatings } = useApp()
+  const user = useStore(state => state.user)
+  const watchLogs = useStore(state => state.watchLogs)
+  const watchlist = useStore(state => state.watchlist)
+  const personalRatings = useStore(state => state.personalRatings)
+  const streak = useDynamicStreak()
+  const stats = useDynamicStats()
   const recentLogs = watchLogs.slice(0, 5)
 
   // Calculate if the user has logged a title this week (Monday to Sunday)

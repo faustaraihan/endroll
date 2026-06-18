@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { AppProvider, ToastProvider } from './contexts'
+import { ToastProvider } from './contexts'
 import { AppLayout } from './components'
 
 // React Router does not reset scroll on navigation; without this, users
@@ -56,7 +56,6 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <ToastProvider>
-        <AppProvider>
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public landing */}
@@ -79,7 +78,6 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
-        </AppProvider>
       </ToastProvider>
     </BrowserRouter>
   )
