@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
 import {
-  Search,
   Star,
-  ChevronLeft,
   Plus,
   Check,
   PenLine,
+  CalendarDays,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "../../contexts";
 import { useStore } from "../../store/useStore";
-import { Poster } from "../../components";
+import { Poster, PageHeader, SearchInput, BackButton, FormGroup } from "../../components";
 import { formatDate } from "../../utils";
 import type { SearchResult, Title, TitleType } from "../../types";
 import styles from "./LogFilm.module.css";
 
-type Step = "search" | "manual" | "form";
+type Step = "search" | "form";
 
 const DRAFT_KEY = "endroll:log-draft";
 
@@ -68,14 +67,11 @@ export default function LogFilm() {
     new Date().toISOString().slice(0, 10),
   );
   const [rating, setRating] = useState<number | null>(null);
-  const [ratingInput, setRatingInput] = useState("");
+
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Manual add state
-  const [manualTitle, setManualTitle] = useState("");
-  const [manualType, setManualType] = useState<TitleType>("film");
-  const [manualYear, setManualYear] = useState("");
+
 
   // Draft (catatan belum tersimpan) — hanya ditawarkan jika tidak datang
   // membawa judul dari halaman lain
@@ -176,7 +172,7 @@ export default function LogFilm() {
       : null;
 
     setRating(existingRating);
-    setRatingInput(existingRating !== null ? existingRating.toFixed(1) : "");
+
     setNotes("");
     setPendingDraft(null);
     setStep("form");
@@ -188,9 +184,7 @@ export default function LogFilm() {
     setEditingLogId(pendingDraft.editingLogId);
     setWatchedAt(pendingDraft.watchedAt);
     setRating(pendingDraft.rating);
-    setRatingInput(
-      pendingDraft.rating !== null ? pendingDraft.rating.toFixed(1) : "",
-    );
+
     setNotes(pendingDraft.notes);
     setPendingDraft(null);
     setStep("form");
@@ -212,38 +206,13 @@ export default function LogFilm() {
     setStep("search");
   }
 
-  function handleManualSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!manualTitle.trim()) return;
-    const year = parseInt(manualYear, 10);
-    const title: Title = {
-      id: crypto.randomUUID(),
-      title: manualTitle.trim(),
-      type: manualType,
-      release_year: Number.isFinite(year) ? year : undefined,
-      genres: [],
-      cast: [],
-    };
-    startFormForTitle(title);
-  }
 
 
-
-  function handleRatingChange(val: string) {
-    setRatingInput(val);
-    const num = parseFloat(val);
-    if (!isNaN(num) && num >= 0 && num <= 10) {
-      setRating(num);
-    } else {
-      setRating(null);
-    }
-  }
 
   function handleSlider(val: number) {
     // Sesuai PRD: slider snap ke 0.5 terdekat (input angka tetap presisi 0.1)
     const snapped = Math.round(val * 2) / 2;
     setRating(snapped);
-    setRatingInput(snapped.toFixed(1));
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -333,15 +302,11 @@ export default function LogFilm() {
     <div className={styles.page}>
       {step === "search" && (
         <div className={styles.searchStep} style={{ animationName: "fade-in" }}>
-          <header className={styles.header}>
-            <p className="eyebrow" style={{ marginBottom: 8 }}>
-              Capture
-            </p>
-            <h1 className={styles.pageTitle}>Log a film or series</h1>
-            <p className={styles.pageSub}>
-              Search for the title you just watched
-            </p>
-          </header>
+          <PageHeader
+            eyebrow="Capture"
+            title="Log a film or series"
+            description="Search for the title you just watched"
+          />
 
           {/* Unsaved draft */}
           {pendingDraft && (
@@ -376,20 +341,11 @@ export default function LogFilm() {
             className={styles.searchForm}
             role="search"
           >
-            <div className={styles.searchBox}>
-              <Search size={18} className={styles.searchIcon} />
-              <input
-                id="log-search"
-                type="search"
-                className={styles.searchInput}
-                placeholder="Type a film or series title…"
-                value={query}
-                onChange={(e) => handleQueryChange(e.target.value)}
-                aria-label="Search for a film or series"
-                autoFocus
-                autoComplete="off"
-              />
-            </div>
+            <SearchInput
+              value={query}
+              onChange={(val) => handleQueryChange(val)}
+              placeholder="Type a film or series title…"
+            />
           </form>
 
           {isSearching && (
@@ -459,110 +415,15 @@ export default function LogFilm() {
                 No results for "<strong>{query}</strong>".
               </p>
               <p className="text-sm text-muted">
-                Try checking the spelling — or just add it manually.
+                Try checking the spelling.
               </p>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => {
-                  setManualTitle(query);
-                  setStep("manual");
-                }}
-              >
-                <PenLine size={14} /> Add manually
-              </button>
             </div>
           )}
 
         </div>
       )}
 
-      {step === "manual" && (
-        <form
-          onSubmit={handleManualSubmit}
-          className={styles.formStep}
-          aria-label="Add title manually"
-        >
-          <button
-            type="button"
-            className={`btn btn-ghost btn-sm ${styles.backBtn}`}
-            onClick={() => setStep("search")}
-          >
-            <ChevronLeft size={16} /> Back
-          </button>
 
-          <header className={styles.header}>
-            <h1 className={styles.pageTitle}>Add Manually</h1>
-            <p className={styles.pageSub}>
-              Not every title is on TMDb — just log it yourself.
-            </p>
-          </header>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="manual-title" className="input-label">
-              Title
-            </label>
-            <input
-              id="manual-title"
-              type="text"
-              className="input"
-              placeholder="Film or series title"
-              value={manualTitle}
-              onChange={(e) => setManualTitle(e.target.value)}
-              maxLength={200}
-              required
-              autoFocus
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <span className="input-label" id="manual-type-label">
-              Type
-            </span>
-            <div
-              className={styles.typeToggle}
-              role="group"
-              aria-labelledby="manual-type-label"
-            >
-              {(["film", "series"] as TitleType[]).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  className={`${styles.typeToggleBtn} ${manualType === t ? styles.typeToggleBtnActive : ""}`}
-                  onClick={() => setManualType(t)}
-                  aria-pressed={manualType === t}
-                >
-                  {t === "film" ? "Film" : "Series"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="manual-year" className="input-label">
-              Release year <span className={styles.labelHint}>(optional)</span>
-            </label>
-            <input
-              id="manual-year"
-              type="number"
-              className={`input ${styles.dateInput}`}
-              placeholder="2026"
-              min={1888}
-              max={new Date().getFullYear() + 5}
-              value={manualYear}
-              onChange={(e) => setManualYear(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className={`btn btn-primary btn-lg ${styles.submitBtn}`}
-            disabled={!manualTitle.trim()}
-          >
-            <Check size={18} /> Continue to notes
-          </button>
-        </form>
-      )}
 
       {step === "form" && selectedTitle && (
         <form
@@ -570,13 +431,10 @@ export default function LogFilm() {
           className={styles.formStep}
           aria-label="Log film form"
         >
-          <button
-            type="button"
-            className={`btn btn-ghost btn-sm ${styles.backBtn}`}
-            onClick={handleBack}
-          >
-            <ChevronLeft size={16} /> Back
-          </button>
+          <BackButton 
+            onClick={handleBack} 
+            className={styles.backBtn} 
+          />
 
           {/* Title preview */}
           <div className={styles.titlePreview}>
@@ -617,40 +475,30 @@ export default function LogFilm() {
             </div>
           </div>
 
-          <div className={styles.formDivider} />
-
-          {/* Watched date */}
-          <div className={styles.formGroup}>
-            <label htmlFor="watched-date" className="input-label">
+          {/* Watched on */}
+          <div className={styles.fieldCard}>
+            <label htmlFor="watched-date" className={styles.fieldLabel}>
               Watched on
             </label>
-            <input
-              id="watched-date"
-              type="date"
-              className={`input ${styles.dateInput}`}
-              value={watchedAt}
-              onChange={(e) => setWatchedAt(e.target.value)}
-              max={new Date().toISOString().slice(0, 10)}
-              required
-            />
+            <div className={styles.dateRow}>
+              <CalendarDays size={15} className={styles.fieldIcon} />
+              <input
+                id="watched-date"
+                type="date"
+                className={styles.dateInputNative}
+                value={watchedAt}
+                onChange={(e) => setWatchedAt(e.target.value)}
+                max={new Date().toISOString().slice(0, 10)}
+                required
+              />
+            </div>
           </div>
 
           {/* Rating */}
-          <div className={styles.formGroup}>
-            <label
-              htmlFor="rating-input"
-              className="input-label"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <span>
-                Rating for this{" "}
-                {selectedTitle.type === "film" ? "film" : "series"}{" "}
-                <span className={styles.labelHint}>(global · optional)</span>
+          <div className={styles.fieldCard}>
+            <div className={styles.fieldCardHeader}>
+              <span className={styles.fieldLabel}>
+                Rating <span className={styles.labelHint}>· optional</span>
               </span>
               {rating !== null && (
                 <button
@@ -658,62 +506,53 @@ export default function LogFilm() {
                   className={styles.clearRatingBtn}
                   onClick={() => {
                     setRating(null);
-                    setRatingInput("");
                   }}
                 >
                   Clear rating
                 </button>
               )}
-            </label>
-            <div className={styles.ratingRow}>
-              <input
-                id="rating-range"
-                type="range"
-                min={0}
-                max={10}
-                step={0.5}
-                value={rating ?? 5}
-                onChange={(e) => handleSlider(parseFloat(e.target.value))}
-                className={`${styles.slider} ${rating === null ? styles.sliderUnrated : ""}`}
-                style={{
-                  background: `linear-gradient(to right, var(--accent, #d9a441) ${(rating ?? 5) * 10}%, var(--border, rgba(255, 255, 255, 0.1)) ${(rating ?? 5) * 10}%)`,
-                }}
-                aria-label="Drag to rate from 0 to 10"
-                aria-valuetext={
-                  rating !== null ? rating.toFixed(1) : "Not rated yet"
-                }
-              />
-              <div className={styles.ratingInputWrap}>
-                <Star
-                  size={14}
-                  fill={rating != null ? "var(--color-amber-400)" : "none"}
-                  color="var(--color-amber-400)"
-                />
-                <input
-                  id="rating-input"
-                  type="number"
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  className={styles.ratingText}
-                  placeholder="—"
-                  value={ratingInput}
-                  onChange={(e) => handleRatingChange(e.target.value)}
-                  aria-label="Enter rating as a number"
-                />
-              </div>
             </div>
+
+            <div className={styles.ratingDisplayRow}>
+              <Star
+                size={22}
+                fill={rating != null ? "var(--accent, #d9a441)" : "none"}
+                color={rating != null ? "var(--accent, #d9a441)" : "var(--color-text-muted)"}
+                strokeWidth={1.5}
+              />
+              <span className={`${styles.ratingBig} ${rating === null ? styles.ratingBigMuted : ""}`}>
+                {rating !== null ? rating.toFixed(1) : "–"}
+              </span>
+              <span className={styles.ratingOutOf}>/10</span>
+            </div>
+
+            <input
+              id="rating-range"
+              type="range"
+              min={0}
+              max={10}
+              step={0.5}
+              value={rating ?? 5}
+              onChange={(e) => handleSlider(parseFloat(e.target.value))}
+              className={`${styles.slider} ${rating === null ? styles.sliderUnrated : ""}`}
+              style={{
+                background: rating !== null
+                  ? `linear-gradient(to right, var(--accent, #d9a441) ${rating * 10}%, var(--border, rgba(255, 255, 255, 0.1)) ${rating * 10}%)`
+                  : undefined,
+              }}
+              aria-label="Drag to rate from 0 to 10"
+              aria-valuetext={rating !== null ? rating.toFixed(1) : "Not rated yet"}
+            />
           </div>
 
           {/* Notes */}
-          <div className={styles.formGroup}>
-            <label htmlFor="notes" className="input-label">
-              Notes
-              <span className={styles.labelHint}>(optional)</span>
+          <div className={styles.fieldCard}>
+            <label htmlFor="notes" className={styles.fieldLabel}>
+              Notes <span className={styles.labelHint}>· optional</span>
             </label>
             <textarea
               id="notes"
-              className={`input ${styles.textarea}`}
+              className={styles.textarea}
               placeholder="How did it make you feel? Jot down anything you want to remember…"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -725,7 +564,7 @@ export default function LogFilm() {
           {/* Submit */}
           <button
             type="submit"
-            className={`btn btn-primary btn-lg ${styles.submitBtn}`}
+            className={styles.submitBtn}
             disabled={isSubmitting}
           >
             {isSubmitting ? (

@@ -1,7 +1,7 @@
 import { ArrowRight, Flame, Check, Star } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { useDynamicStreak, useDynamicStats, useDailyActivity } from '../../store/useDerivedState'
-import { Poster } from '../../components'
+import { Poster, SectionHeader } from '../../components'
 import styles from './Stats.module.css'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -317,10 +317,10 @@ export default function Stats() {
       {/* ── Genre Focus + Rating Curve ── */}
       <div className={styles.splitRow}>
         <section className={styles.genreCard} aria-label="Genre focus">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Genre Focus</h2>
-            <span className={styles.sectionBadge}>Top {stats.favorite_genres.length}</span>
-          </div>
+          <SectionHeader 
+            title="Genre Focus" 
+            badge={`Top ${stats.favorite_genres.length}`} 
+          />
           <div className={styles.genreList}>
             {stats.favorite_genres.map(({ genre, count }: { genre: string; count: number }) => (
               <div key={genre} className={styles.genreRow}>
@@ -336,10 +336,10 @@ export default function Stats() {
 
         {ratings.length > 0 && (
           <section className={styles.chartCard} aria-label="Rating curve">
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>The Rating Curve</h2>
-              <span className={styles.sectionBadge}>{ratings.length} ratings</span>
-            </div>
+              <SectionHeader 
+                title="The Rating Curve" 
+                badge={`${ratings.length} ratings`} 
+              />
             <div className={styles.chartWrap}>
               {ratingCounts.map((count, i) => (
                 <div key={i} className={styles.chartCol}>
@@ -361,9 +361,7 @@ export default function Stats() {
       <div className={styles.splitRow}>
         {stats.era_distribution && (
           <section className={styles.chartCard} aria-label="Eras explored">
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Eras Explored</h2>
-            </div>
+              <SectionHeader title="Eras Explored" />
             <div className={styles.chartWrap}>
               {stats.era_distribution.map(({ era, count }: { era: string; count: number }) => (
                 <div key={era} className={styles.chartCol}>
@@ -382,10 +380,10 @@ export default function Stats() {
 
         {stats.monthly_activity && stats.monthly_activity.length > 0 && (
           <section className={styles.chartCard} aria-label="Monthly activity">
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Cinematic Flow</h2>
-              <span className={styles.sectionBadge}>Last 6 months</span>
-            </div>
+              <SectionHeader 
+                title="Cinematic Flow" 
+                badge="Last 6 months" 
+              />
             <div className={styles.chartWrap}>
               {stats.monthly_activity.slice(-6).map(({ month, count }: { month: string; count: number }) => (
                 <div key={month} className={styles.chartCol}>
@@ -406,10 +404,12 @@ export default function Stats() {
       {/* ── Directors + Actors ── */}
       <div className={styles.splitRow}>
         <section className={styles.facesCard} aria-label="Most watched directors">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Most Watched Directors</h2>
-            <button className={styles.viewAllBtn}>View all <ArrowRight size={12} /></button>
-          </div>
+          <SectionHeader 
+            title="Most Watched Directors" 
+            action={
+              <button className={styles.viewAllBtn}>View all <ArrowRight size={12} /></button>
+            }
+          />
           <div className={styles.facesList}>
             {stats.favorite_directors.map(({ director, count, avatar_url }: { director: string; count: number; avatar_url?: string }) => (
               <div key={director} className={styles.faceItem}>
@@ -427,10 +427,12 @@ export default function Stats() {
 
         {stats.favorite_actors && (
           <section className={styles.facesCard} aria-label="Most watched actors">
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Faces of Your Journal</h2>
-              <button className={styles.viewAllBtn}>View all <ArrowRight size={12} /></button>
-            </div>
+              <SectionHeader 
+                title="Faces of Your Journal" 
+                action={
+                  <button className={styles.viewAllBtn}>View all <ArrowRight size={12} /></button>
+                }
+              />
             <div className={styles.facesList}>
               {stats.favorite_actors.map(({ name, count, avatar_url }: { name: string; count: number; avatar_url?: string }) => (
                 <div key={name} className={styles.faceItem}>

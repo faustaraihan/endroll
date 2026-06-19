@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { FolderPlus, Trash2, ChevronLeft, Plus, Film, Search, X, FolderHeart, Folder, Edit3 } from 'lucide-react'
+import { FolderPlus, Trash2, Plus, Film, X, Folder, Edit3 } from 'lucide-react'
 import { useToast } from '../../contexts'
 import { useStore } from '../../store/useStore'
-import { TitleCard } from '../../components'
+import { TitleCard, PageHeader, FormGroup, BackButton, SearchInput } from '../../components'
 import type { Title } from '../../types'
 import styles from './Collections.module.css'
 
@@ -71,11 +71,6 @@ export default function Collections() {
 
   function handleDeleteCollection(id: string, name: string, e: React.MouseEvent) {
     e.stopPropagation() // Prevent entering detail view
-    if (id === 'col-favorites') {
-      addToast('Default Favorites collection cannot be deleted.', 'error')
-      return
-    }
-
     const confirmed = window.confirm(`Are you sure you want to delete the collection "${name}"?`)
     if (confirmed) {
       deleteCollection(id)
@@ -120,22 +115,19 @@ export default function Collections() {
       {!selectedColId ? (
         // ─── Grid View: All Collections ───
         <div style={{ animation: 'fade-in 0.3s ease' }}>
-          <header className={styles.header}>
-            <div>
-              <p className="eyebrow" style={{ marginBottom: 7 }}>Your library</p>
-              <h1 className={styles.pageTitle}>Collections</h1>
-              <p className={styles.pageSub}>
-                Group your watchlist by mood, genre, or personal custom lists.
-              </p>
-            </div>
-            <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-              <FolderPlus size={16} /> New collection
-            </button>
-          </header>
+          <PageHeader 
+            eyebrow="Your library"
+            title="Collections"
+            description="Group your watchlist by mood, genre, or personal custom lists."
+            rightElement={
+              <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+                <FolderPlus size={16} /> New collection
+              </button>
+            }
+          />
 
           <div className={styles.grid}>
             {collections.map(col => {
-              const isFav = col.id === 'col-favorites'
               const colItems = collectionItems.filter(item => item.collection_id === col.id)
               console.log('COLLECTION:', col.name, 'ITEMS:', colItems.map(i => i.title.title))
               const count = Math.min(colItems.length, 4)
@@ -177,11 +169,7 @@ export default function Collections() {
                       </div>
                     ) : (
                       <div className={styles.coverPlaceholder}>
-                        {isFav ? (
-                          <FolderHeart size={36} className={styles.placeholderHeart} />
-                        ) : (
-                          <Folder size={36} className={styles.placeholderFolder} />
-                        )}
+                        <Folder size={36} className={styles.placeholderFolder} />
                       </div>
                     )}
 
@@ -197,17 +185,14 @@ export default function Collections() {
                     <div className={styles.cardHeaderRow}>
                       <h2 className={styles.cardName}>
                         {col.name}
-                        {isFav && <span className={styles.favIndicator}>★</span>}
                       </h2>
-                      {!isFav && (
-                        <button
-                          className={styles.deleteCardBtn}
-                          onClick={e => handleDeleteCollection(col.id, col.name, e)}
-                          aria-label={`Delete collection ${col.name}`}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )}
+                      <button
+                        className={styles.deleteCardBtn}
+                        onClick={e => handleDeleteCollection(col.id, col.name, e)}
+                        aria-label={`Delete collection ${col.name}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                     <p className={styles.cardDesc}>
                       {col.description || 'No description for this collection yet.'}
@@ -239,10 +224,7 @@ export default function Collections() {
                 </div>
 
                 <form onSubmit={handleCreateCollection} className={styles.modalForm}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="col-name" className="input-label">
-                      Collection Name
-                    </label>
+                  <FormGroup label="Collection Name" htmlFor="col-name">
                     <input
                       id="col-name"
                       type="text"
@@ -253,12 +235,9 @@ export default function Collections() {
                       required
                       autoFocus
                     />
-                  </div>
+                  </FormGroup>
 
-                  <div className={styles.formGroup}>
-                    <label htmlFor="col-desc" className="input-label">
-                      Description <span className="text-muted">(optional)</span>
-                    </label>
+                  <FormGroup label="Description" hint="(optional)" htmlFor="col-desc">
                     <textarea
                       id="col-desc"
                       className="input"
@@ -267,7 +246,7 @@ export default function Collections() {
                       value={colDesc}
                       onChange={e => setColDesc(e.target.value)}
                     />
-                  </div>
+                  </FormGroup>
 
                   <div className={styles.modalFooter}>
                     <button
@@ -290,19 +269,15 @@ export default function Collections() {
         // ─── Detail View: Inside one Collection ───
         <div style={{ animation: 'fade-in 0.3s ease' }}>
           {/* Header & Back */}
-          <div className={styles.detailBackRow}>
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => {
-                setSelectedColId(null)
-                setSearchQuery('')
-                setIsSearchFocused(false)
-                setIsEditingHeader(false)
-              }}
-            >
-              <ChevronLeft size={16} /> Back to Collections
-            </button>
-          </div>
+          <BackButton 
+            label="Back to Collections" 
+            onClick={() => {
+              setSelectedColId(null)
+              setSearchQuery('')
+              setIsSearchFocused(false)
+              setIsEditingHeader(false)
+            }}
+          />
 
           <header className={styles.detailHeader}>
             {isEditingHeader ? (
@@ -337,9 +312,6 @@ export default function Collections() {
                 <div className={styles.detailNameRow}>
                   <h1 className={styles.detailTitle}>
                     {activeCollection?.name}
-                    {activeCollection?.id === 'col-favorites' && (
-                      <span className={styles.detailFavBadge}>★ Favorite</span>
-                    )}
                   </h1>
                   
                   <div className={styles.detailActions}>
@@ -358,20 +330,18 @@ export default function Collections() {
                       <Edit3 size={16} />
                     </button>
 
-                    {activeCollection?.id !== 'col-favorites' && (
-                      <button
-                        className="btn btn-icon btn-ghost"
-                        style={{ color: 'var(--color-error)' }}
-                        onClick={e =>
-                          activeCollection &&
-                          handleDeleteCollection(activeCollection.id, activeCollection.name, e)
-                        }
-                        title="Delete this collection"
-                        aria-label="Delete collection"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                    <button
+                      className="btn btn-icon btn-ghost"
+                      style={{ color: 'var(--color-error)' }}
+                      onClick={e =>
+                        activeCollection &&
+                        handleDeleteCollection(activeCollection.id, activeCollection.name, e)
+                      }
+                      title="Delete this collection"
+                      aria-label="Delete collection"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
                 <p className={styles.detailDesc}>
@@ -385,23 +355,13 @@ export default function Collections() {
 
             {/* Quick Add Search Bar */}
             <div className={styles.searchContainer}>
-              <div className={styles.searchBar}>
-                <Search size={16} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="Add title from your logged diary entries…"
-                  className={styles.searchInput}
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)} // delay to allow clicks
-                />
-                {searchQuery && (
-                  <button className={styles.clearSearchBtn} onClick={() => setSearchQuery('')}>
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
+              <SearchInput 
+                value={searchQuery}
+                onChange={(val) => setSearchQuery(val)}
+                placeholder="Add title from your logged diary entries…"
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+              />
 
               {/* Autocomplete Dropdown */}
               {isSearchFocused && searchQuery && (

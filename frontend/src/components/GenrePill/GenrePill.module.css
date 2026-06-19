@@ -3,9 +3,9 @@
   font-weight: 500;
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  background: var(--accent-soft, rgba(217, 164, 65, 0.12));
-  color: var(--accent-ink, #e7b865);
-  border: 1px solid var(--accent-line, rgba(217, 164, 65, 0.30));
+  background: var(--card-2, rgba(255,255,255,0.03));
+  color: var(--text-2, var(--color-text-secondary));
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.1));
   letter-spacing: 0.01em;
   white-space: nowrap;
 }

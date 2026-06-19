@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../../store/useStore'
 import { useDynamicStreak, useDynamicStats } from '../../store/useDerivedState'
 import { getGreeting } from '../../utils'
-import { EmptyState, GenrePill, Poster, Badge } from '../../components'
+import { EmptyState, GenrePill, Poster, Badge, PageHeader, SectionHeader } from '../../components'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
@@ -40,14 +40,11 @@ export default function Dashboard() {
       {/* ── Left column ── */}
       <div className={styles.left}>
         {/* Greeting */}
-        <header className={styles.header}>
-          <div className={styles.greetingBlock}>
-            <p className="eyebrow" style={{ marginBottom: 9 }}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-            <h1 className={styles.username}>{getGreeting()} {user.username}.</h1>
-          </div>
-        </header>
+        <PageHeader 
+          eyebrow={new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          title={<>{getGreeting()} {user.username}.</>}
+          className={styles.dashboardHeader}
+        />
 
         {/* Streak bar — full width */}
         <section 
@@ -76,15 +73,12 @@ export default function Dashboard() {
 
         {/* Recent diary */}
         <section aria-label="Recent diary entries">
-          <div className={styles.sectionHeader}>
-            <div>
-              <p className="eyebrow" style={{ marginBottom: 5 }}>This week</p>
-              <h2 className={styles.sectionTitle}>Recently watched</h2>
-            </div>
-            <Link to="/diary" className={styles.seeAll}>
-              All entries <ArrowRight size={13} />
-            </Link>
-          </div>
+          <SectionHeader 
+            eyebrow="This week"
+            title="Recently watched"
+            linkTo="/diary"
+            linkLabel="All entries"
+          />
 
           {recentLogs.length === 0 ? (
             <EmptyState
@@ -127,7 +121,7 @@ export default function Dashboard() {
                       <div className={styles.logMeta}>
                         <span className={styles.metaYear}>{log.title.release_year}</span>
                         {log.rewatch_count > 0 && (
-                          <Badge variant="gold">Rewatch ×{log.rewatch_count}</Badge>
+                          <Badge variant="neutral">Rewatch ×{log.rewatch_count}</Badge>
                         )}
                       </div>
                       {log.notes && (
@@ -186,12 +180,11 @@ export default function Dashboard() {
         {/* Watchlist preview — 2×2 mini poster grid */}
         {watchlist.length > 0 && (
           <section aria-label="Watchlist">
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Watchlist</h2>
-              <Link to="/watchlist" className={styles.seeAll}>
-                All <ArrowRight size={13} />
-              </Link>
-            </div>
+            <SectionHeader 
+              title="Watchlist"
+              linkTo="/watchlist"
+              linkLabel="All"
+            />
             <div className={styles.wlGrid}>
               {watchlist.slice(0, 4).map(item => (
                 <Link key={item.id} to={`/title/${item.title.id}`} className={styles.wlCell}>

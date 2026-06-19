@@ -167,6 +167,11 @@
   --primary-fg:   #f6f5f1;
   --primary-bg-h: #000000;
 
+  --shadow-sm:    0 1px 3px rgba(28,23,18,0.1);
+  --shadow-md:    0 4px 16px rgba(28,23,18,0.08);
+  --shadow-lg:    0 8px 32px rgba(28,23,18,0.08);
+  --shadow-glow:  0 0 24px rgba(0,0,0,0.04);
+
   /* Map legacy vars for light mode */
   --color-bg:           #f6f5f1;
   --color-bg-elevated:  #ffffff;

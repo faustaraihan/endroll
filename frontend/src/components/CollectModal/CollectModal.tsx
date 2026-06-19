@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Plus, Check, FolderHeart, Folder } from 'lucide-react'
+import { X, Plus, Check, Folder } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import type { Title } from '../../types'
 import styles from './CollectModal.module.css'
@@ -87,7 +87,6 @@ export function CollectModal({ title, onClose }: CollectModalProps) {
         <div className={styles.list}>
           {collections.map(col => {
             const checked = isCollected(col.id)
-            const isFav = col.id === 'col-favorites'
             return (
               <label key={col.id} className={`${styles.item} ${checked ? styles.itemActive : ''}`}>
                 <input
@@ -97,15 +96,11 @@ export function CollectModal({ title, onClose }: CollectModalProps) {
                   onChange={() => handleToggle(col.id)}
                 />
                 <div className={styles.iconWrap}>
-                  {isFav ? (
-                    <FolderHeart size={16} className={styles.favIcon} />
-                  ) : (
-                    <Folder size={16} className={styles.folderIcon} />
-                  )}
+                  <Folder size={16} className={styles.folderIcon} />
                 </div>
                 <div className={styles.info}>
                   <span className={styles.name}>
-                    {col.name} {isFav && <span className={styles.favBadge}>Favorite</span>}
+                    {col.name}
                   </span>
                   <span className={styles.count}>
                     {col.items_count} {col.items_count === 1 ? 'item' : 'items'}

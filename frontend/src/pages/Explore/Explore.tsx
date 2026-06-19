@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search as SearchIcon, X, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search as SearchIcon, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../contexts'
 import { useStore } from '../../store/useStore'
-import { EmptyState, TitleCard, Poster } from '../../components'
+import { EmptyState, TitleCard, Poster, PageHeader, SearchInput, SectionHeader } from '../../components'
 import type { SearchResult, Title, WatchlistItem } from '../../types'
 import styles from './Explore.module.css'
 
@@ -147,103 +147,79 @@ export default function Explore() {
 
   return (
     <div className={styles.page}>
-      {/* ── Page Header (Consistent layout) ── */}
-      <header className={styles.header}>
-        <div className={styles.headerText}>
-          <p className="eyebrow" style={{ marginBottom: 7 }}>Discover</p>
-          <h1 className={styles.pageTitle}>Explore</h1>
-          <p className={styles.pageSub}>
-            Discover new cinema, television, or search for titles to log.
-          </p>
-        </div>
-
-        <div className={styles.searchContainer} ref={searchContainerRef}>
-          <form onSubmit={handleSearchSubmit} className={styles.searchForm} role="search">
-            <div className={styles.searchBox}>
-              <input
-                type="text"
-                id="search-input"
-                className={styles.searchInput}
-                placeholder="Search movies or series…"
+      <PageHeader 
+        title="Explore"
+        description="Discover new cinema, television, or search for titles to log."
+        rightElement={
+          <div className={styles.searchContainer} ref={searchContainerRef}>
+            <form onSubmit={handleSearchSubmit} className={styles.searchForm} role="search">
+              <SearchInput 
                 value={query}
-                onChange={e => handleQueryChange(e.target.value)}
-                onFocus={() => {
-                  if (query.trim().length > 0) setIsDropdownOpen(true)
+                onChange={handleQueryChange}
+                onClear={() => {
+                  setQuery('')
+                  setHasSearchedPage(false)
+                  setIsDropdownOpen(false)
                 }}
-                aria-label="Search film or series"
-                autoComplete="off"
+                placeholder="Search movies or series…"
               />
-              {query && (
-                <button
-                  type="button"
-                  className={styles.clearBtn}
-                  onClick={() => {
-                    setQuery('')
-                    setHasSearchedPage(false)
-                    setIsDropdownOpen(false)
-                  }}
-                  aria-label="Clear search"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-            <button type="submit" className={styles.searchSubmitBtn} aria-label="Submit search">
-              <SearchIcon size={16} />
-            </button>
-          </form>
+              <button type="submit" className={styles.searchSubmitBtn} aria-label="Submit search">
+                <SearchIcon size={16} />
+              </button>
+            </form>
 
-          {isDropdownOpen && query.trim().length > 0 && (
-            <div className={styles.dropdownMenu}>
-              {isSearchingDropdown ? (
-                <div className={styles.dropdownLoading}>Searching...</div>
-              ) : dropdownResults.length > 0 ? (
-                <ul className={styles.dropdownList}>
-                  {dropdownResults.slice(0, 5).map(result => (
-                    <li key={result.tmdb_id}>
-                      <button 
-                        type="button"
-                        className={styles.dropdownItem}
-                        onClick={() => {
-                          setIsDropdownOpen(false)
-                          handleNavigateDetail(result.tmdb_id)
-                        }}
-                      >
-                        <Poster 
-                          title={result.title}
-                          src={result.poster_path} 
-                          alt="" 
-                          className={styles.dropdownPoster} 
-                          size="sm"
-                        />
-                        <div className={styles.dropdownInfo}>
-                          <span className={styles.dropdownTitle}>{result.title}</span>
-                          <span className={styles.dropdownYear}>
-                            {result.release_year} • {result.type === 'film' ? 'Film' : 'Series'}
-                          </span>
-                        </div>
-                      </button>
-                    </li>
-                  ))}
-                  {dropdownResults.length > 5 && (
-                    <li className={styles.dropdownViewAllWrap}>
-                       <button 
-                          type="button" 
-                          className={styles.dropdownViewAll}
-                          onClick={handleSearchSubmit}
-                       >
-                         View all {dropdownResults.length} results
-                       </button>
-                    </li>
-                  )}
-                </ul>
-              ) : (
-                <div className={styles.dropdownEmpty}>No results found for "{query}"</div>
-              )}
-            </div>
-          )}
-        </div>
-      </header>
+            {isDropdownOpen && query.trim().length > 0 && (
+              <div className={styles.dropdownMenu}>
+                {isSearchingDropdown ? (
+                  <div className={styles.dropdownLoading}>Searching...</div>
+                ) : dropdownResults.length > 0 ? (
+                  <ul className={styles.dropdownList}>
+                    {dropdownResults.slice(0, 5).map(result => (
+                      <li key={result.tmdb_id}>
+                        <button 
+                          type="button"
+                          className={styles.dropdownItem}
+                          onClick={() => {
+                            setIsDropdownOpen(false)
+                            handleNavigateDetail(result.tmdb_id)
+                          }}
+                        >
+                          <Poster 
+                            title={result.title}
+                            src={result.poster_path} 
+                            alt="" 
+                            className={styles.dropdownPoster} 
+                            size="sm"
+                          />
+                          <div className={styles.dropdownInfo}>
+                            <span className={styles.dropdownTitle}>{result.title}</span>
+                            <span className={styles.dropdownYear}>
+                              {result.release_year} • {result.type === 'film' ? 'Film' : 'Series'}
+                            </span>
+                          </div>
+                        </button>
+                      </li>
+                    ))}
+                    {dropdownResults.length > 5 && (
+                      <li className={styles.dropdownViewAllWrap}>
+                        <button 
+                            type="button" 
+                            className={styles.dropdownViewAll}
+                            onClick={handleSearchSubmit}
+                        >
+                          View all {dropdownResults.length} results
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                ) : (
+                  <div className={styles.dropdownEmpty}>No results found for "{query}"</div>
+                )}
+              </div>
+            )}
+          </div>
+        }
+      />
 
       {/* ── Search Mode States ── */}
       {isSearchingPage && (
@@ -464,7 +440,7 @@ function ExploreRow({
 
   return (
     <div className={styles.rowWrapper}>
-      <h3 className={styles.exploreRowHeading}>{title}</h3>
+      <SectionHeader title={title} />
 
       <div className={styles.rowContainer}>
         {showLeft && (

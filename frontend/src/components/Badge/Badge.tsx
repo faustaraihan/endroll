@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import styles from './Badge.module.css'
 
-type BadgeVariant = 'gold' | 'muted'
+type BadgeVariant = 'gold' | 'muted' | 'neutral'
 
 interface BadgeProps {
   children: ReactNode

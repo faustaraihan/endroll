@@ -15,67 +15,9 @@
   animation: fade-in 0.4s ease;
 }
 
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.pageTitle {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.75rem;
-  font-weight: 400;
-  color: var(--text, var(--color-text-primary));
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-}
-
-.pageSub {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin: 0;
-}
-
 .searchForm {
   display: flex;
   gap: 12px;
-}
-
-.searchBox {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  padding: 0 16px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.searchBox:focus-within {
-  border-color: var(--accent-ink, #e7b865);
-  box-shadow: 0 0 0 3px var(--accent-soft, rgba(217,164,65,0.12));
-}
-
-.searchIcon {
-  color: var(--color-text-muted);
-  flex-shrink: 0;
-}
-
-.searchInput {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--color-text-primary);
-  font-size: 0.9375rem;
-  padding: 12px 0;
-}
-
-.searchInput::placeholder {
-  color: var(--color-text-muted);
 }
 
 /* Draft banner */
@@ -112,57 +54,7 @@
   gap: 8px;
 }
 
-/* Manual add hint */
-.manualHint {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  text-align: center;
-  padding: 16px 0;
-}
 
-.manualLink {
-  background: none;
-  border: none;
-  color: var(--accent-ink, #e7b865);
-  font-size: 0.875rem;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 4px;
-  min-height: 44px;
-}
-
-.manualLink:hover {
-  color: var(--accent-ink, #e7b865);
-}
-
-/* Type toggle (manual add) */
-.typeToggle {
-  display: flex;
-  gap: 8px;
-}
-
-.typeToggleBtn {
-  padding: 10px 24px;
-  min-height: 44px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-soft);
-  background: var(--color-bg-card);
-  color: var(--color-text-secondary);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  transition: all var(--transition-fast);
-}
-
-.typeToggleBtn:hover {
-  border-color: var(--color-border);
-  color: var(--color-text-primary);
-}
-
-.typeToggleBtnActive {
-  border-color: var(--accent-ink, #e7b865);
-  background: var(--accent-soft, rgba(217,164,65,0.12));
-  color: var(--color-text-primary);
-}
 
 /* Search skeletons */
 .skeletonRow {
@@ -333,13 +225,94 @@
 .formStep {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   animation: fade-in 0.3s ease;
 }
 
-.backBtn {
-  align-self: flex-start;
-  margin-bottom: -8px;
+/* Field card — wraps each form section */
+.fieldCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color var(--transition-fast);
+}
+
+.fieldCard:focus-within {
+  border-color: var(--border-strong, rgba(255, 255, 255, 0.1));
+}
+
+.fieldCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-text-muted);
+}
+
+.fieldIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* Date row */
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dateInputNative {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  color-scheme: dark;
+  cursor: pointer;
+  flex: 1;
+  padding: 0;
+  letter-spacing: 0.01em;
+}
+
+/* Rating display */
+.ratingDisplayRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.ratingBig {
+  font-size: 2.75rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.ratingBigMuted {
+  color: var(--color-text-muted);
+  font-weight: 300;
+}
+
+.ratingOutOf {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  align-self: flex-end;
+  margin-bottom: 5px;
 }
 
 /* Title preview */
@@ -361,8 +334,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(24px) saturate(1.2);
-  opacity: 0.3;
+  filter: blur(24px) saturate(1.4);
+  opacity: 0.45;
   transform: scale(1.1);
 }
 
@@ -392,11 +365,12 @@
 .previewPosterWrap {
   position: relative;
   flex-shrink: 0;
-  width: 72px;
+  width: 84px;
   aspect-ratio: 2 / 3;
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.06));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .previewPosterWrap::after {
@@ -455,13 +429,6 @@
   height: 1px;
   background: var(--color-border-soft);
   margin: -8px 0;
-}
-
-/* Form groups */
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .labelHint {
@@ -632,11 +599,26 @@
   color: var(--color-text-secondary);
 }
 
-/* Textarea */
+/* Textarea — journal-like, naked inside fieldCard */
 .textarea {
+  background: transparent;
+  border: none;
+  outline: none;
   resize: vertical;
-  min-height: 100px;
-  line-height: 1.6;
+  min-height: 120px;
+  line-height: 1.75;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  font-family: var(--font-serif);
+  width: 100%;
+  padding: 0;
+}
+
+.textarea::placeholder {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans, sans-serif);
+  font-style: italic;
+  font-size: 0.875rem;
 }
 
 .charCount {
@@ -647,10 +629,40 @@
 
 
 
-/* Submit */
+/* Submit — custom premium button */
 .submitBtn {
-  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 17px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--primary-bg, #f4f3f1);
+  color: var(--primary-fg, #161410);
+  border: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
   margin-top: 8px;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.submitBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .btnSpinner {

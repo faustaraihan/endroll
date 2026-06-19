@@ -1,0 +1,46 @@
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+
+.searchInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 32px 0 16px;
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
+  border-radius: var(--radius-md);
+  color: var(--text, var(--color-text-primary));
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  transition: all var(--transition-fast);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--border-strong, rgba(255, 255, 255, 0.16));
+  background: var(--card, var(--color-bg-card));
+}
+
+.clearSearchBtn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--text-3, var(--color-text-muted));
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.clearSearchBtn:hover {
+  color: var(--text, var(--color-text-primary));
+  background: var(--card-hover, rgba(255, 255, 255, 0.1));
+}

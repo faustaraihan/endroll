@@ -11,6 +11,7 @@ export function AppLayout() {
   useEffect(() => {
     if (user?.preferences?.theme) {
       document.documentElement.setAttribute('data-theme', user.preferences.theme)
+      localStorage.setItem("endroll-theme", user.preferences.theme)
     }
   }, [user?.preferences?.theme])
   return (

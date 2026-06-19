@@ -9,3 +9,10 @@ export * from './PosterPlaceholder/Poster'
 export * from './StatBox/StatBox'
 export * from './TitleCard/TitleCard'
 export * from './Toast/Toast'
+
+// Global reusable components
+export * from './PageHeader/PageHeader'
+export * from './SectionHeader/SectionHeader'
+export * from './SearchInput/SearchInput'
+export * from './BackButton/BackButton'
+export * from './FormGroup/FormGroup'

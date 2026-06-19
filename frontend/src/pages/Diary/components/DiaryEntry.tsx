@@ -21,9 +21,10 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
     : personalRating
 
   return (
-    <article
+    <Link
+      to={`/title/${log.title.id}`}
       className={styles.entry}
-      style={{ '--i': index } as React.CSSProperties}
+      style={{ '--i': index, textDecoration: 'none', color: 'inherit' } as React.CSSProperties}
     >
       {/* Date column */}
       <div className={styles.entryDate}>
@@ -32,7 +33,7 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
       </div>
 
       {/* Poster thumb */}
-      <Link to={`/title/${log.title.id}`} className={styles.entryPosterLink}>
+      <div className={styles.entryPosterLink}>
         <Poster
           title={log.title.title}
           src={log.title.poster_path}
@@ -40,13 +41,32 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
           className={styles.posterImg}
           size="sm"
         />
-      </Link>
+        {/* Rating overlay for grid view only */}
+        {ratingToShow != null && (
+          <div className={`${styles.ratingBig} ${styles.gridRatingOverlay}`}>
+            <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
+            {ratingToShow.toFixed(1)}
+            <span className={styles.ratingMax}>/10</span>
+          </div>
+        )}
+      </div>
 
       {/* Info */}
       <div className={styles.entryBody}>
-        <Link to={`/title/${log.title.id}`} className={styles.entryTitleLink}>
-          <h2 className={styles.entryTitle}>{log.title.title}</h2>
-        </Link>
+        <div className={styles.entryRow}>
+          <div className={styles.entryTitleLink}>
+            <h2 className={styles.entryTitle}>{log.title.title}</h2>
+          </div>
+          <div className={styles.entryRight}>
+            {ratingToShow != null && (
+              <span className={styles.ratingBig}>
+                <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
+                {ratingToShow.toFixed(1)}
+                <span className={styles.ratingMax}>/10</span>
+              </span>
+            )}
+          </div>
+        </div>
         <div className={styles.entryMeta}>
           {log.title.release_year && (
             <span className={styles.metaYear}>{log.title.release_year}</span>
@@ -55,24 +75,13 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
             {log.title.type === 'film' ? 'Film' : 'Series'}
           </span>
           {log.rewatch_count > 0 && (
-            <Badge variant="gold">Rewatch ×{log.rewatch_count}</Badge>
+            <Badge variant="neutral">Rewatch ×{log.rewatch_count}</Badge>
           )}
         </div>
         {log.notes && (
           <blockquote className={styles.notes}>"{log.notes}"</blockquote>
         )}
       </div>
-
-      {/* Rating */}
-      <div className={styles.entryRight}>
-        {ratingToShow != null && (
-          <span className={styles.ratingBig}>
-            <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
-            {ratingToShow.toFixed(1)}
-            <span className={styles.ratingMax}>/10</span>
-          </span>
-        )}
-      </div>
-    </article>
+    </Link>
   )
 }

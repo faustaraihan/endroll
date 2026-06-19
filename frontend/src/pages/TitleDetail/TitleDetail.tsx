@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
-  ArrowLeft,
   Film,
   Plus,
   Bookmark,
@@ -16,13 +15,14 @@ import { useToast } from '../../contexts'
 import { useStore } from '../../store/useStore'
 import { useAllKnownTitles } from '../../store/useDerivedState'
 import { formatRuntime, getInitials } from '../../utils'
-import { GenrePill, CollectModal, Poster } from '../../components'
+import { GenrePill, CollectModal, Poster, BackButton, Badge } from '../../components'
 import styles from './TitleDetail.module.css'
 
 export default function TitleDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const watchLogs = useStore(state => state.watchLogs)
+  const setWatchLogs = useStore(state => state.setWatchLogs)
   const watchlist = useStore(state => state.watchlist)
   const setWatchlist = useStore(state => state.setWatchlist)
   const collectionItems = useStore(state => state.collectionItems)
@@ -35,6 +35,9 @@ export default function TitleDetail() {
   const [collectModalOpen, setCollectModalOpen] = useState(false)
   const [isEditingRating, setIsEditingRating] = useState(false)
   const [tempRating, setTempRating] = useState<number | null>(null)
+  
+  const [editingLogId, setEditingLogId] = useState<string | null>(null)
+  const [tempNotes, setTempNotes] = useState('')
 
   // Find the title by local ID or TMDB ID — we now use the central getTitleById
   // Note: id from useParams could be the local UUID or the TMDb ID string.
@@ -153,14 +156,7 @@ export default function TitleDetail() {
     <div className={styles.page}>
       {/* Sticky Top Header with Back Button */}
       <div className={styles.stickyHeader}>
-        <button
-          className={styles.backBtn}
-          onClick={() => navigate(-1)}
-          aria-label="Go back"
-        >
-          <ArrowLeft size={16} />
-          Back
-        </button>
+        <BackButton icon="arrow" />
       </div>
 
       {/* ══════════ HERO ══════════ */}
@@ -253,14 +249,14 @@ export default function TitleDetail() {
 
       {/* ══════════ ACTION BAR ══════════ */}
       <div className={styles.actionBar}>
-        <Link to="/log" state={{ title }} className={styles.actionBtnPrimary}>
+        <Link to="/log" state={{ title }} className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}>
           <Plus size={14} />
           Log this
         </Link>
 
         <button
           className={
-            isInWatchlist ? styles.actionBtnActive : styles.actionBtn
+            isInWatchlist ? `${styles.actionBtn} ${styles.actionBtnActive}` : styles.actionBtn
           }
           onClick={handleWatchlistToggle}
         >
@@ -296,11 +292,6 @@ export default function TitleDetail() {
           <div className={styles.journalHeader}>
             <div>
               <p className={styles.journalEyebrow}>Your journal</p>
-              {titleLogs.length > 0 && (
-                <h2 className={styles.sectionTitle}>
-                  {`Watched ${titleLogs.length} ${titleLogs.length === 1 ? 'time' : 'times'}`}
-                </h2>
-              )}
             </div>
           </div>
 
@@ -349,14 +340,58 @@ export default function TitleDetail() {
                             </span>
                           )}
                           {log.rewatch_count > 0 && (
-                            <span className={styles.entryBadge}>
+                            <Badge variant="neutral">
                               Rewatch #{log.rewatch_count}
-                            </span>
+                            </Badge>
                           )}
                         </div>
 
-                        {log.notes && (
-                          <p className={styles.entryNotes}>"{log.notes}"</p>
+                        {editingLogId === log.id ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                            <textarea
+                              value={tempNotes}
+                              onChange={(e) => setTempNotes(e.target.value)}
+                              className={styles.inlineEditArea}
+                              placeholder="How did it make you feel? Jot down anything you want to remember…"
+                              autoFocus
+                            />
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-sm"
+                                onClick={() => setEditingLogId(null)}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-sm"
+                                onClick={() => {
+                                  setWatchLogs(prev => prev.map(l => l.id === log.id ? { ...l, notes: tempNotes } : l))
+                                  setEditingLogId(null)
+                                }}
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div 
+                            style={{ cursor: 'pointer', padding: '2px 0', marginTop: '4px' }}
+                            onClick={() => {
+                              setEditingLogId(log.id)
+                              setTempNotes(log.notes || '')
+                            }}
+                            title="Click to edit notes"
+                          >
+                            {log.notes ? (
+                              <p className={styles.entryNotes}>"{log.notes}"</p>
+                            ) : (
+                              <p className={styles.entryNotes} style={{ fontStyle: 'normal', opacity: 0.5, borderLeftColor: 'transparent', paddingLeft: 0 }}>
+                                Click to add a note...
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
                     </article>

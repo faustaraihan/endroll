@@ -10,42 +10,6 @@
 }
 
 /* ── Page Header (Consistent layout) ── */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--color-border-soft);
-  padding-bottom: 24px;
-  margin-bottom: 8px;
-  gap: 24px;
-}
-
-.headerText {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.pageTitle {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(1.5rem, 3vw, 1.875rem);
-  font-weight: 400;
-  color: var(--text, var(--color-text-primary));
-  letter-spacing: -0.01em;
-  margin: 0;
-  line-height: 1.1;
-}
-
-.pageSub {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  max-width: 480px;
-  margin: 0;
-}
-
 .searchContainer {
   position: relative;
   width: 100%;
@@ -58,50 +22,6 @@
   display: flex;
   gap: 8px;
   width: 100%;
-}
-
-.searchBox {
-  position: relative;
-  flex: 1;
-}
-
-.searchInput {
-  width: 100%;
-  height: 38px;
-  padding: 0 32px 0 12px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  transition: all 0.2s ease;
-}
-
-.searchInput:focus {
-  outline: none;
-  border-color: var(--accent-ink, #e7b865);
-  box-shadow: 0 0 0 3px var(--accent-soft, rgba(217,164,65,0.12));
-}
-
-.clearBtn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-text-muted);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.clearBtn:hover {
-  color: var(--color-text-primary);
 }
 
 .searchSubmitBtn {
@@ -336,15 +256,6 @@
 /* ── Reusable Carousel Row Styles ── */
 .rowWrapper {
   position: relative;
-}
-
-.exploreRowHeading {
-  font-family: var(--font-sans);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 1rem 0;
-  letter-spacing: -0.01em;
 }
 
 .rowContainer {
@@ -591,13 +502,6 @@
     gap: 28px;
   }
 
-  .header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    padding-bottom: 20px;
-  }
-
   .searchContainer {
     width: 100%;
     max-width: none;
@@ -634,11 +538,6 @@
   .page {
     padding: 24px 16px 90px;
     gap: 24px;
-  }
-
-  .header {
-    gap: 14px;
-    padding-bottom: 16px;
   }
 
   .exploreContent {

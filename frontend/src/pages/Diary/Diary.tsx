@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Film, Plus, LayoutGrid, List, AlignJustify } from 'lucide-react'
 
 import { useStore } from '../../store/useStore'
-import { EmptyState } from '../../components'
+import { EmptyState, PageHeader } from '../../components'
 import styles from './Diary.module.css'
 import type { WatchLog } from '../../types'
 
@@ -28,12 +28,13 @@ export default function Diary() {
   const [filter, setFilter] = useState<FilterType>('all')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
 
-  const sortedLogs = useMemo(() => {
-    // 1. Filter out episode logs (if any) and filter by type (film / series)
-    const baseLogs = watchLogs
+  const baseLogs = useMemo(() => {
+    return watchLogs
       .filter(log => filter === 'all' || log.title.type === filter)
       .filter(log => log.episode_number === undefined || log.episode_number === null)
+  }, [watchLogs, filter])
 
+  const sortedLogs = useMemo(() => {
     // 2. Group by title.id to find representatives (latest log per title)
     const groups: Record<string, WatchLog[]> = {}
     for (const log of baseLogs) {
@@ -95,7 +96,7 @@ export default function Diary() {
       }
       return sortDirection === 'asc' ? comparison : -comparison
     })
-  }, [watchLogs, filter, sortField, sortDirection, personalRatings])
+  }, [baseLogs, watchLogs, sortField, sortDirection, personalRatings])
 
   const groupedSections = useMemo<GroupedSection[]>(() => {
     if (groupBy === 'none') {
@@ -195,69 +196,75 @@ export default function Diary() {
     <div className={styles.page}>
       {/* ── Sticky header bar ── */}
       <div className={styles.topBar}>
-        <div className={styles.headerTitles}>
-          <p className="eyebrow" style={{ marginBottom: 4 }}>Your journal</p>
-          <div className={styles.titleRow}>
-            <h1 className={styles.pageTitle}>Diary</h1>
-            <span className={styles.entryCount}>{sortedLogs.length} entries</span>
-          </div>
-        </div>
+        <PageHeader 
+          className={styles.diaryHeader}
+          eyebrow="Your journal"
+          title={
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+              <span>Diary</span>
+              <span className={styles.entryCount}>
+                {sortedLogs.length} entries
+              </span>
+            </div>
+          }
+          rightElement={
+            <div className={styles.controls}>
+              {/* View Mode Toggle */}
+              <div className={styles.viewToggleGroup} role="group" aria-label="View mode">
+                <button
+                  className={`${styles.viewToggleBtn} ${viewMode === 'list' ? styles.viewToggleBtnActive : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="Details view"
+                  aria-label="Details view"
+                  aria-pressed={viewMode === 'list'}
+                >
+                  <List size={16} />
+                </button>
+                <button
+                  className={`${styles.viewToggleBtn} ${viewMode === 'grid' ? styles.viewToggleBtnActive : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="Grid view"
+                  aria-label="Grid view"
+                  aria-pressed={viewMode === 'grid'}
+                >
+                  <LayoutGrid size={16} />
+                </button>
+                <button
+                  className={`${styles.viewToggleBtn} ${viewMode === 'compact' ? styles.viewToggleBtnActive : ''}`}
+                  onClick={() => setViewMode('compact')}
+                  title="Compact view"
+                  aria-label="Compact view"
+                  aria-pressed={viewMode === 'compact'}
+                >
+                  <AlignJustify size={16} />
+                </button>
+              </div>
 
-        <div className={styles.controls}>
-          {/* View Mode Toggle */}
-          <div className={styles.viewToggleGroup} role="group" aria-label="View mode">
-            <button
-              className={`${styles.viewToggleBtn} ${viewMode === 'list' ? styles.viewToggleBtnActive : ''}`}
-              onClick={() => setViewMode('list')}
-              title="Details view"
-              aria-label="Details view"
-              aria-pressed={viewMode === 'list'}
-            >
-              <List size={16} />
-            </button>
-            <button
-              className={`${styles.viewToggleBtn} ${viewMode === 'grid' ? styles.viewToggleBtnActive : ''}`}
-              onClick={() => setViewMode('grid')}
-              title="Grid view"
-              aria-label="Grid view"
-              aria-pressed={viewMode === 'grid'}
-            >
-              <LayoutGrid size={16} />
-            </button>
-            <button
-              className={`${styles.viewToggleBtn} ${viewMode === 'compact' ? styles.viewToggleBtnActive : ''}`}
-              onClick={() => setViewMode('compact')}
-              title="Compact view"
-              aria-label="Compact view"
-              aria-pressed={viewMode === 'compact'}
-            >
-              <AlignJustify size={16} />
-            </button>
-          </div>
+              {/* Filter pills */}
+              <div className={styles.filterGroup} role="group" aria-label="Filter by type">
+                {(['all', 'film', 'series'] as FilterType[]).map(f => (
+                  <button
+                    key={f}
+                    className={`${styles.filterPill} ${filter === f ? styles.filterPillActive : ''}`}
+                    onClick={() => setFilter(f)}
+                    aria-pressed={filter === f}
+                  >
+                    {f === 'all' ? 'All' : f === 'film' ? 'Film' : 'Series'}
+                  </button>
+                ))}
+              </div>
 
-          {/* Filter pills */}
-          <div className={styles.filterGroup} role="group" aria-label="Filter by type">
-            {(['all', 'film', 'series'] as FilterType[]).map(f => (
-              <button
-                key={f}
-                className={`${styles.filterPill} ${filter === f ? styles.filterPillActive : ''}`}
-                onClick={() => setFilter(f)}
-                aria-pressed={filter === f}
-              >
-                {f === 'all' ? 'All' : f === 'film' ? 'Film' : 'Series'}
-              </button>
-            ))}
-          </div>
-
-          <SortDropdown
-            sortField={sortField}
-            setSortField={setSortField}
-            sortDirection={sortDirection}
-            setSortDirection={setSortDirection}
-            groupBy={groupBy}
-            setGroupBy={setGroupBy}
-          />
-        </div>
+              <SortDropdown
+                sortField={sortField}
+                setSortField={setSortField}
+                sortDirection={sortDirection}
+                setSortDirection={setSortDirection}
+                groupBy={groupBy}
+                setGroupBy={setGroupBy}
+              />
+            </div>
+          }
+        />
       </div>
 
       {/* ── Content ── */}

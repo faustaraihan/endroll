@@ -9,31 +9,6 @@
   width: 100%;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-
-.pageTitle {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(1.625rem, 3vw, 2rem);
-  font-weight: 400;
-  color: var(--text, var(--color-text-primary));
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-
-.pageSub {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  max-width: 480px;
-  margin-top: 4px;
-}
-
 /* ─── Collections Grid ─── */
 .grid {
   display: grid;
@@ -206,6 +181,7 @@
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -277,12 +253,6 @@
   gap: 16px;
 }
 
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .toggleRow {
   display: flex;
   align-items: flex-start;
@@ -305,11 +275,6 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
-}
-
-/* ─── Detail View ─── */
-.detailBackRow {
-  margin-bottom: 12px;
 }
 
 .detailHeader {
@@ -375,57 +340,6 @@
   width: 320px;
   position: relative;
   flex-shrink: 0;
-}
-
-.searchBar {
-  display: flex;
-  align-items: center;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  padding: 0 12px;
-  height: 38px;
-  position: relative;
-  transition: border-color var(--transition-fast);
-}
-
-.searchBar:focus-within {
-  border-color: var(--accent-ink, #e7b865);
-  box-shadow: 0 0 0 3px var(--accent-soft, rgba(217,164,65,0.12));
-}
-
-.searchIcon {
-  color: var(--color-text-muted);
-  margin-right: 8px;
-}
-
-.searchInput {
-  border: none;
-  background: none;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  font-size: 0.8125rem;
-  color: var(--color-text-primary);
-}
-
-.searchInput:focus {
-  outline: none;
-}
-
-.clearSearchBtn {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.clearSearchBtn:hover {
-  color: var(--color-text-primary);
 }
 
 .dropdown {
@@ -572,17 +486,6 @@
   .page {
     padding: 24px 20px 100px;
     gap: 20px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-
-  .header button {
-    width: 100%;
-    justify-content: center;
   }
 
   .detailHeader {

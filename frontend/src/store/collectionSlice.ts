@@ -38,7 +38,6 @@ export const createCollectionSlice: StateCreator<StoreState, [], [], CollectionS
     return newId
   },
   deleteCollection: (id) => {
-    if (id === 'col-favorites') return
     set(state => ({
       collections: state.collections.filter(c => c.id !== id),
       collectionItems: state.collectionItems.filter(item => item.collection_id !== id)

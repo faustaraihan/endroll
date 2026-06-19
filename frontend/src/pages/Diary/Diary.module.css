@@ -17,10 +17,6 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
   padding: 16px 32px;
   background: var(--bg-blur, rgba(11, 11, 12, 0.88));
   backdrop-filter: blur(16px);
@@ -28,25 +24,12 @@
   border-bottom: 1px solid var(--border, var(--color-border-soft));
 }
 
-.headerTitles {
-  display: flex;
-  flex-direction: column;
+.diaryHeader {
+  margin: 0;
 }
 
-.titleRow {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.pageTitle {
-  font-family: var(--font-serif);
-  font-style: italic;
+.diaryHeader :global(.pageTitle) {
   font-size: 1.5rem;
-  font-weight: 400;
-  color: var(--text, var(--color-text-primary));
-  letter-spacing: -0.01em;
-  line-height: 1.1;
 }
 
 .entryCount {
@@ -91,7 +74,9 @@
 .viewToggleBtnActive {
   background: var(--card, var(--color-bg-elevated));
   color: var(--text, var(--color-text-primary));
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px var(--border-2, var(--color-border-soft));
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 0 0 1px var(--border-2, var(--color-border-soft));
 }
 
 /* Filter pills */
@@ -124,7 +109,9 @@
 .filterPillActive {
   background: var(--card, var(--color-bg-elevated));
   color: var(--text, var(--color-text-primary));
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px var(--border-2, var(--color-border-soft));
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 0 0 1px var(--border-2, var(--color-border-soft));
 }
 
 /* Custom Sort Dropdown */
@@ -324,7 +311,7 @@
 }
 .diaryList.compact .entry {
   padding: 8px;
-  grid-template-columns: 40px 36px 1fr auto;
+  grid-template-columns: 40px 36px 1fr;
   gap: 10px;
 }
 .diaryList.compact .posterImg,
@@ -407,8 +394,32 @@
   width: 100%;
   gap: 6px;
 }
+.diaryList.grid .entryRow {
+  flex-direction: column;
+  gap: 4px;
+}
 .diaryList.grid .entryRight {
-  justify-content: flex-start;
+  display: none;
+}
+.gridRatingOverlay {
+  display: none !important;
+}
+.diaryList.grid .gridRatingOverlay {
+  display: flex !important;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(11, 11, 12, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 2;
+}
+.diaryList.grid .gridRatingOverlay .ratingMax {
+  display: none;
+}
+.diaryList.grid .entryPosterLink {
+  position: relative;
   width: 100%;
 }
 .diaryList.grid .notes {
@@ -443,22 +454,30 @@
 /* Entry */
 .entry {
   display: grid;
-  grid-template-columns: 46px 44px 1fr auto;
+  grid-template-columns: 46px 44px 1fr;
   align-items: start;
-  gap: 14px;
-  padding: 15px 8px;
+  gap: 16px;
+  padding: 16px;
+  margin: 0 -8px;
+  border-radius: 16px;
   border-top: 1px solid var(--border, var(--color-border-soft));
-  transition: background var(--transition-fast);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   animation: slide-up 0.35s ease both;
   animation-delay: calc(var(--i, 0) * 50ms);
 }
 
-.entry:first-child {
-  border-top: 0;
+li:first-child .entry {
+  border-top-color: transparent;
 }
 
 .entry:hover {
   background: var(--card-hover, rgba(255, 255, 255, 0.02));
+  border-top-color: transparent;
+  box-shadow: var(--shadow-md);
+}
+
+li:hover + li .entry {
+  border-top-color: transparent;
 }
 
 /* Date column */
@@ -490,16 +509,14 @@
 .entryPosterLink {
   flex-shrink: 0;
   display: block;
+  position: relative;
 }
 
 .entryTitleLink {
   text-decoration: none;
   min-width: 0;
   display: block;
-}
-
-.entryTitleLink:hover .entryTitle {
-  color: var(--accent-ink, #e7b865);
+  flex: 1;
 }
 
 .posterImg {
@@ -509,6 +526,14 @@
   border-radius: var(--radius-sm);
   display: block;
   border: 1px solid var(--border, var(--color-border-soft));
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.4s ease;
+}
+
+.entry:hover .posterImg {
+  transform: scale(1.06);
+  border-color: var(--border-strong, var(--color-border));
 }
 
 .posterFallback {
@@ -671,6 +696,9 @@
 @media (max-width: 1024px) {
   .topBar {
     padding: 14px 24px;
+  }
+
+  .diaryHeader {
     flex-wrap: wrap;
     gap: 12px;
   }
@@ -697,12 +725,16 @@
     padding: 14px 20px;
   }
 
+  .diaryHeader > div:first-child {
+    display: none;
+  }
+
   .content {
     padding: 24px 20px 100px;
   }
 
   .entry {
-    grid-template-columns: 38px 40px 1fr auto;
+    grid-template-columns: 38px 40px 1fr;
     gap: 10px;
     padding: 12px 4px;
   }
@@ -726,6 +758,18 @@
   .controls {
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  .viewToggleGroup,
+  .filterGroup {
+    flex: 1;
+  }
+
+  .viewToggleBtn,
+  .filterPill {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
   }
 
   .sortDropdownWrap {

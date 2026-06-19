@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useToast } from '../../contexts'
 import { useStore } from '../../store/useStore'
+import { PageHeader } from '../../components'
 import styles from './Settings.module.css'
 
 export default function Settings() {
@@ -47,10 +48,10 @@ export default function Settings() {
   return (
     <div className={styles.page}>
       {/* ── Header ── */}
-      <header className={styles.header}>
-        <span className="eyebrow">Account</span>
-        <h1 className={styles.pageTitle}>Settings</h1>
-      </header>
+      <PageHeader
+        eyebrow="Account"
+        title="Settings"
+      />
 
       {/* ── Profile Section ── */}
       <section className={styles.section}>

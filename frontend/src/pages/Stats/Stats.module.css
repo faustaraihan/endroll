@@ -435,28 +435,7 @@
 .cellMid { background: var(--accent-line, rgba(217, 164, 65, 0.40)); }
 .cellHigh { background: var(--accent-ink, #e7b865); }
 
-/* ── Section Header (matches Dashboard .sectionHeader) ── */
-.sectionHeader {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  gap: 14px;
-}
 
-.sectionTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text, var(--color-text-primary));
-  letter-spacing: -0.015em;
-}
-
-.sectionBadge {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--text-3, var(--color-text-muted));
-}
 
 /* ── Comfort Cinema (poster row) ── */
 /* ── Comfort Cinema (Compact row below Hero Stats) ── */

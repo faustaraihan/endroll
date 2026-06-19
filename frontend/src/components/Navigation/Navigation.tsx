@@ -41,13 +41,13 @@ const mobileMore = [
 
 export function Navigation() {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    const saved = localStorage.getItem("endroll-theme");
-    return (saved === "light" ? "light" : "dark") as "dark" | "light";
-  });
   const location = useLocation();
   const moreBtnRef = useRef<HTMLButtonElement>(null);
+  
   const user = useStore(state => state.user);
+  const setUser = useStore(state => state.setUser);
+  
+  const theme = user?.preferences?.theme || "dark";
 
   const isMoreActive = mobileMore.some((item) =>
     location.pathname.startsWith(item.to),
@@ -58,11 +58,6 @@ export function Navigation() {
     setPrevPathname(location.pathname);
     setMoreOpen(false);
   }
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("endroll-theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -76,8 +71,17 @@ export function Navigation() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [moreOpen]);
 
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
-  const initial = (user.username?.[0] ?? "U").toUpperCase();
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setUser(prev => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        theme: newTheme
+      }
+    }));
+  };
+  const initial = (user?.username?.[0] ?? "U").toUpperCase();
 
   return (
     <>

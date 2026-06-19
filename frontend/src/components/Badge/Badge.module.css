@@ -24,3 +24,10 @@
   color: var(--text-3, var(--color-text-muted));
   border: 1px solid var(--border, var(--color-border-soft));
 }
+
+/* Neutral — solid neutral distinct from genre pill */
+.neutral {
+  background: var(--surface, #ffffff);
+  color: var(--text, var(--color-text-primary));
+  border: 1px solid var(--border, var(--color-border-soft));
+}

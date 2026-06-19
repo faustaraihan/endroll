@@ -26,6 +26,11 @@
   transition: all var(--transition-fast);
 }
 
+.stickyHeader [class*="backBtn"] {
+  margin-bottom: 0;
+  align-self: center;
+}
+
 /* ── Hero Section ── */
 .hero {
   position: relative;
@@ -156,24 +161,7 @@
   min-width: 0;
 }
 
-.backBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-2, var(--color-text-secondary));
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: color var(--transition-fast), transform var(--transition-fast);
-}
 
-.backBtn:hover {
-  color: var(--text, var(--color-text-primary));
-  transform: translateX(-2px);
-}
 
 .heroEyebrow {
   font-family: var(--font-mono);
@@ -258,10 +246,12 @@
 
 .overviewClamped {
   -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .overviewExpanded {
   -webkit-line-clamp: unset;
+  line-clamp: unset;
 }
 
 .expandBtn {
@@ -324,7 +314,6 @@
 }
 
 .actionBtnPrimary {
-  composes: actionBtn;
   background: var(--primary-bg, #f4f3f1);
   border-color: transparent;
   color: var(--primary-fg, #161410);
@@ -336,7 +325,6 @@
 }
 
 .actionBtnActive {
-  composes: actionBtn;
   background: var(--accent-soft, rgba(217, 164, 65, 0.12));
   border-color: var(--accent-line, rgba(217, 164, 65, 0.30));
   color: var(--accent-ink, #e7b865);
@@ -461,18 +449,8 @@
   font-family: var(--font-mono);
 }
 
-.entryBadge {
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  background: var(--accent-soft, rgba(217,164,65,0.12));
-  color: var(--accent-ink, #e7b865);
-  border: 1px solid var(--accent-line, rgba(217,164,65,0.28));
-}
 
 .entrySeasonBadge {
-  composes: entryBadge;
   background: rgba(96, 165, 250, 0.1);
   color: var(--color-info);
   border-color: rgba(96, 165, 250, 0.2);
@@ -480,7 +458,8 @@
 
 .entryNotes {
   font-size: 0.9375rem;
-  color: var(--text-2, var(--color-text-secondary));
+  color: var(--text, var(--color-text-primary));
+  opacity: 0.9;
   line-height: 1.7;
   font-style: italic;
   font-family: var(--font-serif);
@@ -488,6 +467,35 @@
   padding-left: 14px;
   border-left: 2px solid var(--accent-line, rgba(217, 164, 65, 0.3));
 }
+
+/* ── Inline Edit Area ── */
+.inlineEditArea {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.75;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  font-family: var(--font-serif);
+  width: 100%;
+  padding: 12px;
+  transition: border-color var(--transition-fast);
+}
+
+.inlineEditArea:focus {
+  border-color: var(--border-strong, rgba(255, 255, 255, 0.16));
+}
+
+.inlineEditArea::placeholder {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans, sans-serif);
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
 
 /* ── Details Sidebar (right) ── */
 .detailsSidebar {

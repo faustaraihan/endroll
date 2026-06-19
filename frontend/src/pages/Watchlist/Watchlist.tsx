@@ -3,7 +3,7 @@ import { Film, Compass } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useToast } from '../../contexts'
 import { useStore } from '../../store/useStore'
-import { EmptyState, CollectModal, TitleCard } from '../../components'
+import { EmptyState, CollectModal, TitleCard, PageHeader } from '../../components'
 import type { Title } from '../../types'
 import styles from './Watchlist.module.css'
 
@@ -34,19 +34,16 @@ export default function Watchlist() {
   return (
     <div className={styles.page}>
       {/* ── Header strip ── */}
-      <div className={styles.topBar}>
-        <div className={styles.topLeft}>
-          <div>
-            <p className="eyebrow" style={{ marginBottom: 5 }}>To watch · {watchlist.length}</p>
-            <h1 className={styles.pageTitle}>Watchlist</h1>
-          </div>
-        </div>
-        <div className={styles.topRight}>
+      <PageHeader 
+        className={styles.watchlistHeader}
+        eyebrow={`To watch · ${watchlist.length}`}
+        title="Watchlist"
+        rightElement={
           <Link to="/explore" className="btn btn-secondary btn-sm">
             <Compass size={14} /> Explore
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {watchlist.length === 0 ? (
         <EmptyState

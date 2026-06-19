@@ -23,27 +23,7 @@
   min-width: 0;
 }
 
-/* ── Header ── */
-.header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.greetingBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.greeting {
-  font-size: 0.875rem;
-  color: var(--text-3, var(--color-text-muted));
-  letter-spacing: 0.02em;
-}
-
-.username {
+.dashboardHeader :global(.pageTitle) {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: clamp(1.625rem, 3vw, 2.125rem);
@@ -150,37 +130,7 @@
   font-weight: 600;
 }
 
-/* ── Section header ── */
-.sectionHeader {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  gap: 14px;
-}
 
-.sectionTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text, var(--color-text-primary));
-  letter-spacing: -0.015em;
-}
-
-.seeAll {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--text-3, var(--color-text-muted));
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-.seeAll:hover {
-  color: var(--accent-ink, var(--color-amber-400));
-}
 
 /* ── Log list ── */
 .logList {
@@ -207,15 +157,15 @@
   animation: slide-up 0.4s ease both;
   animation-delay: calc(var(--stagger, 0) * 60ms);
   cursor: pointer;
-  border-radius: 0;
+  border-radius: var(--radius-md);
 }
 
-.logCard:first-child {
-  border-top: 0;
+li:first-child .logCard {
+  border-top-color: transparent;
 }
 
 .logCard:hover {
-  background: var(--card-hover, rgba(255,255,255,0.02));
+  background: var(--card-hover, rgba(255, 255, 255, 0.02));
 }
 
 /* Date column */
@@ -252,6 +202,12 @@
   border-radius: var(--radius-sm);
   display: block;
   border: 1px solid var(--border, var(--color-border-soft));
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s ease;
+}
+
+.logCard:hover .poster {
+  transform: scale(1.06);
+  border-color: var(--border-strong, var(--color-border));
 }
 
 .posterFallback {
@@ -357,6 +313,7 @@
 .statRail {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: 100%;
   border: 1px solid var(--border, var(--color-border-soft));
   border-radius: var(--radius-lg);
   background: var(--card, var(--color-bg-card));
