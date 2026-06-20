@@ -1,0 +1,387 @@
+/* ── Auth shared styles ──────────────────────────────────── */
+
+/* Layout */
+.root {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+/* ── Hero side ──────────────────────────────────────────── */
+.hero {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    width: 44%;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+  }
+}
+
+/* Cinematic warm gradient — no external image */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 85%, rgba(217, 164, 65, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 10%, rgba(11, 11, 12, 0.6) 0%, transparent 60%),
+    linear-gradient(160deg, #13110e 0%, #0b0b0c 50%, #100e0a 100%);
+  z-index: 0;
+}
+
+/* Decorative film strip lines */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 28px,
+    rgba(255, 255, 255, 0.018) 28px,
+    rgba(255, 255, 255, 0.018) 36px
+  );
+  z-index: 0;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: var(--space-10);
+}
+
+.heroDecoration {
+  position: absolute;
+  right: -32px;
+  top: 50%;
+  transform: translateY(-55%);
+  color: var(--text);
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Brand ──────────────────────────────────────────────── */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+}
+
+.brandDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Brand only visible on mobile (hero side hidden) */
+.brandMobile {
+  display: none;
+  margin-bottom: var(--space-10);
+}
+
+@media (max-width: 959px) {
+  .brandMobile {
+    display: inline-flex;
+  }
+}
+
+/* ── Quote ──────────────────────────────────────────────── */
+.quote {
+  position: relative;
+  z-index: 1;
+  max-width: 340px;
+}
+
+.quoteAccent {
+  width: 28px;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: var(--space-5);
+  border-radius: 2px;
+}
+
+.quoteText {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  line-height: 1.55;
+  color: var(--text) !important;
+  font-style: italic;
+  margin-bottom: var(--space-4);
+}
+
+.quoteAuthor {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ── Form side ──────────────────────────────────────────── */
+.formSide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--space-6);
+  min-height: 100dvh;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* ── Form header ─────────────────────────────────────────── */
+.formHeader {
+  margin-bottom: var(--space-8);
+}
+
+.formTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+  line-height: 1.2;
+}
+
+.formSubtitle {
+  color: var(--text-2) !important;
+  font-size: 0.9375rem;
+}
+
+/* ── Error banner ────────────────────────────────────────── */
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: #f87171;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  margin-bottom: var(--space-5);
+}
+
+/* ── Form fields ─────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-4);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input::placeholder {
+  color: var(--text-4);
+}
+
+.inputWithToggle {
+  padding-right: 44px;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 48px;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.eyeBtn:hover {
+  color: var(--text-2);
+}
+
+.forgotLink {
+  font-size: 0.8125rem;
+  color: var(--accent);
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+.forgotLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* ── Password rules checklist ───────────────────────────── */
+.passwordRules {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  padding: 0;
+}
+
+.passwordRule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  transition: color var(--transition-fast);
+}
+
+.passwordRuleIcon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.passwordRuleMet {
+  color: var(--text-2);
+}
+
+.passwordRuleMet .passwordRuleIcon {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #0b0b0c;
+}
+
+/* ── Submit button ───────────────────────────────────────── */
+.submitBtn {
+  width: 100%;
+  height: 48px;
+  margin-top: var(--space-2);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+  color: var(--text-4);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Social button ───────────────────────────────────────── */
+.socialBtn {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footerText {
+  margin-top: var(--space-8);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-3) !important;
+}
+
+.footerLink {
+  color: var(--text);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: color var(--transition-fast);
+}
+
+.footerLink:hover {
+  color: var(--accent);
+}

@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { ToastProvider } from './contexts'
-import { AppLayout } from './components'
+import { Toaster } from 'sonner'
+import { ToastProvider, AuthProvider } from './contexts'
+import { AppLayout, ProtectedRoute } from './components'
 
 // React Router does not reset scroll on navigation; without this, users
 // land mid-page when moving between long pages (e.g. Diary -> detail)
@@ -14,16 +15,19 @@ function ScrollToTop() {
 }
 
 // Lazy loaded page components to enable code splitting
-const Landing = lazy(() => import('./pages/Landing/Landing'))
-const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'))
+const Home = lazy(() => import('./pages/Home/Home'))
 const Diary = lazy(() => import('./pages/Diary/Diary'))
 const Explore = lazy(() => import('./pages/Explore/Explore'))
 const Watchlist = lazy(() => import('./pages/Watchlist/Watchlist'))
-const Stats = lazy(() => import('./pages/Stats/Stats'))
+const Statistics = lazy(() => import('./pages/Statistics/Statistics'))
 const Settings = lazy(() => import('./pages/Settings/Settings'))
-const LogFilm = lazy(() => import('./pages/LogFilm/LogFilm'))
+const LogTitle = lazy(() => import('./pages/LogTitle/LogTitle'))
 const Collections = lazy(() => import('./pages/Collections/Collections'))
 const TitleDetail = lazy(() => import('./pages/TitleDetail/TitleDetail'))
+
+// Auth pages
+const Login = lazy(() => import('./pages/Auth/Login'))
+const Register = lazy(() => import('./pages/Auth/Register'))
 
 import { Loader2 } from 'lucide-react'
 
@@ -55,30 +59,47 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <ToastProvider>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {/* Public landing */}
-              <Route path="/" element={<Landing />} />
+      <AuthProvider>
+        <ToastProvider>
+            <Toaster
+              position="bottom-right"
+              theme="dark"
+              closeButton
+              gap={8}
+              duration={4000}
+            />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Auth routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-              {/* App routes with sidebar layout */}
-              <Route element={<AppLayout />}>
-                <Route path="/dashboard"  element={<Dashboard />} />
-                <Route path="/diary"      element={<Diary />} />
-                <Route path="/explore"    element={<Explore />} />
-                <Route path="/watchlist"  element={<Watchlist />} />
-                <Route path="/collections" element={<Collections />} />
-              <Route path="/title/:id" element={<TitleDetail />} />
-                <Route path="/stats"      element={<Stats />} />
-                <Route path="/settings"   element={<Settings />} />
-                <Route path="/log"        element={<LogFilm />} />
-              </Route>
+                {/* App routes with sidebar layout */}
+                <Route element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }>
+                  <Route path="/home"  element={<Home />} />
+                  <Route path="/diary"      element={<Diary />} />
+                  <Route path="/explore"    element={<Explore />} />
+                  <Route path="/watchlist"  element={<Watchlist />} />
+                  <Route path="/collections" element={<Collections />} />
+                  <Route path="/title/:id" element={<TitleDetail />} />
+                  <Route path="/statistics"      element={<Statistics />} />
+                  <Route path="/settings"   element={<Settings />} />
+                  <Route path="/log"        element={<LogTitle />} />
+                </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-      </ToastProvider>
+                {/* Redirect root to app home since landing is now on a separate project */}
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/home" replace />} />
+              </Routes>
+            </Suspense>
+        </ToastProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

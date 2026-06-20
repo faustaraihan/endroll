@@ -11,6 +11,7 @@ export interface Title {
   title: string
   type: TitleType
   poster_path?: string
+  backdrop_path?: string
   release_year?: number
   runtime_minutes?: number
   genres: string[]
@@ -85,6 +86,7 @@ export interface UserProfile {
     rating_step?: number
     start_of_week?: string
     favorites_board?: string[] // array of up to 4 title_ids
+    user_pick?: string[] // array of up to 5 title_ids
   }
 }
 
@@ -121,6 +123,7 @@ export interface SearchResult {
   title: string
   type: TitleType
   poster_path?: string
+  backdrop_path?: string
   release_year?: number
   overview?: string
   genres: string[]

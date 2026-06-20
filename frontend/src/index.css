@@ -144,9 +144,9 @@
   --card:        #ffffff;
   --card-2:      #fbfaf7;
   --card-hover:  #f3f1ec;
-  --border:      rgba(28,23,18,0.11);
-  --border-2:    rgba(28,23,18,0.05);
-  --border-strong: rgba(28,23,18,0.22);
+  --border:      rgba(28,23,18,0.15);
+  --border-2:    rgba(28,23,18,0.08);
+  --border-strong: rgba(28,23,18,0.25);
 
   --bg-blur:     rgba(246,245,241,0.85);
   --card-blur:   rgba(255,255,255,0.95);
@@ -586,50 +586,105 @@ input, textarea, select {
   color: var(--color-amber-400);
 }
 
-/* Toast styles */
-.toast-container {
-  position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  z-index: var(--z-toast);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  pointer-events: none;
-  max-width: 360px;
-  width: calc(100vw - var(--space-12));
+/* ── Sonner toast — Endroll theme ── */
+[data-sonner-toaster] {
+  --width: 360px;
+  --offset: var(--space-6);
+  --gap: var(--space-2);
+  font-family: var(--font-sans) !important;
+  z-index: var(--z-toast) !important;
 }
 
-/* On mobile, lift toasts above the fixed bottom navigation bar */
+[data-sonner-toast] {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  font-size: 0.875rem !important;
+  padding: var(--space-3) var(--space-4) !important;
+  gap: var(--space-3) !important;
+  /* Colored left border as type indicator */
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  border-left-color: var(--color-success) !important;
+}
+[data-sonner-toast][data-type="error"] {
+  border-left-color: var(--color-error) !important;
+}
+[data-sonner-toast][data-type="info"],
+[data-sonner-toast][data-type="normal"],
+[data-sonner-toast]:not([data-type]) {
+  border-left-color: var(--accent) !important;
+}
+
+/* Icon colors */
+[data-sonner-toast][data-type="success"] [data-icon] { color: var(--color-success); }
+[data-sonner-toast][data-type="error"]   [data-icon] { color: var(--color-error); }
+[data-sonner-toast][data-type="info"]    [data-icon],
+[data-sonner-toast][data-type="normal"]  [data-icon],
+[data-sonner-toast]:not([data-type])     [data-icon] { color: var(--accent); }
+
+/* Title & description */
+[data-sonner-toast] [data-title] {
+  color: var(--text) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+[data-sonner-toast] [data-description] {
+  color: var(--text-2) !important;
+  font-size: 0.8125rem !important;
+}
+
+/* Action button */
+[data-sonner-toast] [data-button] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--accent-ink) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  padding: 4px 10px !important;
+  height: 28px !important;
+  transition: background var(--transition-fast) !important;
+}
+[data-sonner-toast] [data-button]:hover {
+  background: rgba(255, 255, 255, 0.11) !important;
+}
+
+/* Close button */
+[data-sonner-toast] [data-close-button] {
+  background: var(--card-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-3) !important;
+  transition: color var(--transition-fast), background var(--transition-fast) !important;
+}
+[data-sonner-toast] [data-close-button]:hover {
+  background: var(--card-hover) !important;
+  color: var(--text-2) !important;
+}
+
+/* Light mode overrides */
+[data-theme="light"] [data-sonner-toast] {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  box-shadow: 0 4px 16px rgba(28, 23, 18, 0.1), 0 1px 4px rgba(28, 23, 18, 0.08) !important;
+}
+
+/* Mobile: lift above the bottom nav bar */
 @media (max-width: 768px) {
-  .toast-container {
-    right: var(--space-4);
-    left: var(--space-4);
-    width: auto;
-    max-width: none;
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  [data-sonner-toaster] {
+    --offset: calc(72px + env(safe-area-inset-bottom, 0px));
+    --width: calc(100vw - var(--space-8));
+    left: var(--space-4) !important;
+    right: var(--space-4) !important;
   }
 }
-
-.toast {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  pointer-events: all;
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-}
-
-.toast-success { border-left: 3px solid var(--color-success); }
-.toast-error   { border-left: 3px solid var(--color-error); }
-.toast-info    { border-left: 3px solid var(--accent, #d9a441); }
 
 /* Loading Skeleton */
 .skeleton {
