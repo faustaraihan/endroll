@@ -127,7 +127,7 @@ export function TitleCard({
             )}
             {showMetaType && (
               <span className={styles.metaType}>
-                {title.type === 'film' ? 'Film' : 'Series'}
+                {title.type === 'movie' ? 'Movie' : 'Series'}
               </span>
             )}
           </div>

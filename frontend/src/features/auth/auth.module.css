@@ -37,7 +37,7 @@
   z-index: 0;
 }
 
-/* Decorative film strip lines */
+/* Decorative movie strip lines */
 .hero::after {
   content: '';
   position: absolute;

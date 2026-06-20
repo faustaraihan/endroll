@@ -8,7 +8,7 @@ export const mockTitles: Title[] = [
     id: 't1',
     tmdb_id: 496243,
     title: 'Parasite',
-    type: 'film',
+    type: 'movie',
     poster_path: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/TU9NIjwzjoKPwQHoHshkFcQUCG.jpg',
     release_year: 2019,
@@ -23,7 +23,7 @@ export const mockTitles: Title[] = [
     id: 't2',
     tmdb_id: 238,
     title: 'The Godfather',
-    type: 'film',
+    type: 'movie',
     poster_path: 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/tmU7GeKVybMWFButWEGl2M4GeiP.jpg',
     release_year: 1972,
@@ -38,7 +38,7 @@ export const mockTitles: Title[] = [
     id: 't3',
     tmdb_id: 603,
     title: 'The Matrix',
-    type: 'film',
+    type: 'movie',
     poster_path: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/lMnoYqPIAVL0YaLP5YjRy7iwaYv.jpg',
     release_year: 1999,
@@ -68,7 +68,7 @@ export const mockTitles: Title[] = [
     id: 't5',
     tmdb_id: 299536,
     title: 'Avengers: Infinity War',
-    type: 'film',
+    type: 'movie',
     poster_path: 'https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/mdfp0JVpeK02iPbbI0041zP6X0b.jpg',
     release_year: 2018,
@@ -83,7 +83,7 @@ export const mockTitles: Title[] = [
     id: 't6',
     tmdb_id: 550,
     title: 'Fight Club',
-    type: 'film',
+    type: 'movie',
     poster_path: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/hZkgoQYus5vegHoetptqKqIGJfC.jpg',
     release_year: 1999,
@@ -98,7 +98,7 @@ export const mockTitles: Title[] = [
     id: 't7',
     tmdb_id: 157336,
     title: 'Interstellar',
-    type: 'film',
+    type: 'movie',
     poster_path: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg',
     release_year: 2014,
@@ -170,7 +170,7 @@ export const mockWatchLogs: WatchLog[] = [
     title: mockTitles[0],
     watched_at: '2026-05-28',
     notes:
-      'An extraordinary film. Bong Joon-ho is a genius at delivering social critique through a gripping thriller.',
+      'An extraordinary movie. Bong Joon-ho is a genius at delivering social critique through a gripping thriller.',
     rewatch_count: 1,
   },
   {
@@ -294,7 +294,7 @@ export const mockDailyActivity = generateDailyActivity()
 // Mock Stats
 // ---------------------------------------------------------------------------
 export const mockStats: UserStats = {
-  total_films: 142,
+  total_movies: 142,
   total_series: 18,
   total_watch_hours: 384,
   average_rating: 4.2,
@@ -346,7 +346,7 @@ export const mockSearchResults = [
   {
     tmdb_id: 496243,
     title: 'Parasite',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/TU9NIjwzjoKPwQHoHshkFcQUCG.jpg',
     release_year: 2019,
@@ -356,7 +356,7 @@ export const mockSearchResults = [
   {
     tmdb_id: 27205,
     title: 'Inception',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg',
     release_year: 2010,
@@ -366,7 +366,7 @@ export const mockSearchResults = [
   {
     tmdb_id: 120,
     title: 'The Lord of the Rings: The Fellowship of the Ring',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/x2IqmJtO1s2zAVz0Xz810u92zIf.jpg',
     release_year: 2001,
@@ -376,11 +376,11 @@ export const mockSearchResults = [
   {
     tmdb_id: 19404,
     title: 'Dilwale Dulhania Le Jayenge',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0pW.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/nlCHUWjY9XWbuEUQauCEgEN61SQ.jpg',
     release_year: 1995,
-    overview: 'A classic Bollywood film about love, family, and belonging.',
+    overview: 'A classic Bollywood movie about love, family, and belonging.',
     genres: ['Romance', 'Drama'],
   },
   {
@@ -412,7 +412,7 @@ export const mockTrendingThisWeek = [
   {
     tmdb_id: 823464,
     title: 'Godzilla x Kong: The New Empire',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/z1p34vh7dEOnLDmyCrlUVLuoDzd.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/gvLG3Fnznkxl4SmYfcK8gUuqxM8.jpg',
     release_year: 2024,
@@ -422,7 +422,7 @@ export const mockTrendingThisWeek = [
   {
     tmdb_id: 653346,
     title: 'Kingdom of the Planet of the Apes',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/gKkl37BQuKTanygYQG1pyYgLVgf.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/fypydCipcWDKDTTCoPucBsdGYXW.jpg',
     release_year: 2024,
@@ -432,7 +432,7 @@ export const mockTrendingThisWeek = [
   {
     tmdb_id: 762441,
     title: 'A Quiet Place: Day One',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/hU42CRk14JuPEdqZG3AWmagiPAP.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/6XjMwQTvnICBz6TguiDKkDVHvgS.jpg',
     release_year: 2024,
@@ -442,7 +442,7 @@ export const mockTrendingThisWeek = [
   {
     tmdb_id: 1022789,
     title: 'Inside Out 2',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/p5ozvmdgsmbWe0H8Xk7Rc8SCwAB.jpg',
     release_year: 2024,
@@ -452,7 +452,7 @@ export const mockTrendingThisWeek = [
   {
     tmdb_id: 520763,
     title: 'A Quiet Place Part II',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/uAFhuA2q9pXMstgNYpth8VcZe8f.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/uuBYYlbfiYD7ny5VNj46NG14ykR.jpg',
     release_year: 2021,
@@ -462,7 +462,7 @@ export const mockTrendingThisWeek = [
   {
     tmdb_id: 569094,
     title: 'Spider-Man: Across the Spider-Verse',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/9xfDWXAUbFXQK585JvByT5pEAhe.jpg',
     release_year: 2023,
@@ -475,7 +475,7 @@ export const mockNowPlaying = [
   {
     tmdb_id: 693134,
     title: 'Dune: Part Two',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/uOYAbN3F5n3ne8TzWjzVEvQ7XGX.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
     release_year: 2024,
@@ -485,7 +485,7 @@ export const mockNowPlaying = [
   {
     tmdb_id: 792307,
     title: 'Poor Things',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/zh6IdheEYinU4TPtorWsjx6qPQE.jpg',
     release_year: 2023,
@@ -495,7 +495,7 @@ export const mockNowPlaying = [
   {
     tmdb_id: 786892,
     title: 'Furiosa: A Mad Max Saga',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/vjyrLHDKNWBUFQitdUemYfMrr8T.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/raph7qjAGTMXaIjVxt6ZDSXRzUr.jpg',
     release_year: 2024,
@@ -505,7 +505,7 @@ export const mockNowPlaying = [
   {
     tmdb_id: 967847,
     title: 'Ghostbusters: Frozen Empire',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/e1J2oNzSBdou01sUvriVuoYp0pJ.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/5cCfqeUH2f5Gnu7Lh9xepY9TB6x.jpg',
     release_year: 2024,
@@ -515,7 +515,7 @@ export const mockNowPlaying = [
   {
     tmdb_id: 872585,
     title: 'Oppenheimer',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/neeNHeXjMF5fXoCJRsOmkNGC7q.jpg',
     release_year: 2023,
@@ -528,7 +528,7 @@ export const mockTopRatedClassics = [
   {
     tmdb_id: 278,
     title: 'The Shawshank Redemption',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/zfbjgQE1uSd9wiPTX4VzsLi0rGG.jpg',
     release_year: 1994,
@@ -538,7 +538,7 @@ export const mockTopRatedClassics = [
   {
     tmdb_id: 238,
     title: 'The Godfather',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/tmU7GeKVybMWFButWEGl2M4GeiP.jpg',
     release_year: 1972,
@@ -548,7 +548,7 @@ export const mockTopRatedClassics = [
   {
     tmdb_id: 122,
     title: 'The Lord of the Rings: The Return of the King',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/2u7zbn8EudG6kLlBzUYqP8RyFU4.jpg',
     release_year: 2003,
@@ -558,7 +558,7 @@ export const mockTopRatedClassics = [
   {
     tmdb_id: 680,
     title: 'Pulp Fiction',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg',
     release_year: 1994,
@@ -568,7 +568,7 @@ export const mockTopRatedClassics = [
   {
     tmdb_id: 424,
     title: "Schindler's List",
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/zb6fM1CX41D9rF9hdgclu0peUmy.jpg',
     release_year: 1993,
@@ -581,7 +581,7 @@ export const mockUpcomingClassics = [
   {
     tmdb_id: 558449,
     title: 'Gladiator II',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/tOqIwliWMovSIZ9DyvHcHI7p2im.jpg',
     release_year: 2024,
@@ -591,7 +591,7 @@ export const mockUpcomingClassics = [
   {
     tmdb_id: 533535,
     title: 'Deadpool & Wolverine',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg',
     release_year: 2024,
@@ -601,7 +601,7 @@ export const mockUpcomingClassics = [
   {
     tmdb_id: 426063,
     title: 'Nosferatu',
-    type: 'film' as const,
+    type: 'movie' as const,
     poster_path: 'https://image.tmdb.org/t/p/w500/5qGIxdEO841C0tdY8vOdLoRVrr0.jpg',
     backdrop_path: 'https://image.tmdb.org/t/p/w1280/gprjiZWY43vxSKngMha1wfb5TGG.jpg',
     release_year: 2024,

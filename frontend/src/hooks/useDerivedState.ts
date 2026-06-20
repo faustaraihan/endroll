@@ -183,7 +183,7 @@ export function useDynamicStats() {
       if (!uniqueTitleIds.has(log.title_id)) {
         uniqueTitleIds.add(log.title_id)
         if (title) {
-          if (title.type === 'film') totalFilms++
+          if (title.type === 'movie') totalFilms++
           if (title.type === 'series') totalSeries++
         }
       }
@@ -251,7 +251,7 @@ export function useDynamicStats() {
     }
 
     return {
-      total_films: totalFilms,
+      total_movies: totalFilms,
       total_series: totalSeries,
       total_watch_hours: Math.floor(watchMinutes / 60),
       average_rating: dynamicAverageRating,

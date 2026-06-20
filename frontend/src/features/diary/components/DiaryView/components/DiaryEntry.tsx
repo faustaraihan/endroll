@@ -17,7 +17,7 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
   const day = date?.getDate()
   const month = date?.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
 
-  const ratingToShow = log.title.type === 'film'
+  const ratingToShow = log.title.type === 'movie'
     ? (log.rating ?? personalRating)
     : personalRating
 
@@ -38,7 +38,7 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
         <Poster
           title={log.title.title}
           src={log.title.poster_path}
-          alt={`Poster ${log.title.type === 'film' ? 'film' : 'series'} ${log.title.title} (${log.title.release_year})`}
+          alt={`Poster ${log.title.type === 'movie' ? 'movie' : 'series'} ${log.title.title} (${log.title.release_year})`}
           className={styles.posterImg}
           size="sm"
         />
@@ -73,7 +73,7 @@ export const DiaryEntry: React.FC<DiaryEntryProps> = ({ log, index, personalRati
             <span className={styles.metaYear}>{log.title.release_year}</span>
           )}
           <span className={styles.metaType}>
-            {log.title.type === 'film' ? 'Film' : 'Series'}
+            {log.title.type === 'movie' ? 'Movie' : 'Series'}
           </span>
           {log.rewatch_count > 0 && (
             <Badge variant="neutral">Rewatch ×{log.rewatch_count}</Badge>

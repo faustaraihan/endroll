@@ -2,7 +2,7 @@ import { getInitials, getColorFromString } from '../../../../utils'
 import styles from './PosterPlaceholder.module.css'
 
 interface PosterPlaceholderProps {
-  /** Film/series title — source of the initials and color */
+  /** Movie/series title — source of the initials and color */
   title: string
   /** Initials font size */
   size?: 'sm' | 'md' | 'lg'

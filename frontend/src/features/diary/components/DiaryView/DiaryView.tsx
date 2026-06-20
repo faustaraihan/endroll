@@ -10,7 +10,7 @@ import { SortDropdown } from './components/SortDropdown'
 import type { SortField, SortDirection, GroupField } from './components/SortDropdown'
 import { DiaryEntry } from './components/DiaryEntry'
 
-type FilterType = 'all' | 'film' | 'series'
+type FilterType = 'all' | 'movie' | 'series'
 type ViewMode = 'list' | 'grid' | 'compact'
 
 interface GroupedSection {
@@ -78,8 +78,8 @@ export default function DiaryView() {
           break
         }
         case 'rating': {
-          const rA = (a.title.type === 'film' ? (a.rating ?? personalRatings[a.title.id]) : personalRatings[a.title.id]) ?? 0
-          const rB = (b.title.type === 'film' ? (b.rating ?? personalRatings[b.title.id]) : personalRatings[b.title.id]) ?? 0
+          const rA = (a.title.type === 'movie' ? (a.rating ?? personalRatings[a.title.id]) : personalRatings[a.title.id]) ?? 0
+          const rB = (b.title.type === 'movie' ? (b.rating ?? personalRatings[b.title.id]) : personalRatings[b.title.id]) ?? 0
           comparison = rA - rB
           break
         }
@@ -112,7 +112,7 @@ export default function DiaryView() {
 
       if (groupBy === 'type') {
         key = log.title.type
-        label = log.title.type === 'film' ? 'Film' : 'Series'
+        label = log.title.type === 'movie' ? 'Movie' : 'Series'
       } else if (groupBy === 'month') {
         if (log.watched_at) {
           const d = new Date(log.watched_at)
@@ -137,7 +137,7 @@ export default function DiaryView() {
           label = 'Unknown Release Year'
         }
       } else if (groupBy === 'rating') {
-        const r = (log.title.type === 'film' ? (log.rating ?? personalRatings[log.title.id]) : personalRatings[log.title.id])
+        const r = (log.title.type === 'movie' ? (log.rating ?? personalRatings[log.title.id]) : personalRatings[log.title.id])
         if (r === undefined || r === null) {
           key = '5_unrated'
           label = 'Unrated'
@@ -242,14 +242,14 @@ export default function DiaryView() {
 
               {/* Filter pills */}
               <div className={styles.filterGroup} role="group" aria-label="Filter by type">
-                {(['all', 'film', 'series'] as FilterType[]).map(f => (
+                {(['all', 'movie', 'series'] as FilterType[]).map(f => (
                   <button
                     key={f}
                     className={`${styles.filterPill} ${filter === f ? styles.filterPillActive : ''}`}
                     onClick={() => setFilter(f)}
                     aria-pressed={filter === f}
                   >
-                    {f === 'all' ? 'All' : f === 'film' ? 'Film' : 'Series'}
+                    {f === 'all' ? 'All' : f === 'movie' ? 'Movie' : 'Series'}
                   </button>
                 ))}
               </div>

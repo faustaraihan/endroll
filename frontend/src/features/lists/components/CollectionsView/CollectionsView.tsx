@@ -394,7 +394,7 @@ export default function CollectionsView() {
                             <div className={styles.dropdownItemInfo}>
                               <span className={styles.dropdownItemTitle}>{title.title}</span>
                               <span className={styles.dropdownItemMeta}>
-                                {title.release_year} · {title.type === 'film' ? 'Film' : 'Series'}
+                                {title.release_year} · {title.type === 'movie' ? 'Movie' : 'Series'}
                               </span>
                             </div>
                             <Plus size={14} className={styles.dropdownAddIcon} />

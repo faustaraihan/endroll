@@ -1,7 +1,7 @@
 // Endroll Type Definitions
 // Aligned with PRD v1.1 and database schema
 
-export type TitleType = 'film' | 'series'
+export type TitleType = 'movie' | 'series'
 
 export type WatchStatus = 'Watching' | 'Completed' | 'Dropped' | 'Paused'
 
@@ -91,7 +91,7 @@ export interface UserProfile {
 }
 
 export interface UserStats {
-  total_films: number
+  total_movies: number
   total_series: number
   total_watch_hours: number
   average_rating?: number
@@ -134,7 +134,7 @@ export type OnboardingStep =
   | 'register'
   | 'username'
   | 'taste'
-  | 'first-film'
+  | 'first-movie'
   | 'quick-log'
   | 'dashboard'
 

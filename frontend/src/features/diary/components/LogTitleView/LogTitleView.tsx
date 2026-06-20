@@ -162,7 +162,7 @@ export default function LogTitleView() {
     setEditingLogId(null);
     setWatchedAt(new Date().toISOString().slice(0, 10));
 
-    // Cari rating global dari film ini
+    // Cari rating global dari movie ini
     const existingWatch = watchLogs.find(
       (l) =>
         ("id" in result && l.title.id === result.id) ||
@@ -305,7 +305,7 @@ export default function LogTitleView() {
         <div className={styles.searchStep} style={{ animationName: "fade-in" }}>
           <PageHeader
             eyebrow="Capture"
-            title="Log a film or series"
+            title="Log a movie or series"
             description="Search for the title you just watched"
           />
 
@@ -345,7 +345,7 @@ export default function LogTitleView() {
             <SearchInput
               value={query}
               onChange={(val) => handleQueryChange(val)}
-              placeholder="Type a film or series title…"
+              placeholder="Type a movie or series title…"
             />
           </form>
 
@@ -394,7 +394,7 @@ export default function LogTitleView() {
                       <div className={styles.resultTitle}>{result.title}</div>
                       <div className={styles.resultMeta}>
                         <span className="badge badge-muted">
-                          {result.type === "film" ? "Film" : "Series"}
+                          {result.type === "movie" ? "Movie" : "Series"}
                         </span>
                         {result.release_year && (
                           <span className="text-sm text-muted">
@@ -430,7 +430,7 @@ export default function LogTitleView() {
         <form
           onSubmit={handleSubmit}
           className={styles.formStep}
-          aria-label="Log film form"
+          aria-label="Log movie form"
         >
           <BackButton 
             onClick={handleBack} 
@@ -464,7 +464,7 @@ export default function LogTitleView() {
               </div>
               <div className={styles.previewInfo}>
                 <p className={styles.previewEyebrow}>
-                  {selectedTitle.type === "film" ? "Film" : "Series"}
+                  {selectedTitle.type === "movie" ? "Movie" : "Series"}
                 </p>
                 <h1 className={styles.previewTitle}>{selectedTitle.title}</h1>
                 <div className={styles.previewMeta}>

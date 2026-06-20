@@ -51,8 +51,8 @@ export default function WatchlistView() {
         <EmptyState
           icon={<Film size={40} strokeWidth={1.5} />}
           title="Your watchlist is empty."
-          description="Add films you want to watch later from the Explore page."
-          actionLabel="Find films"
+          description="Add movies you want to watch later from the Explore page."
+          actionLabel="Find movies"
           actionLink="/explore"
           actionIcon={<Compass size={16} />}
         />

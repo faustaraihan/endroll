@@ -202,7 +202,7 @@ export default function TitleDetailView() {
           {/* Title info */}
           <div className={styles.titleInfo}>
             <p className={styles.heroEyebrow}>
-              {title.type === 'film' ? 'Film' : 'Series'}
+              {title.type === 'movie' ? 'Movie' : 'Series'}
             </p>
             <h1 className={styles.titleName}>{title.title}</h1>
 

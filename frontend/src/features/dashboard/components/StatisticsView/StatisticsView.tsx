@@ -158,7 +158,7 @@ export default function StatisticsView() {
           <p className="eyebrow">Personal Insights</p>
           <h1 className={styles.pageTitle}>{firstName}'s Cinematic Rhythm</h1>
           <p className={styles.pageSub}>
-            {stats.total_films + stats.total_series} watch logs. A quiet archive of frames, feelings, and memories.
+            {stats.total_movies + stats.total_series} watch logs. A quiet archive of frames, feelings, and memories.
           </p>
         </div>
       </header>
@@ -166,8 +166,8 @@ export default function StatisticsView() {
       {/* ── Hero Stats ── */}
       <div className={styles.heroStats}>
         <div className={styles.heroStatBlock}>
-          <span className={styles.heroValue}>{stats.total_films}</span>
-          <span className={styles.heroLabel}>Films</span>
+          <span className={styles.heroValue}>{stats.total_movies}</span>
+          <span className={styles.heroLabel}>Movies</span>
         </div>
         <div className={styles.heroStatBlock}>
           <span className={styles.heroValue}>{stats.total_series}</span>
@@ -297,8 +297,8 @@ export default function StatisticsView() {
                         key={day}
                         role="gridcell"
                         className={`${styles.heatmapCell} ${activityLevel(count)}`}
-                        title={`${day}: ${count} film${count !== 1 ? 's' : ''} watched`}
-                        aria-label={`${day}: ${count} films watched`}
+                        title={`${day}: ${count} movie${count !== 1 ? 's' : ''} watched`}
+                        aria-label={`${day}: ${count} movies watched`}
                       />
                     )
                   })}
@@ -415,7 +415,7 @@ export default function StatisticsView() {
                 </div>
                 <div className={styles.faceInfo}>
                   <span className={styles.faceName}>{director}</span>
-                  <span className={styles.faceCount}>{count} films</span>
+                  <span className={styles.faceCount}>{count} movies</span>
                 </div>
               </div>
             ))}

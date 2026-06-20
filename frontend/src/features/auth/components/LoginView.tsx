@@ -6,7 +6,7 @@ import { AuthLayout } from './AuthLayout'
 import styles from '../auth.module.css'
 
 const QUOTE = {
-  text: '"A film is never really good unless the camera is an eye in the head of a poet."',
+  text: '"A movie is never really good unless the camera is an eye in the head of a poet."',
   author: '— Orson Welles',
 }
 

@@ -85,7 +85,7 @@ export default function HomeView() {
           {recentLogs.length === 0 ? (
             <EmptyState
               icon={<Film size={36} strokeWidth={1.5} />}
-              title={<>No films here yet.<br />What did you watch recently?</>}
+              title={<>No movies here yet.<br />What did you watch recently?</>}
               actionLabel="Log first title"
               actionLink="/log"
               actionIcon={<Plus size={16} />}
@@ -111,7 +111,7 @@ export default function HomeView() {
                       <Poster
                         title={log.title.title}
                         src={log.title.poster_path}
-                        alt={`Poster ${log.title.type === 'film' ? 'film' : 'series'} ${log.title.title} (${log.title.release_year})`}
+                        alt={`Poster ${log.title.type === 'movie' ? 'movie' : 'series'} ${log.title.title} (${log.title.release_year})`}
                         className={styles.poster}
                         size="sm"
                       />
@@ -133,7 +133,7 @@ export default function HomeView() {
 
                     {/* Rating */}
                     {(() => {
-                      const ratingToShow = log.title.type === 'film'
+                      const ratingToShow = log.title.type === 'movie'
                         ? (log.rating ?? personalRatings[log.title_id])
                         : personalRatings[log.title_id];
                       if (ratingToShow == null) return <div />;
@@ -159,8 +159,8 @@ export default function HomeView() {
         {/* Stat rail — 4 inline stats */}
         <div className={styles.statRail}>
           <div className={styles.statCell}>
-            <div className={styles.statVal}>{stats.total_films}</div>
-            <div className={styles.statLbl}>Films</div>
+            <div className={styles.statVal}>{stats.total_movies}</div>
+            <div className={styles.statLbl}>Movies</div>
           </div>
           <div className={styles.statCell}>
             <div className={styles.statVal}>{stats.total_series}</div>

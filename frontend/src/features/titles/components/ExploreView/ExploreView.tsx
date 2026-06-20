@@ -197,7 +197,7 @@ export default function ExploreView() {
                           <div className={styles.dropdownInfo}>
                             <span className={styles.dropdownTitle}>{result.title}</span>
                             <span className={styles.dropdownYear}>
-                              {result.release_year} • {result.type === 'film' ? 'Film' : 'Series'}
+                              {result.release_year} • {result.type === 'movie' ? 'Movie' : 'Series'}
                             </span>
                           </div>
                         </button>
@@ -359,7 +359,7 @@ function SearchResultCard({
         <div className={styles.resultMeta}>
           {result.release_year && <span>{result.release_year}</span>}
           {result.release_year && <span className={styles.metaDot}>•</span>}
-          <span>{result.type === 'film' ? 'Film' : 'Series'}</span>
+          <span>{result.type === 'movie' ? 'Movie' : 'Series'}</span>
           {result.genres.length > 0 && (
             <>
               <span className={styles.metaDot}>•</span>

@@ -377,6 +377,7 @@
 }
 .diaryList.grid .entry:hover {
   background: transparent;
+  box-shadow: none;
 }
 .diaryList.grid .entryDate {
   display: none;
@@ -409,10 +410,10 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(11, 11, 12, 0.85);
+  background: var(--bg-blur, rgba(11, 11, 12, 0.85));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-soft);
   z-index: 2;
 }
 .diaryList.grid .gridRatingOverlay .ratingMax {
