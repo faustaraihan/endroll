@@ -133,18 +133,14 @@ Supaya tidak pusing "di mana datanya":
 | Watchlist | `watchlistSlice` (**dipisah** dari diary) |
 | Collections | `collectionSlice` |
 | Explore data (TMDb) | `titleSlice` |
-| User / session / auth | `userSlice` (→ `authSlice`) — *bukan* Context |
+| Session / login identity | `authSlice` (`authUser` + login/register/logout) |
+| Profil + preferences (UserProfile) | `userSlice` (`user`) |
 | UI ephemeral non-domain (Toast) | **Context** di `src/contexts` |
 | State lokal 1 komponen | `useState` biasa |
 
-> **Catatan penting — pemisahan `watchSlice`:** sekarang `watchSlice` masih
-> menampung watchLogs **dan** watchlist sekaligus. Ini yang bikin batas store
-> tidak cocok dengan batas feature. Target: pecah jadi `diarySlice` (watchLogs +
-> `personalRatings`) dan `watchlistSlice` (watchlist saja).
->
-> **Catatan transisi Auth:** saat ini Auth masih di `contexts/AuthContext`.
-> Rencananya dipindah jadi bagian `userSlice`/`authSlice`. Sampai itu terjadi,
-> jangan tambah Context baru untuk data domain.
+> `authSlice.authUser` (identitas login) ≠ `userSlice.user` (profil+preferences
+> untuk tampilan/stats). Keduanya sengaja terpisah. `authUser` di-hydrate
+> sinkron dari `localStorage` saat store dibuat, jadi tak ada `loading` gate.
 
 > **Rating per-judul (keputusan owner):** rating disimpan global per judul di
 > `personalRatings: Record<titleId, number>`, **bukan** per watch-log. Jangan
@@ -222,7 +218,10 @@ Status per Juli 2026 — refactor struktural inti **selesai**.
 - [x] `XView` → `XPage`, sub-komponen dinaikkan, tak ada lagi `components/` subdir
 - [x] `src/pages/` dihapus — route menunjuk `@/features/*/XPage`
 
-**Sisa (belum dikerjakan — di luar refactor struktur):**
-- [ ] Pindahkan `AuthContext` → `userSlice`/`authSlice`
-- [ ] Rapikan 2 lint error lama di `AuthContext` (setState-in-effect, export)
+**Tambahan (selesai — di luar refactor struktur):** ✅
+- [x] `AuthContext` → `authSlice` (session di store, hydrate sinkron)
+- [x] 2 lint error lama di `AuthContext` hilang (file dibuang)
+- [x] Hapus `StatBox` (dead code)
+
+Struktur `frontend/` kini sepenuhnya selaras dokumen ini. `eslint` bersih.
 ```
