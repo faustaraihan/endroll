@@ -3,9 +3,9 @@ import { useStore } from '@/store/useStore'
 import { useDynamicStreak, useDynamicStats, useDailyActivity } from '@/hooks/useDerivedState'
 import { SectionHeader } from '@/components'
 import { Poster } from '@/components/ui/Poster/Poster'
-import { UserPickModal } from '@/features/statistics/components/UserPickModal/UserPickModal'
+import { UserPickModal } from '@/features/statistics/UserPickModal'
 import { useState } from 'react'
-import styles from './StatisticsView.module.css'
+import styles from './StatisticsPage.module.css'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ function initials(name: string): string {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function StatisticsView() {
+export default function StatisticsPage() {
   const watchLogs = useStore(state => state.watchLogs)
   const personalRatings = useStore(state => state.personalRatings)
   const user = useStore(state => state.user)

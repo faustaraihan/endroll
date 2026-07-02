@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom'
 import { useToast } from '@/contexts'
 import { useStore } from '@/store/useStore'
 import { EmptyState, PageHeader } from '@/components'
-import { CollectionModal } from '@/features/collections/components/CollectionModal/CollectionModal'
+import { CollectionModal } from '@/features/collections/CollectionModal'
 import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
 import type { Title } from '@/types'
-import styles from './WatchlistView.module.css'
+import styles from './WatchlistPage.module.css'
 
-export default function WatchlistView() {
+export default function WatchlistPage() {
   const watchlist = useStore(state => state.watchlist)
   const setWatchlist = useStore(state => state.setWatchlist)
   const watchLogs = useStore(state => state.watchLogs)

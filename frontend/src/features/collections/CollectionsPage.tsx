@@ -5,9 +5,9 @@ import { useStore } from '@/store/useStore'
 import { PageHeader, FormGroup, BackButton, SearchInput } from '@/components'
 import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
 import type { Title } from '@/types'
-import styles from './CollectionsView.module.css'
+import styles from './CollectionsPage.module.css'
 
-export default function CollectionsView() {
+export default function CollectionsPage() {
   const collections = useStore(state => state.collections)
   const setCollections = useStore(state => state.setCollections)
   const collectionItems = useStore(state => state.collectionItems)

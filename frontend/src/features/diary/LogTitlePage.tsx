@@ -13,7 +13,7 @@ import { PageHeader, SearchInput, BackButton } from "@/components";
 import { Poster } from "@/components/ui/Poster/Poster";
 import { formatDate } from "@/utils";
 import type { SearchResult, Title } from "@/types";
-import styles from "./LogTitleView.module.css";
+import styles from "./LogTitlePage.module.css";
 
 type Step = "search" | "form";
 
@@ -44,7 +44,7 @@ function clearDraft() {
   localStorage.removeItem(DRAFT_KEY);
 }
 
-export default function LogTitleView() {
+export default function LogTitlePage() {
   const setWatchLogs = useStore(state => state.setWatchLogs);
   const watchLogs = useStore(state => state.watchLogs);
   const watchlist = useStore(state => state.watchlist);

@@ -1,49 +1,36 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Loader2, Eye, EyeOff, ArrowRight, AlertCircle, Check } from 'lucide-react'
+import { Loader2, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/contexts'
 import { AuthLayout } from './AuthLayout'
 import styles from '@/features/auth/auth.module.css'
 
 const QUOTE = {
-  text: '"Cinema is a matter of what\'s in the frame and what\'s out."',
-  author: '— Martin Scorsese',
+  text: '"A movie is never really good unless the camera is an eye in the head of a poet."',
+  author: '— Orson Welles',
 }
 
-const PASSWORD_RULES = [
-  { key: 'minLength',   label: 'At least 8 characters',  test: (p: string) => p.length >= 8 },
-  { key: 'hasUpper',    label: '1 uppercase letter',      test: (p: string) => /[A-Z]/.test(p) },
-  { key: 'hasNumber',   label: '1 number',                test: (p: string) => /[0-9]/.test(p) },
-]
-
-export default function RegisterView() {
-  const [name, setName] = useState('')
+export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [passwordFocused, setPasswordFocused] = useState(false)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { register } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/home'
 
-  const ruleResults = PASSWORD_RULES.map(r => ({ ...r, met: r.test(password) }))
-  const isPasswordValid = ruleResults.every(r => r.met)
-  const showRules = passwordFocused || password.length > 0
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!isPasswordValid) return
     setError('')
     setIsSubmitting(true)
     try {
-      await register(email, name)
+      await login(email)
       navigate(from, { replace: true })
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError('Invalid email or password. Please try again.')
       setIsSubmitting(false)
     }
   }
@@ -51,8 +38,8 @@ export default function RegisterView() {
   return (
     <AuthLayout quote={QUOTE}>
       <div className={styles.formHeader}>
-        <h1 className={styles.formTitle}>Register</h1>
-        <p className={styles.formSubtitle}>Start your private cinematic journal today.</p>
+        <h1 className={styles.formTitle}>Welcome back</h1>
+        <p className={styles.formSubtitle}>Enter your details to access your journal.</p>
       </div>
 
       {error && (
@@ -64,24 +51,9 @@ export default function RegisterView() {
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.inputGroup}>
-          <label htmlFor="signup-name" className={styles.label}>Your name</label>
+          <label htmlFor="login-email" className={styles.label}>Email address</label>
           <input
-            id="signup-name"
-            type="text"
-            required
-            autoComplete="name"
-            autoFocus
-            className={styles.input}
-            placeholder="Fausta Raihan"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <label htmlFor="signup-email" className={styles.label}>Email address</label>
-          <input
-            id="signup-email"
+            id="login-email"
             type="email"
             required
             autoComplete="email"
@@ -93,19 +65,20 @@ export default function RegisterView() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="signup-password" className={styles.label}>Password</label>
+          <div className={styles.labelRow}>
+            <label htmlFor="login-password" className={styles.label}>Password</label>
+            <a href="#" className={styles.forgotLink}>Forgot password?</a>
+          </div>
           <div className={styles.inputWrap}>
             <input
-              id="signup-password"
+              id="login-password"
               type={showPassword ? 'text' : 'password'}
               required
-              autoComplete="new-password"
+              autoComplete="current-password"
               className={`${styles.input} ${styles.inputWithToggle}`}
-              placeholder="Create a strong password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setPasswordFocused(true)}
-              onBlur={() => setPasswordFocused(false)}
             />
             <button
               type="button"
@@ -116,37 +89,21 @@ export default function RegisterView() {
               {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
-
-          {showRules && (
-            <ul className={styles.passwordRules} aria-label="Password requirements">
-              {ruleResults.map(rule => (
-                <li
-                  key={rule.key}
-                  className={`${styles.passwordRule} ${rule.met ? styles.passwordRuleMet : ''}`}
-                >
-                  <span className={styles.passwordRuleIcon} aria-hidden="true">
-                    <Check size={10} strokeWidth={3} />
-                  </span>
-                  {rule.label}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
         <button
           type="submit"
-          disabled={isSubmitting || !name || !email || !isPasswordValid}
+          disabled={isSubmitting || !email || !password}
           className={`btn btn-primary ${styles.submitBtn}`}
         >
           {isSubmitting
             ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
-            : 'Register'
+            : 'Login'
           }
         </button>
       </form>
 
-      <div className={styles.divider}><span>or register with</span></div>
+      <div className={styles.divider}><span>or continue with</span></div>
 
       <button type="button" className={`btn btn-secondary ${styles.socialBtn}`}>
         <GoogleIcon />
@@ -154,9 +111,9 @@ export default function RegisterView() {
       </button>
 
       <p className={styles.footerText}>
-        Already have an account?{' '}
-        <Link to="/login" className={styles.footerLink}>
-          Login <ArrowRight size={13} />
+        Don't have an account?{' '}
+        <Link to="/register" className={styles.footerLink}>
+          Register <ArrowRight size={13} />
         </Link>
       </p>
     </AuthLayout>

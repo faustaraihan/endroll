@@ -3,12 +3,12 @@ import { Film, Plus, LayoutGrid, List, AlignJustify } from 'lucide-react'
 
 import { useStore } from '@/store/useStore'
 import { EmptyState, PageHeader } from '@/components'
-import styles from './DiaryView.module.css'
+import styles from './DiaryPage.module.css'
 import type { WatchLog } from '@/types'
 
-import { SortDropdown } from './components/SortDropdown'
-import type { SortField, SortDirection, GroupField } from './components/SortDropdown'
-import { DiaryEntry } from './components/DiaryEntry'
+import { SortDropdown } from './SortDropdown'
+import type { SortField, SortDirection, GroupField } from './SortDropdown'
+import { DiaryEntry } from './DiaryEntry'
 
 type FilterType = 'all' | 'movie' | 'series'
 type ViewMode = 'list' | 'grid' | 'compact'
@@ -19,7 +19,7 @@ interface GroupedSection {
   logs: WatchLog[]
 }
 
-export default function DiaryView() {
+export default function DiaryPage() {
   const watchLogs = useStore(state => state.watchLogs)
   const personalRatings = useStore(state => state.personalRatings)
   const [sortField, setSortField] = useState<SortField>('date')

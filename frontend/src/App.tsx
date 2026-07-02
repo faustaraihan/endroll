@@ -15,19 +15,19 @@ function ScrollToTop() {
 }
 
 // Lazy loaded page components to enable code splitting
-const Home = lazy(() => import('./pages/Home/Home'))
-const Diary = lazy(() => import('./pages/Diary/Diary'))
-const Explore = lazy(() => import('./pages/Explore/Explore'))
-const Watchlist = lazy(() => import('./pages/Watchlist/Watchlist'))
-const Statistics = lazy(() => import('./pages/Statistics/Statistics'))
-const Settings = lazy(() => import('./pages/Settings/Settings'))
-const LogTitle = lazy(() => import('./pages/LogTitle/LogTitle'))
-const Collections = lazy(() => import('./pages/Collections/Collections'))
-const TitleDetail = lazy(() => import('./pages/TitleDetail/TitleDetail'))
+const Home = lazy(() => import('@/features/home/HomePage'))
+const Diary = lazy(() => import('@/features/diary/DiaryPage'))
+const Explore = lazy(() => import('@/features/titles/ExplorePage'))
+const Watchlist = lazy(() => import('@/features/watchlist/WatchlistPage'))
+const Statistics = lazy(() => import('@/features/statistics/StatisticsPage'))
+const Settings = lazy(() => import('@/features/settings/SettingsPage'))
+const LogTitle = lazy(() => import('@/features/diary/LogTitlePage'))
+const Collections = lazy(() => import('@/features/collections/CollectionsPage'))
+const TitleDetail = lazy(() => import('@/features/titles/TitleDetailPage'))
 
 // Auth pages
-const Login = lazy(() => import('./pages/Auth/Login'))
-const Register = lazy(() => import('./pages/Auth/Register'))
+const Login = lazy(() => import('@/features/auth/LoginPage'))
+const Register = lazy(() => import('@/features/auth/RegisterPage'))
 
 import { Loader2 } from 'lucide-react'
 

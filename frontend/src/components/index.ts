@@ -1,5 +1,5 @@
 // Layout
-export * from '@/features/auth/components/ProtectedRoute'
+export * from '@/features/auth/ProtectedRoute'
 export * from './layout/AppLayout/AppLayout'
 export * from './layout/Navigation/Navigation'
 export * from './layout/PageHeader/PageHeader'

@@ -7,9 +7,9 @@ import { EmptyState, PageHeader, SearchInput, SectionHeader } from '@/components
 import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
 import { Poster } from '@/components/ui/Poster/Poster'
 import type { SearchResult, Title, WatchlistItem } from '@/types'
-import styles from './ExploreView.module.css'
+import styles from './ExplorePage.module.css'
 
-export default function ExploreView() {
+export default function ExplorePage() {
   const watchlist = useStore(state => state.watchlist)
   const setWatchlist = useStore(state => state.setWatchlist)
   const exploreData = useStore(state => state.exploreData)

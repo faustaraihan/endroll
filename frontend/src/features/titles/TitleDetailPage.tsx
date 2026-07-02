@@ -17,11 +17,11 @@ import { useAllKnownTitles } from '@/hooks/useDerivedState'
 import { formatRuntime, getInitials } from '@/utils'
 import { BackButton, Badge } from '@/components'
 import { GenrePill } from '@/components/ui/GenrePill/GenrePill'
-import { CollectionModal } from '@/features/collections/components/CollectionModal/CollectionModal'
+import { CollectionModal } from '@/features/collections/CollectionModal'
 import { Poster } from '@/components/ui/Poster/Poster'
-import styles from './TitleDetailView.module.css'
+import styles from './TitleDetailPage.module.css'
 
-export default function TitleDetailView() {
+export default function TitleDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const watchLogs = useStore(state => state.watchLogs)

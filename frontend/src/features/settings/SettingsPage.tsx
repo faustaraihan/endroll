@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { useToast, useAuth } from '@/contexts'
 import { useStore } from '@/store/useStore'
 import { PageHeader } from '@/components'
-import styles from './SettingsView.module.css'
+import styles from './SettingsPage.module.css'
 
-export default function SettingsView() {
+export default function SettingsPage() {
   const user = useStore(state => state.user)
   const setUser = useStore(state => state.setUser)
   const { addToast } = useToast()

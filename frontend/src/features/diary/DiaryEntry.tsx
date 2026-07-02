@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { Badge } from '@/components'
 import { Poster } from '@/components/ui/Poster/Poster'
-import styles from '@/features/diary/components/DiaryView/DiaryView.module.css'
+import styles from '@/features/diary/DiaryPage.module.css'
 import type { WatchLog } from '@/types'
 
 interface DiaryEntryProps {
