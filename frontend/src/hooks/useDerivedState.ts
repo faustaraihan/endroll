@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react'
-import { useStore } from '../store/useStore'
-import type { Title } from '../types'
-import { mockStreak, mockTitles } from '../data/mockData'
+import { useStore } from '@/store/useStore'
+import type { Title } from '@/types'
+import { mockStreak, mockTitles } from '@/data/mockData'
 
 export function useAllKnownTitles() {
   const watchLogs = useStore(state => state.watchLogs)

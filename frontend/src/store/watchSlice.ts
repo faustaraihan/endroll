@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand'
 import type { StoreState } from './useStore'
-import type { WatchLog, WatchlistItem } from '../types'
-import { mockWatchLogs, mockWatchlist, mockPersonalRatings } from '../data/mockData'
+import type { WatchLog, WatchlistItem } from '@/types'
+import { mockWatchLogs, mockWatchlist, mockPersonalRatings } from '@/data/mockData'
 
 export interface WatchSlice {
   watchLogs: WatchLog[]

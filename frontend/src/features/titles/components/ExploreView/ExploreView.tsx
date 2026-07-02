@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { Search as SearchIcon, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useToast } from '../../../../contexts'
-import { useStore } from '../../../../store/useStore'
-import { EmptyState, PageHeader, SearchInput, SectionHeader } from '../../../../components'
-import { TitleCard } from '../TitleCard/TitleCard'
-import { Poster } from '../Poster/Poster'
-import type { SearchResult, Title, WatchlistItem } from '../../../../types'
+import { useToast } from '@/contexts'
+import { useStore } from '@/store/useStore'
+import { EmptyState, PageHeader, SearchInput, SectionHeader } from '@/components'
+import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
+import { Poster } from '@/components/ui/Poster/Poster'
+import type { SearchResult, Title, WatchlistItem } from '@/types'
 import styles from './ExploreView.module.css'
 
 export default function ExploreView() {

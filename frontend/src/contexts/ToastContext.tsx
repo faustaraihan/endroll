@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, type ReactNode } from 'react'
 import { toast } from 'sonner'
-import type { ToastType, ToastAction } from '../types'
+import type { ToastType, ToastAction } from '@/types'
 
 interface AddToastOptions {
   action?: ToastAction

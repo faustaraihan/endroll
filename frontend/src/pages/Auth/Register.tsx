@@ -1,3 +1,3 @@
-import RegisterView from '../../features/auth/components/RegisterView'
+import RegisterView from '@/features/auth/components/RegisterView'
 
 export default RegisterView

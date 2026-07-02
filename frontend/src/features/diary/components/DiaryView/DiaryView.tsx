@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react'
 import { Film, Plus, LayoutGrid, List, AlignJustify } from 'lucide-react'
 
-import { useStore } from '../../../../store/useStore'
-import { EmptyState, PageHeader } from '../../../../components'
+import { useStore } from '@/store/useStore'
+import { EmptyState, PageHeader } from '@/components'
 import styles from './DiaryView.module.css'
-import type { WatchLog } from '../../../../types'
+import type { WatchLog } from '@/types'
 
 import { SortDropdown } from './components/SortDropdown'
 import type { SortField, SortDirection, GroupField } from './components/SortDropdown'

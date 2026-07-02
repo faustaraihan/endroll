@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Navigation } from '../Navigation/Navigation'
-import { useStore } from '../../../store/useStore'
+import { Navigation } from '@/components/layout/Navigation/Navigation'
+import { useStore } from '@/store/useStore'
 import styles from './AppLayout.module.css'
 
 export function AppLayout() {

@@ -1,4 +1,4 @@
-import DiaryView from '../../features/diary/components/DiaryView/DiaryView';
+import DiaryView from '@/features/diary/components/DiaryView/DiaryView';
 
 const Diary = () => {
   return <DiaryView />;

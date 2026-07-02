@@ -1,4 +1,4 @@
-import StatisticsView from '../../features/dashboard/components/StatisticsView/StatisticsView';
+import StatisticsView from '@/features/statistics/components/StatisticsView/StatisticsView';
 
 const Statistics = () => {
   return <StatisticsView />;

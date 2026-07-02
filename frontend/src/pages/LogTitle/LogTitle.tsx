@@ -1,4 +1,4 @@
-import LogTitleView from '../../features/diary/components/LogTitleView/LogTitleView';
+import LogTitleView from '@/features/diary/components/LogTitleView/LogTitleView';
 
 const LogTitle = () => {
   return <LogTitleView />;

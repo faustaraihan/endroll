@@ -13,8 +13,8 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { useStore } from "../../../store/useStore";
-import { useAuth } from "../../../contexts";
+import { useStore } from "@/store/useStore";
+import { useAuth } from "@/contexts";
 import styles from "./Navigation.module.css";
 
 const navItems = [

@@ -1,4 +1,4 @@
-import HomeView from '../../features/dashboard/components/HomeView/HomeView';
+import HomeView from '@/features/home/components/HomeView/HomeView';
 
 const Home = () => {
   return <HomeView />;

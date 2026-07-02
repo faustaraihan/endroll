@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ArrowUpDown, ChevronDown, Check } from 'lucide-react'
-import styles from '../DiaryView.module.css'
+import styles from '@/features/diary/components/DiaryView/DiaryView.module.css'
 
 export type SortField = 'date' | 'title' | 'year' | 'rating' | 'runtime' | 'rewatch'
 export type SortDirection = 'asc' | 'desc'

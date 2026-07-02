@@ -1,4 +1,4 @@
-import type { Title, WatchLog, WatchlistItem, UserProfile, UserStats, Streak, Collection, CollectionItem } from '../types'
+import type { Title, WatchLog, WatchlistItem, UserProfile, UserStats, Streak, Collection, CollectionItem } from '@/types'
 
 // ---------------------------------------------------------------------------
 // Mock Titles

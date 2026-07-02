@@ -1,3 +1,3 @@
-import LoginView from '../../features/auth/components/LoginView'
+import LoginView from '@/features/auth/components/LoginView'
 
 export default LoginView

@@ -1,4 +1,4 @@
-import WatchlistView from '../../features/lists/components/WatchlistView/WatchlistView';
+import WatchlistView from '@/features/watchlist/components/WatchlistView/WatchlistView';
 
 const Watchlist = () => {
   return <WatchlistView />;

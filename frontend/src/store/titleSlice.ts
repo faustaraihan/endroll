@@ -1,13 +1,13 @@
 import type { StateCreator } from 'zustand'
 import type { StoreState } from './useStore'
-import type { SearchResult } from '../types'
+import type { SearchResult } from '@/types'
 import {
   mockTrendingThisWeek,
   mockNowPlaying,
   mockTopRatedClassics,
   mockUpcomingClassics,
   mockSearchResults,
-} from '../data/mockData'
+} from '@/data/mockData'
 
 export interface ExploreData {
   trending: SearchResult[]

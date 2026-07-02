@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Film } from 'lucide-react'
-import styles from '../auth.module.css'
+import styles from '@/features/auth/auth.module.css'
 
 interface AuthLayoutProps {
   children: ReactNode

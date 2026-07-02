@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import { Badge } from '../../../../../components'
-import { Poster } from '../../../../titles/components/Poster/Poster'
-import styles from '../DiaryView.module.css'
-import type { WatchLog } from '../../../../../types'
+import { Badge } from '@/components'
+import { Poster } from '@/components/ui/Poster/Poster'
+import styles from '@/features/diary/components/DiaryView/DiaryView.module.css'
+import type { WatchLog } from '@/types'
 
 interface DiaryEntryProps {
   log: WatchLog

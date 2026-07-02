@@ -11,14 +11,14 @@ import {
   CalendarDays,
   BookOpen,
 } from 'lucide-react'
-import { useToast } from '../../../../contexts'
-import { useStore } from '../../../../store/useStore'
-import { useAllKnownTitles } from '../../../../hooks/useDerivedState'
-import { formatRuntime, getInitials } from '../../../../utils'
-import { BackButton, Badge } from '../../../../components'
-import { GenrePill } from '../GenrePill/GenrePill'
-import { CollectionModal } from '../../../lists/components/CollectionModal/CollectionModal'
-import { Poster } from '../Poster/Poster'
+import { useToast } from '@/contexts'
+import { useStore } from '@/store/useStore'
+import { useAllKnownTitles } from '@/hooks/useDerivedState'
+import { formatRuntime, getInitials } from '@/utils'
+import { BackButton, Badge } from '@/components'
+import { GenrePill } from '@/components/ui/GenrePill/GenrePill'
+import { CollectionModal } from '@/features/collections/components/CollectionModal/CollectionModal'
+import { Poster } from '@/components/ui/Poster/Poster'
 import styles from './TitleDetailView.module.css'
 
 export default function TitleDetailView() {

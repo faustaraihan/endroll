@@ -1,4 +1,4 @@
-import ExploreView from '../../features/titles/components/ExploreView/ExploreView';
+import ExploreView from '@/features/titles/components/ExploreView/ExploreView';
 
 const Explore = () => {
   return <ExploreView />;

@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand'
 import type { StoreState } from './useStore'
-import type { Collection, CollectionItem, Title } from '../types'
-import { mockCollections, mockCollectionItems } from '../data/mockData'
+import type { Collection, CollectionItem, Title } from '@/types'
+import { mockCollections, mockCollectionItems } from '@/data/mockData'
 
 export interface CollectionSlice {
   collections: Collection[]

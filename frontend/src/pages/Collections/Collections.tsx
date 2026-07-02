@@ -1,4 +1,4 @@
-import CollectionsView from '../../features/lists/components/CollectionsView/CollectionsView';
+import CollectionsView from '@/features/collections/components/CollectionsView/CollectionsView';
 
 const Collections = () => {
   return <CollectionsView />;

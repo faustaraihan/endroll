@@ -1,0 +1,89 @@
+import { useState } from 'react'
+import { Film, Compass } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useToast } from '@/contexts'
+import { useStore } from '@/store/useStore'
+import { EmptyState, PageHeader } from '@/components'
+import { CollectionModal } from '@/features/collections/components/CollectionModal/CollectionModal'
+import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
+import type { Title } from '@/types'
+import styles from './WatchlistView.module.css'
+
+export default function WatchlistView() {
+  const watchlist = useStore(state => state.watchlist)
+  const setWatchlist = useStore(state => state.setWatchlist)
+  const watchLogs = useStore(state => state.watchLogs)
+  const { addToast } = useToast()
+  const [collectTitle, setCollectTitle] = useState<Title | null>(null)
+
+  function handleRemove(id: string, titleName: string) {
+    const removed = watchlist.find(item => item.id === id)
+    setWatchlist(prev => prev.filter(item => item.id !== id))
+    addToast(`"${titleName}" removed from watchlist.`, 'info', {
+      action: removed
+        ? {
+            label: 'Undo',
+            onClick: () => setWatchlist(prev => [removed, ...prev]),
+          }
+        : undefined,
+    })
+  }
+
+  function isWatched(titleId: string) {
+    return watchLogs.some(log => log.title_id === titleId)
+  }
+
+  return (
+    <div className={styles.page}>
+      {/* ── Header strip ── */}
+      <PageHeader 
+        className={styles.watchlistHeader}
+        eyebrow={`To watch · ${watchlist.length}`}
+        title="Watchlist"
+        rightElement={
+          <Link to="/explore" className="btn btn-secondary btn-sm">
+            <Compass size={14} /> Explore
+          </Link>
+        }
+      />
+
+      {watchlist.length === 0 ? (
+        <EmptyState
+          icon={<Film size={40} strokeWidth={1.5} />}
+          title="Your watchlist is empty."
+          description="Add movies you want to watch later from the Explore page."
+          actionLabel="Find movies"
+          actionLink="/explore"
+          actionIcon={<Compass size={16} />}
+        />
+      ) : (
+        <div className={styles.content}>
+          <ul className={styles.posterGrid} role="list">
+            {watchlist.map((item, i) => {
+              const watched = isWatched(item.title_id)
+              return (
+                <li key={item.id}>
+                  <TitleCard
+                    title={item.title}
+                    index={i}
+                    watched={watched}
+                    showLogAction={true}
+                    showMetaType={true}
+                    onCollect={() => setCollectTitle(item.title)}
+                    onRemove={() => handleRemove(item.id, item.title.title)}
+                    removeTooltip="Remove from watchlist"
+                  />
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+
+      <CollectionModal
+        title={collectTitle}
+        onClose={() => setCollectTitle(null)}
+      />
+    </div>
+  )
+}

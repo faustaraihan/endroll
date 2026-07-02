@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand'
 import type { StoreState } from './useStore'
-import type { UserProfile } from '../types'
-import { mockUser } from '../data/mockData'
+import type { UserProfile } from '@/types'
+import { mockUser } from '@/data/mockData'
 
 export interface UserSlice {
   user: UserProfile

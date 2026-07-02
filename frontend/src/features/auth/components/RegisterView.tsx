@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, Eye, EyeOff, ArrowRight, AlertCircle, Check } from 'lucide-react'
-import { useAuth } from '../../../contexts'
+import { useAuth } from '@/contexts'
 import { AuthLayout } from './AuthLayout'
-import styles from '../auth.module.css'
+import styles from '@/features/auth/auth.module.css'
 
 const QUOTE = {
   text: '"Cinema is a matter of what\'s in the frame and what\'s out."',

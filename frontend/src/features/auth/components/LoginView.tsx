@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
-import { useAuth } from '../../../contexts'
+import { useAuth } from '@/contexts'
 import { AuthLayout } from './AuthLayout'
-import styles from '../auth.module.css'
+import styles from '@/features/auth/auth.module.css'
 
 const QUOTE = {
   text: '"A movie is never really good unless the camera is an eye in the head of a poet."',

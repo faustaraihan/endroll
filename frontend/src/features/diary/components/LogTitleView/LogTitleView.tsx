@@ -7,12 +7,12 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useToast } from "../../../../contexts";
-import { useStore } from "../../../../store/useStore";
-import { PageHeader, SearchInput, BackButton } from "../../../../components";
-import { Poster } from "../../../titles/components/Poster/Poster";
-import { formatDate } from "../../../../utils";
-import type { SearchResult, Title } from "../../../../types";
+import { useToast } from "@/contexts";
+import { useStore } from "@/store/useStore";
+import { PageHeader, SearchInput, BackButton } from "@/components";
+import { Poster } from "@/components/ui/Poster/Poster";
+import { formatDate } from "@/utils";
+import type { SearchResult, Title } from "@/types";
 import styles from "./LogTitleView.module.css";
 
 type Step = "search" | "form";
@@ -47,6 +47,8 @@ function clearDraft() {
 export default function LogTitleView() {
   const setWatchLogs = useStore(state => state.setWatchLogs);
   const watchLogs = useStore(state => state.watchLogs);
+  const watchlist = useStore(state => state.watchlist);
+  const setWatchlist = useStore(state => state.setWatchlist);
   const personalRatings = useStore(state => state.personalRatings);
   const setRatingForTitle = useStore(state => state.setRatingForTitle);
   const exploreData = useStore(state => state.exploreData);
@@ -291,7 +293,24 @@ export default function LogTitleView() {
         };
 
         setWatchLogs((prev) => [newLog, ...prev]);
-        addToast(`"${selectedTitle.title}" logged to your diary.`, "success");
+
+        // If this title was on the watchlist, move it out automatically.
+        // Match by TMDb id (search results) or local id (titles from detail).
+        const watchlistItem = watchlist.find(
+          (w) =>
+            (selectedTitle.tmdb_id != null &&
+              w.title.tmdb_id === selectedTitle.tmdb_id) ||
+            ("id" in selectedTitle && w.title.id === selectedTitle.id),
+        );
+        if (watchlistItem) {
+          setWatchlist((prev) => prev.filter((w) => w.id !== watchlistItem.id));
+          addToast(
+            `"${selectedTitle.title}" moved from watchlist to diary.`,
+            "success",
+          );
+        } else {
+          addToast(`"${selectedTitle.title}" logged to your diary.`, "success");
+        }
       }
       clearDraft();
       setIsSubmitting(false);
