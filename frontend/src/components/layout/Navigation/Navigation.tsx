@@ -14,7 +14,6 @@ import {
   Moon,
 } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import { useAuth } from "@/contexts";
 import styles from "./Navigation.module.css";
 
 const navItems = [
@@ -45,7 +44,7 @@ export function Navigation() {
   const location = useLocation();
   const moreBtnRef = useRef<HTMLButtonElement>(null);
   
-  const { user: authUser } = useAuth();
+  const authUser = useStore(state => state.authUser);
   const user = useStore(state => state.user);
   const setUser = useStore(state => state.setUser);
   

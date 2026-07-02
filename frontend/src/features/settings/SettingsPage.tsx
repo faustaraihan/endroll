@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useToast, useAuth } from '@/contexts'
+import { useToast } from '@/contexts'
 import { useStore } from '@/store/useStore'
 import { PageHeader } from '@/components'
 import styles from './SettingsPage.module.css'
@@ -8,7 +8,7 @@ export default function SettingsPage() {
   const user = useStore(state => state.user)
   const setUser = useStore(state => state.setUser)
   const { addToast } = useToast()
-  const { logout } = useAuth()
+  const logout = useStore(state => state.logout)
 
   // Local state for Preferences
   const [theme, setTheme] = useState(user.preferences.theme || 'dark')

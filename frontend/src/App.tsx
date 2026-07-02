@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Toaster } from 'sonner'
-import { ToastProvider, AuthProvider } from './contexts'
+import { ToastProvider } from './contexts'
 import { AppLayout, ProtectedRoute } from './components'
 
 // React Router does not reset scroll on navigation; without this, users
@@ -59,8 +59,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <AuthProvider>
-        <ToastProvider>
+      <ToastProvider>
             <Toaster
               position="bottom-right"
               theme="dark"
@@ -99,7 +98,6 @@ export default function App() {
               </Routes>
             </Suspense>
         </ToastProvider>
-      </AuthProvider>
     </BrowserRouter>
   )
 }

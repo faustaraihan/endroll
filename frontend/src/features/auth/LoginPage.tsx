@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
-import { useAuth } from '@/contexts'
+import { useStore } from '@/store/useStore'
 import { AuthLayout } from './AuthLayout'
 import styles from '@/features/auth/auth.module.css'
 
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { login } = useAuth()
+  const login = useStore((s) => s.login)
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/home'
