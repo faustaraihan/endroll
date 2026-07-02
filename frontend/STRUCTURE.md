@@ -203,26 +203,26 @@ Folder `store/`, `api/`, `types/` **per-feature** (yang sekarang kosong ber-
 
 ---
 
-## Rencana migrasi bertahap (dari struktur sekarang)
+## Rencana migrasi bertahap
 
-Urut dari dampak tinggi / risiko rendah. Dikerjakan sepotong-sepotong.
+Status per Juli 2026 — refactor struktural inti **selesai**.
 
-**Tahap 1 — shared UI keluar (aman, cuma pindah + update import):**
-- [ ] Pindahkan `Poster`, `TitleCard`, `GenrePill` dari `features/titles/components`
-      → `components/ui/`, update import (pakai `@/components/...`)
+**Tahap 1 — shared UI keluar:** ✅ selesai
+- [x] `Poster`, `TitleCard`, `GenrePill` → `components/ui/`
 
-**Tahap 2 — bongkar folder payung jadi per-nav:**
-- [ ] `dashboard` → pecah jadi `home/` dan `statistics/`
-- [ ] `lists` → pecah jadi `watchlist/` dan `collections/`
-- [ ] `user` → rename `settings/`
+**Tahap 2 — bongkar folder payung jadi per-nav:** ✅ selesai
+- [x] `dashboard` → `home/` + `statistics/`
+- [x] `lists` → `watchlist/` + `collections/`
+- [x] `user` → `settings/`
 
-**Tahap 3 — samakan batas store dengan feature:**
-- [ ] Pecah `watchSlice` → `diarySlice` (watchLogs + `personalRatings`) +
-      `watchlistSlice` (watchlist)
+**Tahap 3 — samakan batas store dengan feature:** ✅ selesai
+- [x] `watchSlice` → `diarySlice` + `watchlistSlice`
 
-**Tahap 4 — ratakan tiap feature & buang lapisan `pages/`:**
-- [ ] Ratakan `XView` → `XPage`, naikkan sub-komponen (mulai `diary`)
-- [ ] Hapus `src/pages/` setelah semua route menunjuk `features/*`
+**Tahap 4 — ratakan tiap feature & buang lapisan `pages/`:** ✅ selesai
+- [x] `XView` → `XPage`, sub-komponen dinaikkan, tak ada lagi `components/` subdir
+- [x] `src/pages/` dihapus — route menunjuk `@/features/*/XPage`
+
+**Sisa (belum dikerjakan — di luar refactor struktur):**
 - [ ] Pindahkan `AuthContext` → `userSlice`/`authSlice`
 - [ ] Rapikan 2 lint error lama di `AuthContext` (setState-in-effect, export)
 ```
