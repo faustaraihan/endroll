@@ -1,9 +1,10 @@
 import { ArrowRight, Flame, Check, Star } from 'lucide-react'
 import { useStore } from '@/store/useStore'
-import { useDynamicStreak, useDynamicStats, useDailyActivity } from '@/hooks/useDerivedState'
+import { useDynamicStreak, useDynamicStats, useDailyActivity, useAllKnownTitles } from '@/hooks/useDerivedState'
 import { SectionHeader } from '@/components'
 import { Poster } from '@/components/ui/Poster/Poster'
 import { UserPickModal } from '@/features/statistics/UserPickModal'
+import type { Title } from '@/types'
 import { useState } from 'react'
 import styles from './StatisticsPage.module.css'
 
@@ -57,6 +58,7 @@ export default function StatisticsPage() {
   const dailyActivity = useDailyActivity()
   const streak = useDynamicStreak()
   const stats = useDynamicStats()
+  const { getTitleById } = useAllKnownTitles()
   const [showUserPickModal, setShowUserPickModal] = useState(false)
 
   // Personalized info
@@ -89,6 +91,25 @@ export default function StatisticsPage() {
     ratingCounts[bucket]++
     if (ratingCounts[bucket] > maxRatingCount) maxRatingCount = ratingCounts[bucket]
   })
+
+  // Most watched — total plays per title (initial watch + rewatches), top 5
+  const mostWatched = (() => {
+    const byTitle = new Map<string, { title: Title; count: number }>()
+    watchLogs.forEach(log => {
+      const plays = 1 + log.rewatch_count
+      const existing = byTitle.get(log.title_id)
+      if (existing) existing.count += plays
+      else byTitle.set(log.title_id, { title: log.title, count: plays })
+    })
+    return Array.from(byTitle.values()).sort((a, b) => b.count - a.count).slice(0, 5)
+  })()
+
+  // Highest rated — top personal (per-title) ratings, top 5
+  const highestRated = Object.entries(personalRatings)
+    .map(([titleId, rating]) => ({ title: getTitleById(titleId), rating }))
+    .filter((x): x is { title: Title; rating: number } => Boolean(x.title))
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 5)
 
   // Calculate if the user has logged a title this week (Monday to Sunday)
   const isSecured = (() => {
@@ -309,7 +330,71 @@ export default function StatisticsPage() {
         </section>
       </div>
 
+      {/* ── Most Watched + Highest Rated ── */}
+      <div className={styles.splitRow}>
+        {/* Most Watched */}
+        <section className={styles.rankCard} aria-label="Most watched titles">
+          <SectionHeader title="Most Watched" badge={`Top ${mostWatched.length}`} />
+          {mostWatched.length > 0 ? (
+            <ol className={styles.rankList}>
+              {mostWatched.map(({ title, count }, i) => (
+                <li key={title.id} className={styles.rankItem}>
+                  <span className={styles.rankNumber}>{i + 1}</span>
+                  <div className={styles.rankPosterWrap}>
+                    <Poster
+                      title={title.title}
+                      src={title.poster_path}
+                      alt={`Poster ${title.title}`}
+                      className={styles.rankPoster}
+                      size="sm"
+                    />
+                  </div>
+                  <div className={styles.rankInfo}>
+                    <span className={styles.rankName}>{title.title}</span>
+                    {title.release_year && <span className={styles.rankMeta}>{title.release_year}</span>}
+                  </div>
+                  <span className={styles.rankValue}>{count}×</span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className={styles.rankEmpty}>No watches logged yet.</p>
+          )}
+        </section>
 
+        {/* Highest Rated */}
+        <section className={styles.rankCard} aria-label="Highest rated titles">
+          <SectionHeader title="Highest Rated" badge={`Top ${highestRated.length}`} />
+          {highestRated.length > 0 ? (
+            <ol className={styles.rankList}>
+              {highestRated.map(({ title, rating }, i) => (
+                <li key={title.id} className={styles.rankItem}>
+                  <span className={styles.rankNumber}>{i + 1}</span>
+                  <div className={styles.rankPosterWrap}>
+                    <Poster
+                      title={title.title}
+                      src={title.poster_path}
+                      alt={`Poster ${title.title}`}
+                      className={styles.rankPoster}
+                      size="sm"
+                    />
+                  </div>
+                  <div className={styles.rankInfo}>
+                    <span className={styles.rankName}>{title.title}</span>
+                    {title.release_year && <span className={styles.rankMeta}>{title.release_year}</span>}
+                  </div>
+                  <span className={`${styles.rankValue} ${styles.rankValueRating}`}>
+                    <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
+                    {rating.toFixed(1)}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className={styles.rankEmpty}>No ratings yet.</p>
+          )}
+        </section>
+      </div>
 
       {/* ── Genre Focus + Rating Curve ── */}
       <div className={styles.splitRow}>

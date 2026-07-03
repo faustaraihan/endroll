@@ -794,6 +794,122 @@
   color: var(--accent-ink, #e7b865);
 }
 
+/* ── Ranked lists (Most Watched / Highest Rated) ── */
+.rankCard {
+  background: var(--card, var(--color-bg-card));
+  border: 1px solid var(--border, var(--color-border-soft));
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color var(--transition-fast);
+}
+
+.rankCard:hover {
+  border-color: var(--border-strong, var(--color-border));
+}
+
+.rankList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+  list-style: none;
+  padding: 0;
+}
+
+.rankItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform var(--transition-fast);
+}
+
+.rankItem:hover {
+  transform: translateX(4px);
+}
+
+.rankNumber {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-4, #514e49);
+  width: 16px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.rankItem:first-child .rankNumber {
+  color: var(--accent-ink, #e7b865);
+}
+
+.rankPosterWrap {
+  width: 38px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--card-2, var(--color-bg-elevated));
+  flex-shrink: 0;
+}
+
+.rankPoster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rankInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rankName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, var(--color-text-primary));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-fast);
+}
+
+.rankItem:hover .rankName {
+  color: var(--accent-ink, #e7b865);
+}
+
+.rankMeta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3, var(--color-text-muted));
+}
+
+.rankValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2, var(--color-text-secondary));
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.rankValueRating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-ink, #e7b865);
+}
+
+.rankEmpty {
+  font-size: 0.875rem;
+  color: var(--text-3, var(--color-text-muted));
+  padding: 8px 0;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .streakGrid {
