@@ -3,7 +3,7 @@ import type { StoreState } from './useStore'
 import type { Collection, CollectionItem, Title } from '@/types'
 import { mockCollections, mockCollectionItems } from '@/data/mockData'
 
-export interface CollectionSlice {
+export interface CollectionsSlice {
   collections: Collection[]
   collectionItems: CollectionItem[]
   setCollections: (collections: Collection[] | ((prev: Collection[]) => Collection[])) => void
@@ -14,7 +14,7 @@ export interface CollectionSlice {
   removeTitleFromCollection: (collectionId: string, titleId: string) => void
 }
 
-export const createCollectionSlice: StateCreator<StoreState, [], [], CollectionSlice> = (set, get) => ({
+export const createCollectionsSlice: StateCreator<StoreState, [], [], CollectionsSlice> = (set, get) => ({
   collections: mockCollections,
   collectionItems: mockCollectionItems,
   setCollections: (collectionsOrUpdater) => set((state) => ({

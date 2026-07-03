@@ -39,9 +39,10 @@ src/
 ├── App.tsx                  # router + provider global
 ├── index.css                # design tokens (--bg, --accent, dst) + reset global
 │
-├── components/              # komponen dipakai LINTAS feature
+├── components/              # komponen dipakai LINTAS feature (flat: Badge.tsx +
+│   │                        #   Badge.module.css bersebelahan, tanpa subfolder)
 │   ├── ui/                  # primitives: Badge, EmptyState, SearchInput, Toast,
-│   │                        #   Poster, TitleCard, GenrePill...
+│   │                        #   Poster/, TitleCard, GenrePill...
 │   └── layout/              # shell aplikasi: AppLayout, Navigation, PageHeader...
 │
 ├── features/               # satu folder per item nav (lihat tabel di bawah)
@@ -56,11 +57,12 @@ src/
 │
 ├── store/                  # Zustand: SATU store, digabung dari slice per domain
 │   ├── useStore.ts
+│   ├── authSlice.ts        # authUser + login/register/logout (session)
 │   ├── diarySlice.ts       # watchLogs + personalRatings (rating per-judul)
 │   ├── watchlistSlice.ts   # watchlist — DIPISAH dari diary
-│   ├── collectionSlice.ts
-│   ├── titleSlice.ts       # exploreData
-│   └── userSlice.ts
+│   ├── collectionsSlice.ts
+│   ├── exploreSlice.ts     # exploreData (trending/nowPlaying/... dari TMDb)
+│   └── userSlice.ts        # user profile + preferences
 │
 ├── contexts/               # HANYA untuk cross-cutting non-domain (mis. Toast)
 ├── hooks/                  # hook generik lintas feature
@@ -82,10 +84,10 @@ Referensi cepat. Setiap baris konsisten dari kiri ke kanan.
 | `/login`, `/register` | `auth` | LoginPage, RegisterPage | `userSlice` (→ `authSlice`) |
 | `/home` | `home` | HomePage | baca `diarySlice` |
 | `/diary`, `/log` | `diary` | DiaryPage, LogTitlePage | `diarySlice` |
-| `/explore` | `titles` | ExplorePage | `titleSlice` |
+| `/explore` | `titles` | ExplorePage | `exploreSlice` |
 | `/title/:id` | `titles` | TitleDetailPage | baca beberapa slice |
 | `/watchlist` | `watchlist` | WatchlistPage | `watchlistSlice` |
-| `/collections` | `collections` | CollectionsPage | `collectionSlice` |
+| `/collections` | `collections` | CollectionsPage | `collectionsSlice` |
 | `/statistics` | `statistics` | StatisticsPage | baca `diarySlice` |
 | `/settings` | `settings` | SettingsPage | `userSlice` |
 
@@ -131,8 +133,8 @@ Supaya tidak pusing "di mana datanya":
 |---|---|
 | Diary (watchLogs) + rating per-judul | `diarySlice` |
 | Watchlist | `watchlistSlice` (**dipisah** dari diary) |
-| Collections | `collectionSlice` |
-| Explore data (TMDb) | `titleSlice` |
+| Collections | `collectionsSlice` |
+| Explore data (TMDb) | `exploreSlice` |
 | Session / login identity | `authSlice` (`authUser` + login/register/logout) |
 | Profil + preferences (UserProfile) | `userSlice` (`user`) |
 | UI ephemeral non-domain (Toast) | **Context** di `src/contexts` |

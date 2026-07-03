@@ -4,7 +4,7 @@ import { useStore } from '@/store/useStore'
 import { useDynamicStreak, useDynamicStats } from '@/hooks/useDerivedState'
 import { getGreeting } from '@/utils'
 import { EmptyState, Badge, PageHeader, SectionHeader } from '@/components'
-import { GenrePill } from '@/components/ui/GenrePill/GenrePill'
+import { GenrePill } from '@/components/ui/GenrePill'
 import { Poster } from '@/components/ui/Poster/Poster'
 import styles from './HomePage.module.css'
 

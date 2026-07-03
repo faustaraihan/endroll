@@ -3,7 +3,7 @@ import { FolderPlus, Trash2, Plus, Film, X, Folder, Edit3 } from 'lucide-react'
 import { useToast } from '@/contexts'
 import { useStore } from '@/store/useStore'
 import { PageHeader, FormGroup, BackButton, SearchInput } from '@/components'
-import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
+import { TitleCard } from '@/components/ui/TitleCard'
 import type { Title } from '@/types'
 import styles from './CollectionsPage.module.css'
 

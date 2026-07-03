@@ -25,12 +25,12 @@ const staticExploreData: ExploreData = {
   searchResults: mockSearchResults,
 }
 
-export interface TitleSlice {
+export interface ExploreSlice {
   exploreData: ExploreData
   setExploreData: (data: ExploreData) => void
 }
 
-export const createTitleSlice: StateCreator<StoreState, [], [], TitleSlice> = (set) => ({
+export const createExploreSlice: StateCreator<StoreState, [], [], ExploreSlice> = (set) => ({
   exploreData: staticExploreData,
   setExploreData: (data) => set({ exploreData: data }),
 })

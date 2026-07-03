@@ -5,7 +5,7 @@ import { useToast } from '@/contexts'
 import { useStore } from '@/store/useStore'
 import { EmptyState, PageHeader } from '@/components'
 import { CollectionModal } from '@/features/collections/CollectionModal'
-import { TitleCard } from '@/components/ui/TitleCard/TitleCard'
+import { TitleCard } from '@/components/ui/TitleCard'
 import type { Title } from '@/types'
 import styles from './WatchlistPage.module.css'
 
