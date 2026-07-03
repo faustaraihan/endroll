@@ -150,7 +150,8 @@ export default function ExplorePage() {
 
   return (
     <div className={styles.page}>
-      <PageHeader 
+      <PageHeader
+        className={styles.exploreHeader}
         title="Explore"
         description="Discover new cinema, television, or search for titles to log."
         rightElement={

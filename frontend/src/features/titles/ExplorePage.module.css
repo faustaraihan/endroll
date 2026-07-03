@@ -502,6 +502,14 @@
     gap: 28px;
   }
 
+  /* Stack title/description above the search bar instead of squeezing
+     them side by side (PageHeader stays row layout at this breakpoint). */
+  .exploreHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
   .searchContainer {
     width: 100%;
     max-width: none;
