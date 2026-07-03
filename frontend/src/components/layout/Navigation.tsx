@@ -26,14 +26,18 @@ const navItems = [
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-const mobilePrimary = [
+// Mobile bottom bar: two tabs on each side of the centered Log FAB.
+const mobileLeft = [
   { to: "/home", label: "Home", icon: LayoutDashboard },
   { to: "/diary", label: "Diary", icon: BookOpen },
+];
+
+const mobileRight = [
   { to: "/explore", label: "Explore", icon: Compass },
-  { to: "/watchlist", label: "Watchlist", icon: Bookmark },
 ];
 
 const mobileMore = [
+  { to: "/watchlist", label: "Watchlist", icon: Bookmark },
   { to: "/collections", label: "Collections", icon: Library },
   { to: "/statistics", label: "Statistics", icon: BarChart2 },
   { to: "/settings", label: "Settings", icon: Settings },
@@ -155,7 +159,7 @@ export function Navigation() {
 
       {/* Bottom bar — mobile */}
       <nav className={styles.bottomBar} aria-label="Mobile navigation">
-        {mobilePrimary.map(({ to, label, icon: Icon }) => (
+        {mobileLeft.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -169,13 +173,28 @@ export function Navigation() {
           </NavLink>
         ))}
 
+        {/* Primary action — centered raised FAB */}
         <NavLink
           to="/log"
           className={styles.bottomLogBtn}
           aria-label="Log a title"
         >
-          <Plus size={20} />
+          <Plus size={22} />
         </NavLink>
+
+        {mobileRight.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `${styles.bottomItem} ${isActive ? styles.bottomItemActive : ""}`
+            }
+            aria-label={label}
+          >
+            <Icon size={20} />
+            <span className={styles.bottomLabel}>{label}</span>
+          </NavLink>
+        ))}
 
         <button
           ref={moreBtnRef}
