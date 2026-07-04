@@ -113,7 +113,7 @@ export default function StatisticsPage() {
 
   // Calculate if the user has logged a title this week (Monday to Sunday)
   const isSecured = (() => {
-    const today = new Date('2026-06-16')
+    const today = new Date()
     const day = today.getDay()
     const mondayOffset = day === 0 ? -6 : 1 - day
     
@@ -133,7 +133,7 @@ export default function StatisticsPage() {
 
   // Generate current week tracker days (Mon-Sun)
   const currentWeekDays = (() => {
-    const today = new Date('2026-06-16')
+    const today = new Date()
     const day = today.getDay()
     const mondayOffset = day === 0 ? -6 : 1 - day
     
@@ -150,7 +150,7 @@ export default function StatisticsPage() {
       const dateStr = d.toISOString().split('T')[0]
       
       const hasLog = watchLogs.some(log => log.watched_at === dateStr)
-      const isToday = dateStr === '2026-06-16'
+      const isToday = dateStr === new Date().toISOString().split('T')[0]
       
       trackerDays.push({
         dateStr,

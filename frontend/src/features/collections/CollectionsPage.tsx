@@ -130,7 +130,6 @@ export default function CollectionsPage() {
           <div className={styles.grid}>
             {collections.map(col => {
               const colItems = collectionItems.filter(item => item.collection_id === col.id)
-              console.log('COLLECTION:', col.name, 'ITEMS:', colItems.map(i => i.title.title))
               const count = Math.min(colItems.length, 4)
               const gridStyle: React.CSSProperties = {
                 gridTemplateColumns: `repeat(${Math.max(count, 1)}, 1fr)`,

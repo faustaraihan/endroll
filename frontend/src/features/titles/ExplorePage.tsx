@@ -208,7 +208,7 @@ export default function ExplorePage() {
                         <button 
                             type="button" 
                             className={styles.dropdownViewAll}
-                            onClick={handleSearchSubmit}
+                            onClick={() => handleSearchSubmit()}
                         >
                           View all {dropdownResults.length} results
                         </button>

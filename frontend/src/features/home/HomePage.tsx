@@ -216,7 +216,7 @@ export default function HomePage() {
           </section>
         )}
 
-        <Link to="/stats" className={styles.statsLink}>
+        <Link to="/statistics" className={styles.statsLink}>
           View full statistics <ArrowRight size={14} />
         </Link>
       </aside>

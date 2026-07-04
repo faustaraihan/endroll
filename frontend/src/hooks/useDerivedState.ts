@@ -61,6 +61,19 @@ export function useAllKnownTitles() {
   return { allKnownTitles, getTitleById }
 }
 
+function getWeekNumber(dateStr: string): string {
+  const d = new Date(dateStr)
+  // Get the nearest Thursday (ISO week rule: week containing Thursday)
+  const day = d.getDay()
+  const thursdayOffset = day <= 4 ? 4 - day : 7 - (day - 4)
+  const thursday = new Date(d)
+  thursday.setDate(d.getDate() + thursdayOffset)
+  // January 1st of the ISO year
+  const yearStart = new Date(thursday.getFullYear(), 0, 1)
+  const weekNum = Math.ceil(((thursday.getTime() - yearStart.getTime()) / 86400000 + yearStart.getDay() + 1) / 7)
+  return `${thursday.getFullYear()}-W${String(weekNum).padStart(2, '0')}`
+}
+
 export function useDynamicStreak() {
   const watchLogs = useStore(state => state.watchLogs)
   const user = useStore(state => state.user)
@@ -127,7 +140,7 @@ export function useDynamicStreak() {
       user_id: user.id,
       current_streak_weeks: activeCurrentStreak,
       longest_streak_weeks: longest,
-      last_log_week: new Date(lastLoggedWeek).toISOString().split('T')[0],
+      last_log_week: getWeekNumber(new Date(lastLoggedWeek).toISOString()),
     }
   }, [watchLogs, user.id])
 }
