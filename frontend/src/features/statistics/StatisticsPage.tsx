@@ -1,4 +1,5 @@
 import { ArrowRight, Flame, Check, Star } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useStore } from '@/store/useStore'
 import { useDynamicStreak, useDynamicStats, useDailyActivity, useAllKnownTitles } from '@/hooks/useDerivedState'
 import { SectionHeader } from '@/components'
@@ -66,7 +67,6 @@ export default function StatisticsPage() {
 
   const weeks = getHeatmapWeeks()
   const maxGenreCount = stats.favorite_genres[0]?.count ?? 1
-  const maxEraCount = Math.max(...(stats.era_distribution?.map((e: {era: string, count: number}) => e.count) ?? [1]))
   const maxMonthCount = Math.max(...(stats.monthly_activity?.map((m: {month: string, count: number}) => m.count) ?? [1]))
 
   // User Pick: Selected by the user
@@ -227,7 +227,7 @@ export default function StatisticsPage() {
         {userPick.length > 0 ? (
           <div className={styles.userPickList}>
             {userPick.map(log => (
-              <div key={log.title_id} className={styles.userPickPosterCard}>
+              <Link key={log.title_id} to={`/title/${log.title_id}`} className={styles.userPickPosterCard}>
                 <div className={styles.userPickPosterWrap}>
                   <Poster
                     title={log.title.title}
@@ -240,7 +240,7 @@ export default function StatisticsPage() {
                     <div className={styles.userPickCountBadge}>{log.total_watch_count}×</div>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
@@ -338,22 +338,24 @@ export default function StatisticsPage() {
           {mostWatched.length > 0 ? (
             <ol className={styles.rankList}>
               {mostWatched.map(({ title, count }, i) => (
-                <li key={title.id} className={styles.rankItem}>
-                  <span className={styles.rankNumber}>{i + 1}</span>
-                  <div className={styles.rankPosterWrap}>
-                    <Poster
-                      title={title.title}
-                      src={title.poster_path}
-                      alt={`Poster ${title.title}`}
-                      className={styles.rankPoster}
-                      size="sm"
-                    />
-                  </div>
-                  <div className={styles.rankInfo}>
-                    <span className={styles.rankName}>{title.title}</span>
-                    {title.release_year && <span className={styles.rankMeta}>{title.release_year}</span>}
-                  </div>
-                  <span className={styles.rankValue}>{count}×</span>
+                <li key={title.id}>
+                  <Link to={`/title/${title.id}`} className={styles.rankItem}>
+                    <span className={styles.rankNumber}>{i + 1}</span>
+                    <div className={styles.rankPosterWrap}>
+                      <Poster
+                        title={title.title}
+                        src={title.poster_path}
+                        alt={`Poster ${title.title}`}
+                        className={styles.rankPoster}
+                        size="sm"
+                      />
+                    </div>
+                    <div className={styles.rankInfo}>
+                      <span className={styles.rankName}>{title.title}</span>
+                      {title.release_year && <span className={styles.rankMeta}>{title.release_year}</span>}
+                    </div>
+                    <span className={styles.rankValue}>{count}×</span>
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -368,25 +370,27 @@ export default function StatisticsPage() {
           {highestRated.length > 0 ? (
             <ol className={styles.rankList}>
               {highestRated.map(({ title, rating }, i) => (
-                <li key={title.id} className={styles.rankItem}>
-                  <span className={styles.rankNumber}>{i + 1}</span>
-                  <div className={styles.rankPosterWrap}>
-                    <Poster
-                      title={title.title}
-                      src={title.poster_path}
-                      alt={`Poster ${title.title}`}
-                      className={styles.rankPoster}
-                      size="sm"
-                    />
-                  </div>
-                  <div className={styles.rankInfo}>
-                    <span className={styles.rankName}>{title.title}</span>
-                    {title.release_year && <span className={styles.rankMeta}>{title.release_year}</span>}
-                  </div>
-                  <span className={`${styles.rankValue} ${styles.rankValueRating}`}>
-                    <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
-                    {rating.toFixed(1)}
-                  </span>
+                <li key={title.id}>
+                  <Link to={`/title/${title.id}`} className={styles.rankItem}>
+                    <span className={styles.rankNumber}>{i + 1}</span>
+                    <div className={styles.rankPosterWrap}>
+                      <Poster
+                        title={title.title}
+                        src={title.poster_path}
+                        alt={`Poster ${title.title}`}
+                        className={styles.rankPoster}
+                        size="sm"
+                      />
+                    </div>
+                    <div className={styles.rankInfo}>
+                      <span className={styles.rankName}>{title.title}</span>
+                      {title.release_year && <span className={styles.rankMeta}>{title.release_year}</span>}
+                    </div>
+                    <span className={`${styles.rankValue} ${styles.rankValueRating}`}>
+                      <Star size={11} fill="var(--accent, #d9a441)" color="var(--accent, #d9a441)" />
+                      {rating.toFixed(1)}
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -439,49 +443,28 @@ export default function StatisticsPage() {
         )}
       </div>
 
-      {/* ── Eras Explored + Cinematic Flow ── */}
-      <div className={styles.splitRow}>
-        {stats.era_distribution && (
-          <section className={styles.chartCard} aria-label="Eras explored">
-              <SectionHeader title="Eras Explored" />
-            <div className={styles.chartWrap}>
-              {stats.era_distribution.map(({ era, count }: { era: string; count: number }) => (
-                <div key={era} className={styles.chartCol}>
-                  <div className={styles.chartBarWrap}>
-                    <div
-                      className={`${styles.chartBar} ${count === maxEraCount ? styles.chartBarPeak : ''}`}
-                      style={{ height: `${(count / maxEraCount) * 100}%` }}
-                    />
-                  </div>
-                  <span className={styles.chartLabel}>{era}</span>
+      {/* ── Cinematic Flow (Last 12 Months) ── */}
+      {stats.monthly_activity && stats.monthly_activity.length > 0 && (
+        <section className={styles.chartCard} aria-label="Monthly activity">
+          <SectionHeader 
+            title="Cinematic Flow" 
+            badge="Last 12 months" 
+          />
+          <div className={styles.chartWrap}>
+            {stats.monthly_activity.slice(-12).map(({ month, count }: { month: string; count: number }) => (
+              <div key={month} className={styles.chartCol}>
+                <div className={styles.chartBarWrap}>
+                  <div
+                    className={`${styles.chartBar} ${count === maxMonthCount && count > 0 ? styles.chartBarPeak : ''}`}
+                    style={{ height: `${(count / maxMonthCount) * 100}%` }}
+                  />
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {stats.monthly_activity && stats.monthly_activity.length > 0 && (
-          <section className={styles.chartCard} aria-label="Monthly activity">
-              <SectionHeader 
-                title="Cinematic Flow" 
-                badge="Last 6 months" 
-              />
-            <div className={styles.chartWrap}>
-              {stats.monthly_activity.slice(-6).map(({ month, count }: { month: string; count: number }) => (
-                <div key={month} className={styles.chartCol}>
-                  <div className={styles.chartBarWrap}>
-                    <div
-                      className={`${styles.chartBar} ${count === maxMonthCount && count > 0 ? styles.chartBarPeak : ''}`}
-                      style={{ height: `${(count / maxMonthCount) * 100}%` }}
-                    />
-                  </div>
-                  <span className={styles.chartLabel}>{month.split(' ')[0]}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+                <span className={styles.chartLabel}>{month.split(' ')[0]}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Directors + Actors ── */}
       <div className={styles.splitRow}>
