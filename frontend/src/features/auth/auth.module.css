@@ -385,3 +385,24 @@
 .footerLink:hover {
   color: var(--accent);
 }
+
+/* ── Success state (post-registration) ──────────────────── */
+.successContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8) 0;
+}
+
+.successIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(74, 222, 128, 0.1);
+  border: 2px solid rgba(74, 222, 128, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4ade80;
+  margin-bottom: var(--space-6);
+}

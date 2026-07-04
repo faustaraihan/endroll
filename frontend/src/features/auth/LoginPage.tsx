@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const login = useStore((s) => s.login)
+  const loginWithGoogle = useStore((s) => s.loginWithGoogle)
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/home'
@@ -27,11 +28,19 @@ export default function LoginPage() {
     setError('')
     setIsSubmitting(true)
     try {
-      await login(email)
+      await login(email, password)
       navigate(from, { replace: true })
     } catch {
       setError('Invalid email or password. Please try again.')
       setIsSubmitting(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle()
+    } catch {
+      setError('Failed to sign in with Google. Please try again.')
     }
   }
 
@@ -105,7 +114,7 @@ export default function LoginPage() {
 
       <div className={styles.divider}><span>or continue with</span></div>
 
-      <button type="button" className={`btn btn-secondary ${styles.socialBtn}`}>
+      <button type="button" className={`btn btn-secondary ${styles.socialBtn}`} onClick={handleGoogleLogin}>
         <GoogleIcon />
         Continue with Google
       </button>

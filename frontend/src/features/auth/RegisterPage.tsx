@@ -1,58 +1,67 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Loader2, Eye, EyeOff, ArrowRight, AlertCircle, Check } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { AuthLayout } from './AuthLayout'
 import styles from '@/features/auth/auth.module.css'
 
 const QUOTE = {
-  text: '"Cinema is a matter of what\'s in the frame and what\'s out."',
+  text: '"The cinema is a mirror by which we often discover ourselves."',
   author: '— Martin Scorsese',
 }
 
-const PASSWORD_RULES = [
-  { key: 'minLength',   label: 'At least 8 characters',  test: (p: string) => p.length >= 8 },
-  { key: 'hasUpper',    label: '1 uppercase letter',      test: (p: string) => /[A-Z]/.test(p) },
-  { key: 'hasNumber',   label: '1 number',                test: (p: string) => /[0-9]/.test(p) },
-]
-
 export default function RegisterPage() {
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [passwordFocused, setPasswordFocused] = useState(false)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const register = useStore((s) => s.register)
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/home'
-
-  const ruleResults = PASSWORD_RULES.map(r => ({ ...r, met: r.test(password) }))
-  const isPasswordValid = ruleResults.every(r => r.met)
-  const showRules = passwordFocused || password.length > 0
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!isPasswordValid) return
     setError('')
     setIsSubmitting(true)
     try {
-      await register(email, name)
-      navigate(from, { replace: true })
-    } catch {
-      setError('Something went wrong. Please try again.')
+      await register(email, password, name)
+      setIsSuccess(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.')
       setIsSubmitting(false)
     }
+  }
+
+  if (isSuccess) {
+    return (
+      <AuthLayout quote={QUOTE}>
+        <div className={styles.successContainer}>
+          <div className={styles.successIcon}>
+            <Check size={32} />
+          </div>
+          <h1 className={styles.formTitle} style={{ textAlign: 'center' }}>
+            Check your email
+          </h1>
+          <p className={styles.formSubtitle} style={{ textAlign: 'center' }}>
+            We've sent a confirmation link to <strong>{email}</strong>.
+            Click the link to activate your account.
+          </p>
+          <Link to="/login" className={styles.footerLink} style={{ justifyContent: 'center', marginTop: 24 }}>
+            Go to Login <ArrowRight size={13} />
+          </Link>
+        </div>
+      </AuthLayout>
+    )
   }
 
   return (
     <AuthLayout quote={QUOTE}>
       <div className={styles.formHeader}>
         <h1 className={styles.formTitle}>Register</h1>
-        <p className={styles.formSubtitle}>Start your private cinematic journal today.</p>
+        <p className={styles.formSubtitle}>Create your account to start journaling.</p>
       </div>
 
       {error && (
@@ -64,24 +73,23 @@ export default function RegisterPage() {
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.inputGroup}>
-          <label htmlFor="signup-name" className={styles.label}>Your name</label>
+          <label htmlFor="reg-name" className={styles.label}>Name</label>
           <input
-            id="signup-name"
+            id="reg-name"
             type="text"
             required
             autoComplete="name"
-            autoFocus
             className={styles.input}
-            placeholder="Fausta Raihan"
+            placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="signup-email" className={styles.label}>Email address</label>
+          <label htmlFor="reg-email" className={styles.label}>Email address</label>
           <input
-            id="signup-email"
+            id="reg-email"
             type="email"
             required
             autoComplete="email"
@@ -93,19 +101,18 @@ export default function RegisterPage() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="signup-password" className={styles.label}>Password</label>
+          <label htmlFor="reg-password" className={styles.label}>Password</label>
           <div className={styles.inputWrap}>
             <input
-              id="signup-password"
+              id="reg-password"
               type={showPassword ? 'text' : 'password'}
               required
+              minLength={6}
               autoComplete="new-password"
               className={`${styles.input} ${styles.inputWithToggle}`}
-              placeholder="Create a strong password"
+              placeholder="At least 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setPasswordFocused(true)}
-              onBlur={() => setPasswordFocused(false)}
             />
             <button
               type="button"
@@ -116,27 +123,11 @@ export default function RegisterPage() {
               {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
-
-          {showRules && (
-            <ul className={styles.passwordRules} aria-label="Password requirements">
-              {ruleResults.map(rule => (
-                <li
-                  key={rule.key}
-                  className={`${styles.passwordRule} ${rule.met ? styles.passwordRuleMet : ''}`}
-                >
-                  <span className={styles.passwordRuleIcon} aria-hidden="true">
-                    <Check size={10} strokeWidth={3} />
-                  </span>
-                  {rule.label}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
         <button
           type="submit"
-          disabled={isSubmitting || !name || !email || !isPasswordValid}
+          disabled={isSubmitting || !email || !password || !name}
           className={`btn btn-primary ${styles.submitBtn}`}
         >
           {isSubmitting

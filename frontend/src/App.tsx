@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { Toaster } from 'sonner'
 import { ToastProvider } from './contexts'
 import { AppLayout, ProtectedRoute } from './components'
+import { useStore } from '@/store/useStore'
 
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
@@ -30,6 +31,7 @@ const TitleDetail = lazy(() => import('@/features/titles/TitleDetailPage'))
 // Auth pages
 const Login = lazy(() => import('@/features/auth/LoginPage'))
 const Register = lazy(() => import('@/features/auth/RegisterPage'))
+const AuthCallback = lazy(() => import('@/features/auth/AuthCallbackPage'))
 
 import { Loader2 } from 'lucide-react'
 
@@ -58,6 +60,17 @@ function PageLoader() {
 }
 
 export default function App() {
+  const initialize = useStore((s) => s.initialize)
+  const isLoading = useStore((s) => s.isLoading)
+
+  useEffect(() => {
+    initialize()
+  }, [initialize])
+
+  if (isLoading) {
+    return <PageLoader />
+  }
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -75,6 +88,7 @@ export default function App() {
                   {/* Auth routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
 
                   {/* App routes with sidebar layout */}
                   <Route element={

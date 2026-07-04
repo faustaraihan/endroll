@@ -41,7 +41,6 @@ Important v1.1 changes:
 - Supports both films and series.
 - Main content table is `titles`, not `movies`.
 - `titles.type` supports `film` and `series`.
-- Series tracking has Level 1, Level 2, and Level 3 architecture.
 - Rating is decimal `0.0–10.0`.
 - Streak is weekly, not daily.
 - Accessibility is part of core requirements.
@@ -75,7 +74,6 @@ Build after P0 is stable:
 4. Mood/context tags
 5. Rewatch tracking
 6. Director and actor tracking
-7. Series Level 2: season-level logging
 
 ### P2 — Polish
 
@@ -98,7 +96,6 @@ Do not build early unless explicitly requested:
 3. Export data
 4. Native mobile app
 5. Smart notifications
-6. Episode-level tracking UI
 
 ## Tech Stack
 
@@ -174,8 +171,6 @@ watch_logs
   notes nullable
   rewatch_count
   mood_tags array
-  season_number nullable
-  episode_number nullable
 
 watchlist
   id
@@ -208,28 +203,6 @@ streaks
   last_log_week
 ```
 
-## Series Tracking Model
-
-Endroll has three tracking levels:
-
-### Level 1 — Default
-
-- Log a whole show.
-- Status examples: `Watching`, `Completed`, `Dropped`.
-- Best for casual users.
-
-### Level 2 — Season-level
-
-- Log per season.
-- Rating and notes can apply to a season.
-- Good for intentional users.
-
-### Level 3 — Episode-level
-
-- UI is roadmap.
-- Database support must exist from early architecture.
-- Use nullable `episode_number`.
-
 ## Rating System
 
 Use decimal rating, not only stars.
@@ -254,7 +227,6 @@ Rules:
 - User needs at least one valid log per calendar week.
 - Grace period lasts until end of Monday in the following week.
 - Rewatch is valid.
-- One series episode log is valid.
 - Retroactive logging cannot revive a broken streak.
 
 Avoid daily streak mechanics.
@@ -463,7 +435,6 @@ Do not implement these in v1.0 unless explicitly requested:
 - Offline-first PWA
 - Podcast/book/music tracking
 - Monetization/paywall
-- Full episode-level UI
 
 ## Source of Truth
 
