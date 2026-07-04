@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { X } from 'lucide-react';
 import styles from './SearchInput.module.css';
 
@@ -17,10 +17,12 @@ export function SearchInput({
   placeholder = 'Search...',
   ...rest
 }: SearchInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className={`${styles.searchBar} ${containerClassName}`}>
-
       <input
+        ref={inputRef}
         type="text"
         className={styles.searchInput}
         placeholder={placeholder}
@@ -35,6 +37,7 @@ export function SearchInput({
           onClick={() => {
             onChange('');
             if (onClear) onClear();
+            inputRef.current?.focus();
           }}
           aria-label="Clear search"
         >
@@ -44,3 +47,4 @@ export function SearchInput({
     </div>
   );
 }
+

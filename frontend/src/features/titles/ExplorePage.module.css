@@ -249,6 +249,10 @@
   padding-bottom: 12px;
   scroll-padding-left: calc((100vw - 220px - min(1200px, 100vw - 220px)) / 2 + 32px);
   scroll-padding-right: calc((100vw - 220px - min(1200px, 100vw - 220px)) / 2 + 32px);
+  
+  /* Horizontal overflow fade mask for premium cinematic feel */
+  mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
 }
 
 .rowItems::after {
@@ -453,6 +457,10 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-bottom: 4px;
+
+  /* Horizontal overflow fade mask */
+  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
 }
 
 .genreList::-webkit-scrollbar {
