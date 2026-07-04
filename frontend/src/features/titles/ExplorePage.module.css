@@ -9,7 +9,7 @@
   width: 100%;
 }
 
-/* ── Page Header (Consistent layout) ── */
+/* ── Page Header ── */
 .searchContainer {
   position: relative;
   width: 100%;
@@ -60,14 +60,8 @@
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdownList {
@@ -156,7 +150,7 @@
   color: var(--color-text-muted);
 }
 
-/* ── Loading Spinner State ── */
+/* ── Loading ── */
 .loadingState {
   display: flex;
   flex-direction: column;
@@ -168,30 +162,7 @@
   gap: 1rem;
 }
 
-.spinnerWrap {
-  display: flex;
-  gap: 6px;
-}
-
-.spinnerDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: var(--accent-ink, #e7b865);
-  animation: dotBounce 1.4s infinite ease-in-out both;
-  animation-delay: calc(var(--d) * 0.16s);
-}
-
-@keyframes dotBounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
-/* ── Search Results Grid View ── */
+/* ── Search Results ── */
 .resultsSection {
   margin-top: 1rem;
   animation: fadeIn 0.4s ease-out;
@@ -214,7 +185,6 @@
   list-style: none;
 }
 
-/* Search skeletons for vertical posters */
 .skeletonCard {
   display: flex;
   flex-direction: column;
@@ -243,9 +213,7 @@
   background: var(--color-bg-card);
 }
 
-
-
-/* ── Explore Recommendation Rows ── */
+/* ── Explore Feed ── */
 .exploreContent {
   display: flex;
   flex-direction: column;
@@ -253,7 +221,7 @@
   animation: fadeIn 0.5s ease-out;
 }
 
-/* ── Reusable Carousel Row Styles ── */
+/* ── Carousel Row ── */
 .rowWrapper {
   position: relative;
 }
@@ -274,7 +242,7 @@
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   width: 100%;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
   padding-left: calc((100vw - 220px - min(1200px, 100vw - 220px)) / 2 + 32px);
   padding-right: calc((100vw - 220px - min(1200px, 100vw - 220px)) / 2 + 32px);
   padding-top: 0;
@@ -289,14 +257,13 @@
 }
 
 .rowItems::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
-/* Desktop Arrow Navigation Buttons */
 .arrowBtn {
   position: absolute;
   top: 0;
-  bottom: 12px; /* Account for rowItems padding-bottom */
+  bottom: 12px;
   z-index: 10;
   width: 64px;
   background: none;
@@ -338,7 +305,6 @@
   background: linear-gradient(to left, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.6) 40%, transparent 100%);
 }
 
-/* Carousel Cards */
 .card {
   flex: 0 0 130px;
   flex-shrink: 0;
@@ -348,18 +314,14 @@
 }
 
 @media (min-width: 480px) {
-  .card {
-    flex: 0 0 145px;
-  }
+  .card { flex: 0 0 145px; }
 }
 
 @media (min-width: 768px) {
-  .card {
-    flex: 0 0 155px;
-  }
+  .card { flex: 0 0 155px; }
 }
 
-/* ── Search Results List View ── */
+/* ── Search Result Card ── */
 .resultCard {
   display: flex;
   align-items: flex-start;
@@ -427,6 +389,7 @@
   text-align: left;
   line-height: 1.3;
 }
+
 .resultTitleBtn:hover {
   text-decoration: underline;
 }
@@ -476,26 +439,180 @@
   }
 }
 
-@media (min-width: 481px) {
+/* ──────────────────────────────────────────────
+   GENRE CHIPS
+   ────────────────────────────────────────────── */
+.genreSection {
+  margin-bottom: -8px;
 }
 
-/* Animations & Responsive Media Queries */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.genreList {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
+.genreList::-webkit-scrollbar {
+  display: none;
+}
+
+.genreChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-border-soft, rgba(255,255,255,0.1));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0a0);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+}
+
+.genreChip:hover {
+  border-color: var(--accent-ink, #e7b865);
+  color: var(--accent-ink, #e7b865);
+  background: rgba(231, 184, 101, 0.08);
+}
+
+.genreActive {
+  background: var(--accent-ink, #e7b865);
+  color: #0b0b0c;
+  border-color: var(--accent-ink, #e7b865);
+  font-weight: 600;
+}
+
+.genreActive:hover {
+  background: var(--accent-ink, #e7b865);
+  color: #0b0b0c;
+}
+
+.genreX {
+  font-size: 0.625rem;
+  opacity: 0.7;
+  margin-left: 2px;
+  cursor: pointer;
+}
+
+.genreX:hover {
+  opacity: 1;
+}
+
+/* ──────────────────────────────────────────────
+   SPLIT ROW — Top Rated + Coming Soon (2-col)
+   ────────────────────────────────────────────── */
+.splitRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.splitCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.splitDivider {
+  width: 1px;
+  background: var(--color-border-soft, rgba(255,255,255,0.08));
+  margin: 0 24px;
+}
+
+.gridList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.miniCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s ease;
+  animation: slideIn 0.3s ease-out both;
+  animation-delay: calc(var(--i) * 0.04s);
+  font-family: var(--font-sans);
+}
+
+.miniCard:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.miniPoster {
+  width: 36px;
+  height: 54px;
+  border-radius: var(--radius-sm, 4px);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.miniInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.miniTitle {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #e8e6e3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniYear {
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #6f6c66);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .splitRow {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .splitDivider {
+    display: none;
+  }
+
+  .gridList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
 }
 
+@media (max-width: 480px) {
+  .gridList {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
   .page {
     padding: 32px 20px 100px;
@@ -509,10 +626,6 @@
 
   .exploreContent {
     gap: 28px;
-  }
-
-  .resultGrid {
-    gap: 24px 14px;
   }
 
   .rowContainer {
@@ -544,10 +657,6 @@
     gap: 24px;
   }
 
-  .resultGrid {
-    gap: 20px 12px;
-  }
-
   .rowContainer {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -564,5 +673,22 @@
 
   .rowItems::after {
     flex: 0 0 16px;
+  }
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
