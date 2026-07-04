@@ -4,6 +4,8 @@ import { Toaster } from 'sonner'
 import { ToastProvider } from './contexts'
 import { AppLayout, ProtectedRoute } from './components'
 
+import { ErrorBoundary } from '@/components/ErrorBoundary'
+
 // React Router does not reset scroll on navigation; without this, users
 // land mid-page when moving between long pages (e.g. Diary -> detail)
 function ScrollToTop() {
@@ -68,34 +70,36 @@ export default function App() {
               duration={4000}
             />
             <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* Auth routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+              <ErrorBoundary>
+                <Routes>
+                  {/* Auth routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
 
-                {/* App routes with sidebar layout */}
-                <Route element={
-                  <ProtectedRoute>
-                    <AppLayout />
-                  </ProtectedRoute>
-                }>
-                  <Route path="/home"  element={<Home />} />
-                  <Route path="/diary"      element={<Diary />} />
-                  <Route path="/explore"    element={<Explore />} />
-                  <Route path="/watchlist"  element={<Watchlist />} />
-                  <Route path="/collections" element={<Collections />} />
-                  <Route path="/title/:id" element={<TitleDetail />} />
-                  <Route path="/statistics"      element={<Statistics />} />
-                  <Route path="/settings"   element={<Settings />} />
-                  <Route path="/log"        element={<LogTitle />} />
-                </Route>
+                  {/* App routes with sidebar layout */}
+                  <Route element={
+                    <ProtectedRoute>
+                      <AppLayout />
+                    </ProtectedRoute>
+                  }>
+                    <Route path="/home"  element={<Home />} />
+                    <Route path="/diary"      element={<Diary />} />
+                    <Route path="/explore"    element={<Explore />} />
+                    <Route path="/watchlist"  element={<Watchlist />} />
+                    <Route path="/collections" element={<Collections />} />
+                    <Route path="/title/:id" element={<TitleDetail />} />
+                    <Route path="/statistics"      element={<Statistics />} />
+                    <Route path="/settings"   element={<Settings />} />
+                    <Route path="/log"        element={<LogTitle />} />
+                  </Route>
 
-                {/* Redirect root to app home since landing is now on a separate project */}
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                
-                {/* Fallback */}
-                <Route path="*" element={<Navigate to="/home" replace />} />
-              </Routes>
+                  {/* Redirect root to app home since landing is now on a separate project */}
+                  <Route path="/" element={<Navigate to="/home" replace />} />
+                  
+                  {/* Fallback */}
+                  <Route path="*" element={<Navigate to="/home" replace />} />
+                </Routes>
+              </ErrorBoundary>
             </Suspense>
         </ToastProvider>
     </BrowserRouter>

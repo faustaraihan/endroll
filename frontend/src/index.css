@@ -465,6 +465,18 @@ input, textarea, select {
   transform: translateY(-1px);
 }
 
+.btn-danger {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--color-error, #f87171);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  font-weight: 600;
+}
+
+.btn-danger:hover {
+  background: rgba(248, 113, 113, 0.2);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
 .btn-sm {
   padding: var(--space-2) var(--space-3);
   font-size: 0.8125rem;

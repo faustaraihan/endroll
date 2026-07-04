@@ -1,21 +1,19 @@
 import { useState, useEffect } from "react";
 import {
   Star,
-  Plus,
   Check,
   PenLine,
   CalendarDays,
+  Search as SearchIcon,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/contexts";
 import { useStore } from "@/store/useStore";
-import { PageHeader, SearchInput, BackButton } from "@/components";
+import { PageHeader, SearchInput } from "@/components";
 import { Poster } from "@/components/ui/Poster/Poster";
 import { formatDate } from "@/utils";
 import type { SearchResult, Title } from "@/types";
 import styles from "./LogTitlePage.module.css";
-
-type Step = "search" | "form";
 
 const DRAFT_KEY = "endroll:log-draft";
 
@@ -56,7 +54,6 @@ export default function LogTitlePage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [step, setStep] = useState<Step>("search");
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -70,48 +67,25 @@ export default function LogTitlePage() {
     new Date().toISOString().slice(0, 10),
   );
   const [rating, setRating] = useState<number | null>(null);
-
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
 
-
-
-  // Draft (catatan belum tersimpan) — hanya ditawarkan jika tidak datang
-  // membawa judul dari halaman lain
+  // Draft — hanya ditawarkan jika tidak datang membawa judul dari halaman lain
   const [pendingDraft, setPendingDraft] = useState<LogDraft | null>(() =>
     location.state?.title ? null : readDraft(),
   );
 
-  // Edit state
-  const [editingLogId, setEditingLogId] = useState<string | null>(null);
-
-  // Pre-select title from router state (e.g. from Search page) —
-  // penyesuaian state saat render, bukan effect
-  const stateTitle = location.state?.title as SearchResult | Title | undefined;
-  const [handledStateTitle, setHandledStateTitle] = useState<
-    SearchResult | Title | null
-  >(null);
-  if (stateTitle && stateTitle !== handledStateTitle) {
-    setHandledStateTitle(stateTitle);
-    handleSelect(stateTitle);
-  }
-
-  // Live search dengan debounce — tanpa perlu menekan tombol
-  function handleQueryChange(value: string) {
-    setQuery(value);
-    if (value.trim().length < 3) {
+  // Live search dengan debounce
+  useEffect(() => {
+    if (query.trim().length < 3) {
       setSearchResults([]);
       setHasSearched(false);
       setIsSearching(false);
-    } else {
-      setIsSearching(true);
+      return;
     }
-  }
-
-  useEffect(() => {
-    if (query.trim().length < 3) return;
+    setIsSearching(true);
     const timer = setTimeout(() => {
-      // Simulate API search by checking all explore data
       const allSearchable = Array.from(
         new Map(
           [
@@ -134,9 +108,9 @@ export default function LogTitlePage() {
     return () => clearTimeout(timer);
   }, [query, exploreData]);
 
-  // Simpan draft otomatis selama mengisi form, agar catatan tidak pernah hilang
+  // Simpan draft otomatis
   useEffect(() => {
-    if (step !== "form" || !selectedTitle) return;
+    if (!selectedTitle) return;
     const draft: LogDraft = {
       selectedTitle,
       watchedAt,
@@ -146,20 +120,9 @@ export default function LogTitlePage() {
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-  }, [step, selectedTitle, watchedAt, rating, notes, editingLogId]);
-
-
-
-  function handleSearchSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    // Pencarian sudah berjalan otomatis; Enter hanya mencegah reload
-  }
+  }, [selectedTitle, watchedAt, rating, notes, editingLogId]);
 
   function handleSelect(result: SearchResult | Title) {
-    startFormForTitle(result);
-  }
-
-  function startFormForTitle(result: SearchResult | Title) {
     setSelectedTitle(result);
     setEditingLogId(null);
     setWatchedAt(new Date().toISOString().slice(0, 10));
@@ -175,10 +138,8 @@ export default function LogTitlePage() {
       : null;
 
     setRating(existingRating);
-
     setNotes("");
     setPendingDraft(null);
-    setStep("form");
   }
 
   function handleResumeDraft() {
@@ -187,10 +148,8 @@ export default function LogTitlePage() {
     setEditingLogId(pendingDraft.editingLogId);
     setWatchedAt(pendingDraft.watchedAt);
     setRating(pendingDraft.rating);
-
     setNotes(pendingDraft.notes);
     setPendingDraft(null);
-    setStep("form");
   }
 
   function handleDiscardDraft() {
@@ -198,22 +157,7 @@ export default function LogTitlePage() {
     setPendingDraft(null);
   }
 
-  function handleBack() {
-    if (notes.trim()) {
-      // The draft is already saved automatically — reassure the user
-      addToast("Your note has been saved as a draft.", "info");
-      setPendingDraft(readDraft());
-    } else {
-      clearDraft();
-    }
-    setStep("search");
-  }
-
-
-
-
   function handleSlider(val: number) {
-    // Sesuai PRD: slider snap ke 0.5 terdekat (input angka tetap presisi 0.1)
     const snapped = Math.round(val * 2) / 2;
     setRating(snapped);
   }
@@ -224,7 +168,6 @@ export default function LogTitlePage() {
 
     setIsSubmitting(true);
     setTimeout(() => {
-      // Cari atau buat title ID yang stabil
       const existingWatch = watchLogs.find(
         (l) =>
           ("id" in selectedTitle && l.title.id === selectedTitle.id) ||
@@ -256,11 +199,9 @@ export default function LogTitlePage() {
             overview: selectedTitle.overview,
           };
 
-      // Update rating global
       setRatingForTitle(titleIdToUse, rating);
 
       if (editingLogId) {
-        // Editing existing log
         setWatchLogs((prev) =>
           prev.map((l) =>
             l.id === editingLogId
@@ -275,8 +216,6 @@ export default function LogTitlePage() {
         );
         addToast(`Entry for "${selectedTitle.title}" updated.`, "success");
       } else {
-        // Adding new log
-        // Hitung rewatch secara otomatis
         const rewatchCount = watchLogs.filter(
           (l) => l.title_id === titleIdToUse,
         ).length;
@@ -294,8 +233,6 @@ export default function LogTitlePage() {
 
         setWatchLogs((prev) => [newLog, ...prev]);
 
-        // If this title was on the watchlist, move it out automatically.
-        // Match by TMDb id (search results) or local id (titles from detail).
         const watchlistItem = watchlist.find(
           (w) =>
             (selectedTitle.tmdb_id != null &&
@@ -318,144 +255,147 @@ export default function LogTitlePage() {
     }, 600);
   }
 
+  function handleClear() {
+    setSelectedTitle(null);
+    setRating(null);
+    setNotes("");
+    setEditingLogId(null);
+  }
+
   return (
     <div className={styles.page}>
-      {step === "search" && (
-        <div className={styles.searchStep} style={{ animationName: "fade-in" }}>
-          <PageHeader
-            eyebrow="Capture"
-            title="Log a movie or series"
-            description="Search for the title you just watched"
-          />
+      {/* ── Search ── */}
+      <div style={{ animationName: "fade-in" }}>
+        <PageHeader
+          eyebrow="Capture"
+          title={selectedTitle ? `Logging: ${selectedTitle.title}` : "Log a movie or series"}
+          description={selectedTitle ? "Fill in the details below." : "Search for the title you just watched"}
+        />
 
-          {/* Unsaved draft */}
-          {pendingDraft && (
-            <div className={styles.draftBanner} role="status">
-              <PenLine size={16} className={styles.draftIcon} />
-              <div className={styles.draftText}>
-                <strong>{pendingDraft.selectedTitle.title}</strong> is still
-                waiting — your note was saved on{" "}
-                {formatDate(pendingDraft.savedAt)}.
-              </div>
-              <div className={styles.draftActions}>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={handleResumeDraft}
-                >
-                  Resume
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={handleDiscardDraft}
-                >
-                  Discard
-                </button>
-              </div>
+        {/* Unsaved draft banner */}
+        {pendingDraft && !selectedTitle && (
+          <div className={styles.draftBanner} role="status">
+            <PenLine size={16} className={styles.draftIcon} />
+            <div className={styles.draftText}>
+              <strong>{pendingDraft.selectedTitle.title}</strong> is still
+              waiting — your note was saved on{" "}
+              {formatDate(pendingDraft.savedAt)}.
             </div>
-          )}
+            <div className={styles.draftActions}>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleResumeDraft}
+              >
+                Resume
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={handleDiscardDraft}
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        )}
 
+        {!selectedTitle && (
           <form
-            onSubmit={handleSearchSubmit}
+            onSubmit={(e) => e.preventDefault()}
             className={styles.searchForm}
             role="search"
           >
             <SearchInput
               value={query}
-              onChange={(val) => handleQueryChange(val)}
+              onChange={(val) => setQuery(val)}
               placeholder="Type a movie or series title…"
             />
           </form>
+        )}
 
-          {isSearching && (
-            <ul
-              className={styles.resultList}
-              role="list"
-              aria-label="Loading search results"
-              aria-busy="true"
-            >
-              {[0, 1, 2, 3].map((i) => (
-                <li key={i} className={styles.skeletonRow}>
-                  <div className={`skeleton ${styles.skeletonPoster}`} />
-                  <div className={styles.skeletonLines}>
-                    <div className={`skeleton ${styles.skeletonLine}`} />
-                    <div className={`skeleton ${styles.skeletonLineShort}`} />
+        {/* Search Results (hidden after selection) */}
+        {!selectedTitle && isSearching && (
+          <ul
+            className={styles.resultList}
+            role="list"
+            aria-label="Loading search results"
+            aria-busy="true"
+          >
+            {[0, 1, 2, 3].map((i) => (
+              <li key={i} className={styles.skeletonRow}>
+                <div className={`skeleton ${styles.skeletonPoster}`} />
+                <div className={styles.skeletonLines}>
+                  <div className={`skeleton ${styles.skeletonLine}`} />
+                  <div className={`skeleton ${styles.skeletonLineShort}`} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {!selectedTitle && !isSearching && hasSearched && searchResults.length > 0 && (
+          <ul
+            className={styles.resultList}
+            role="list"
+            aria-label="Search results"
+          >
+            {searchResults.map((result) => (
+              <li key={result.tmdb_id}>
+                <button
+                  className={styles.resultItem}
+                  onClick={() => handleSelect(result)}
+                  aria-label={`Select ${result.title} (${result.release_year})`}
+                >
+                  <div className={styles.resultPosterWrap}>
+                    <Poster
+                      title={result.title}
+                      src={result.poster_path}
+                      alt={`Poster ${result.title}`}
+                      className={styles.resultPoster}
+                      size="sm"
+                    />
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!isSearching && hasSearched && searchResults.length > 0 && (
-            <ul
-              className={styles.resultList}
-              role="list"
-              aria-label="Search results"
-            >
-              {searchResults.map((result) => (
-                <li key={result.tmdb_id}>
-                  <button
-                    className={styles.resultItem}
-                    onClick={() => handleSelect(result)}
-                    aria-label={`Select ${result.title} (${result.release_year})`}
-                  >
-                    <div className={styles.resultPosterWrap}>
-                      <Poster
-                        title={result.title}
-                        src={result.poster_path}
-                        alt={`Poster ${result.title}`}
-                        className={styles.resultPoster}
-                        size="sm"
-                      />
-                    </div>
-                    <div className={styles.resultInfo}>
-                      <div className={styles.resultTitle}>{result.title}</div>
-                      <div className={styles.resultMeta}>
-                        <span className="badge badge-muted">
-                          {result.type === "movie" ? "Movie" : "Series"}
+                  <div className={styles.resultInfo}>
+                    <div className={styles.resultTitle}>{result.title}</div>
+                    <div className={styles.resultMeta}>
+                      <span className="badge badge-muted">
+                        {result.type === "movie" ? "Movie" : "Series"}
+                      </span>
+                      {result.release_year && (
+                        <span className="text-sm text-muted">
+                          {result.release_year}
                         </span>
-                        {result.release_year && (
-                          <span className="text-sm text-muted">
-                            {result.release_year}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
-                    <Plus size={18} className={styles.resultAdd} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+                  </div>
+                  <PenLine size={18} className={styles.resultAdd} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-          {!isSearching && hasSearched && searchResults.length === 0 && (
-            <div className={styles.noResults}>
-              <p>
-                No results for "<strong>{query}</strong>".
-              </p>
-              <p className="text-sm text-muted">
-                Try checking the spelling.
-              </p>
-            </div>
-          )}
+        {!selectedTitle && !isSearching && hasSearched && searchResults.length === 0 && (
+          <div className={styles.noResults}>
+            <SearchIcon size={36} strokeWidth={1.5} style={{ opacity: 0.3, marginBottom: 8 }} />
+            <p>
+              No results for "<strong>{query}</strong>".
+            </p>
+            <p className="text-sm text-muted">
+              Try checking the spelling.
+            </p>
+          </div>
+        )}
+      </div>
 
-        </div>
-      )}
-
-
-
-      {step === "form" && selectedTitle && (
+      {/* ── Form (visible after selecting a title) ── */}
+      {selectedTitle && (
         <form
           onSubmit={handleSubmit}
           className={styles.formStep}
           aria-label="Log movie form"
         >
-          <BackButton 
-            onClick={handleBack} 
-            className={styles.backBtn} 
-          />
-
           {/* Title preview */}
           <div className={styles.titlePreview}>
             <div className={styles.previewBackdrop}>
@@ -493,6 +433,16 @@ export default function LogTitlePage() {
                 </div>
               </div>
             </div>
+
+            {/* Change / Clear button */}
+            <button
+              type="button"
+              className={styles.changeTitleBtn}
+              onClick={handleClear}
+              title="Choose a different title"
+            >
+              Change
+            </button>
           </div>
 
           {/* Watched on */}
@@ -524,9 +474,7 @@ export default function LogTitlePage() {
                 <button
                   type="button"
                   className={styles.clearRatingBtn}
-                  onClick={() => {
-                    setRating(null);
-                  }}
+                  onClick={() => setRating(null)}
                 >
                   Clear rating
                 </button>
@@ -541,7 +489,7 @@ export default function LogTitlePage() {
                 strokeWidth={1.5}
               />
               <span className={`${styles.ratingBig} ${rating === null ? styles.ratingBigMuted : ""}`}>
-                {rating !== null ? rating.toFixed(1) : "–"}
+                {rating !== null ? rating.toFixed(1) : "\u2013"}
               </span>
               <span className={styles.ratingOutOf}>/10</span>
             </div>
@@ -573,7 +521,7 @@ export default function LogTitlePage() {
             <textarea
               id="notes"
               className={styles.textarea}
-              placeholder="How did it make you feel? Jot down anything you want to remember…"
+              placeholder="How did it make you feel? Jot down anything you want to remember\u2026"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               maxLength={1000}
@@ -589,7 +537,7 @@ export default function LogTitlePage() {
           >
             {isSubmitting ? (
               <>
-                <div className={styles.btnSpinner} /> Saving…
+                <div className={styles.btnSpinner} /> Saving\u2026
               </>
             ) : (
               <>
@@ -599,8 +547,6 @@ export default function LogTitlePage() {
           </button>
         </form>
       )}
-
-
     </div>
   );
 }

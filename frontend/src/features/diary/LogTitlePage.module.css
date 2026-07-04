@@ -353,6 +353,28 @@
   background: linear-gradient(to right, color-mix(in srgb, var(--color-bg-card) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-card) 40%, transparent) 100%);
 }
 
+/* Change / clear title button */
+.changeTitleBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  background: var(--card, #18171a);
+  border: 1px solid var(--border, rgba(255,255,255,0.085));
+  color: var(--text-2, #a4a19b);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.changeTitleBtn:hover {
+  background: var(--card-hover, #232227);
+  color: var(--text, #f4f3f1);
+}
+
 .previewContent {
   position: relative;
   z-index: 2;
