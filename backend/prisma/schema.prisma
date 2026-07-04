@@ -1,0 +1,130 @@
+// ============================================
+// Endroll — Prisma Schema (Supabase PostgreSQL)
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users — extends Supabase auth.users
+model User {
+  id         String   @id @default(uuid())
+  email      String?
+  username   String?  @unique
+  avatarUrl  String?  @map("avatar_url")
+  createdAt  DateTime @default(now()) @map("created_at")
+  preferences Json    @default("{}")
+
+  watchLogs    WatchLog[]
+  watchlist    Watchlist[]
+  collections  Collection[]
+  streak       Streak?
+
+  @@map("users")
+}
+
+// Titles — TMDB cache
+model Title {
+  id            String   @id @default(uuid())
+  tmdbId        Int      @unique @map("tmdb_id")
+  title         String
+  type          String   // "film" | "series"
+  posterPath    String?  @map("poster_path")
+  releaseYear   Int?     @map("release_year")
+  runtimeMinutes Int?    @map("runtime_minutes")
+  genres        String[]
+  director      String?
+  castList      String[] @map("cast_list")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  watchLogs      WatchLog[]
+  watchlist      Watchlist[]
+  collections    Collection[]    @relation("CoverTitle")
+  collectionItems CollectionItem[]
+
+  @@map("titles")
+}
+
+// Watch logs — diary entries
+model WatchLog {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  titleId      String    @map("title_id")
+  watchedAt    DateTime  @map("watched_at")
+  rating       Decimal?
+  notes        String?
+  rewatchCount Int       @default(0) @map("rewatch_count")
+  moodTags     String[]  @map("mood_tags")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, titleId, watchedAt, rewatchCount])
+  @@map("watch_logs")
+}
+
+// Watchlist
+model Watchlist {
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  titleId  String   @map("title_id")
+  addedAt  DateTime @default(now()) @map("added_at")
+  priority Int?     @db.SmallInt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, titleId])
+  @@map("watchlist")
+}
+
+// Collections
+model Collection {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  name         String
+  description  String?
+  coverTitleId String?  @map("cover_title_id")
+  isPrivate    Boolean  @default(true) @map("is_private")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coverTitle  Title?            @relation("CoverTitle", fields: [coverTitleId], references: [id], onDelete: SetNull)
+  items       CollectionItem[]
+
+  @@map("collections")
+}
+
+// Collection items
+model CollectionItem {
+  id           String   @id @default(uuid())
+  collectionId String   @map("collection_id")
+  titleId      String   @map("title_id")
+  sortOrder    Int      @default(0) @map("sort_order")
+  addedAt      DateTime @default(now()) @map("added_at")
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  title      Title      @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, titleId])
+  @@map("collection_items")
+}
+
+// Streaks
+model Streak {
+  id                  String    @id @default(uuid())
+  userId              String     @unique @map("user_id")
+  currentStreakWeeks  Int        @default(0) @map("current_streak_weeks")
+  longestStreakWeeks  Int        @default(0) @map("longest_streak_weeks")
+  lastLogWeek         DateTime?  @map("last_log_week")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
