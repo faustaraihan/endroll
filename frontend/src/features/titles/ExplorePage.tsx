@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Search as SearchIcon, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/contexts'
@@ -9,6 +9,14 @@ import { Poster } from '@/components/ui/Poster/Poster'
 import type { SearchResult, Title, WatchlistItem } from '@/types'
 import styles from './ExplorePage.module.css'
 
+const TMDB_GENRES = [
+  'All', 'Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
+  'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror',
+  'Music', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western',
+] as const
+
+type Genre = (typeof TMDB_GENRES)[number]
+
 export default function ExplorePage() {
   const watchlist = useStore(state => state.watchlist)
   const setWatchlist = useStore(state => state.setWatchlist)
@@ -18,6 +26,7 @@ export default function ExplorePage() {
   const [query, setQuery] = useState('')
   const [dropdownResults, setDropdownResults] = useState<SearchResult[]>([])
   const [pageResults, setPageResults] = useState<SearchResult[]>([])
+  const [selectedGenre, setSelectedGenre] = useState<Genre>('All')
   
   const [isSearchingDropdown, setIsSearchingDropdown] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -28,6 +37,50 @@ export default function ExplorePage() {
   const searchContainerRef = useRef<HTMLDivElement>(null)
   const debounceTimerRef = useRef<number | null>(null)
 
+  // ── Genre-based filtered data ──
+  const filterByGenre = (items: SearchResult[]) =>
+    selectedGenre === 'All'
+      ? items
+      : items.filter(item => item.genres.includes(selectedGenre))
+
+  const filteredTrending = useMemo(() => filterByGenre(exploreData.trending), [exploreData.trending, selectedGenre])
+  const filteredTopRated = useMemo(() => filterByGenre(exploreData.classics), [exploreData.classics, selectedGenre])
+  const filteredUpcoming = useMemo(() => filterByGenre(exploreData.upcoming), [exploreData.upcoming, selectedGenre])
+
+  // ── Recommended: based on watchlist genres ──
+  const recommended = useMemo(() => {
+    // Gather genres the user has in their watchlist
+    const favGenres = new Set<string>()
+    watchlist.forEach(item => item.title.genres?.forEach(g => favGenres.add(g)))
+
+    if (favGenres.size === 0) return exploreData.nowPlaying.slice(0, 10)
+
+    // Pick from trending & nowPlaying that match user's fav genres
+    const candidates = [...exploreData.trending, ...exploreData.nowPlaying]
+    const seen = new Set<number>()
+
+    // Prioritise items that match multiple fav genres
+    const scored = candidates
+      .filter(item => !seen.has(item.tmdb_id) && seen.add(item.tmdb_id))
+      .map(item => ({
+        item,
+        score: item.genres.filter(g => favGenres.has(g)).length,
+      }))
+      .sort((a, b) => b.score - a.score)
+
+    const matches = scored.filter(s => s.score > 0).map(s => s.item)
+    const fillers = exploreData.nowPlaying.filter(item => !seen.has(item.tmdb_id))
+
+    return [...matches, ...fillers].slice(0, 10)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchlist, exploreData.trending, exploreData.nowPlaying])
+
+  const filteredRecommended = useMemo(() => filterByGenre(recommended), [recommended, selectedGenre])
+
+  // ── Genre chip scroll ──
+  const genreListRef = useRef<HTMLDivElement>(null)
+
+  // ── Click outside dropdown ──
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
@@ -38,6 +91,7 @@ export default function ExplorePage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // ── Search handlers ──
   function handleQueryChange(value: string) {
     setQuery(value)
     
@@ -83,7 +137,6 @@ export default function ExplorePage() {
     setIsSearchingPage(true)
     setHasSearchedPage(true)
 
-    // Simulate search loading for full page
     setTimeout(() => {
       const allExploreTitles = Array.from(
         new Map(
@@ -147,6 +200,41 @@ export default function ExplorePage() {
     navigate(`/title/${tmdbId}`)
   }
 
+  // ── Genre chip component ──
+  function GenreChips() {
+    return (
+      <div className={styles.genreSection}>
+        <div className={styles.genreList} ref={genreListRef}>
+          {TMDB_GENRES.map(genre => (
+            <button
+              key={genre}
+              className={`${styles.genreChip} ${selectedGenre === genre ? styles.genreActive : ''}`}
+              onClick={() => setSelectedGenre(genre)}
+            >
+              {genre}
+              {selectedGenre === genre && <span className={styles.genreX} onClick={(e) => { e.stopPropagation(); setSelectedGenre('All') }}>✕</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Convert SearchResult to Title for TitleCard ──
+  function toTitleObj(item: SearchResult): Title {
+    return {
+      id: String(item.tmdb_id),
+      tmdb_id: item.tmdb_id,
+      title: item.title,
+      type: item.type,
+      poster_path: item.poster_path,
+      backdrop_path: item.backdrop_path,
+      release_year: item.release_year,
+      genres: item.genres,
+      cast: [],
+      overview: item.overview,
+    }
+  }
 
   return (
     <div className={styles.page}>
@@ -270,43 +358,68 @@ export default function ExplorePage() {
         </section>
       )}
 
-      {/* ── Explore Recommendation Rows (Visible when not actively searched) ── */}
+      {/* ── Explore Feed (Visible when not actively searching) ── */}
       {!hasSearchedPage && !isSearchingPage && (
         <div className={styles.exploreContent}>
+          
+          {/* Genre Chips */}
+          <GenreChips />
+
+          {/* Trending — Full width carousel */}
           <ExploreRow
-            title="Trending This Week"
-            items={exploreData.trending}
+            title="🔥 Trending This Week"
+            items={filteredTrending}
             onAddToWatchlist={handleToggleWatchlist}
             isInWatchlist={isInWatchlist}
           />
 
-          <ExploreRow
-            title="Now Playing in Theatres"
-            items={exploreData.nowPlaying}
-            onAddToWatchlist={handleToggleWatchlist}
-            isInWatchlist={isInWatchlist}
-          />
+          {/* Top Rated + Coming Soon — Split 2-col */}
+          <div className={styles.splitRow}>
+            <div className={styles.splitCol}>
+              <SectionHeader title="⭐ Top Rated" />
+              <div className={styles.gridList}>
+                {filteredTopRated.slice(0, 6).map((item, i) => (
+                  <MiniCard
+                    key={item.tmdb_id}
+                    item={item}
+                    index={i}
+                    onNavigate={handleNavigateDetail}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className={styles.splitDivider} />
+            <div className={styles.splitCol}>
+              <SectionHeader title="📅 Coming Soon" />
+              <div className={styles.gridList}>
+                {filteredUpcoming.slice(0, 6).map((item, i) => (
+                  <MiniCard
+                    key={item.tmdb_id}
+                    item={item}
+                    index={i}
+                    onNavigate={handleNavigateDetail}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
 
-          <ExploreRow
-            title="Top Rated Classics"
-            items={exploreData.classics}
-            onAddToWatchlist={handleToggleWatchlist}
-            isInWatchlist={isInWatchlist}
-          />
-
-          <ExploreRow
-            title="Upcoming Releases"
-            items={exploreData.upcoming}
-            onAddToWatchlist={handleToggleWatchlist}
-            isInWatchlist={isInWatchlist}
-          />
+          {/* Recommended — Full width carousel */}
+          {filteredRecommended.length > 0 && (
+            <ExploreRow
+              title="✨ Recommended for You"
+              items={filteredRecommended}
+              onAddToWatchlist={handleToggleWatchlist}
+              isInWatchlist={isInWatchlist}
+            />
+          )}
         </div>
       )}
     </div>
   )
 }
 
-/* ── Modular Search Result Card Component (Handles Image Load Failures) ── */
+/* ── Search Result Card ── */
 interface SearchResultCardProps {
   result: SearchResult
   index: number
@@ -389,7 +502,39 @@ function SearchResultCard({
   )
 }
 
-/* ── Reusable Swipeable Horizontal Carousel Row ── */
+/* ── Mini Card for Grid (compact vertical layout) ── */
+interface MiniCardProps {
+  item: SearchResult
+  index: number
+  onNavigate: (tmdbId: number) => void
+}
+
+function MiniCard({ item, index, onNavigate }: MiniCardProps) {
+  return (
+    <button
+      type="button"
+      className={styles.miniCard}
+      style={{ '--i': index } as React.CSSProperties}
+      onClick={() => onNavigate(item.tmdb_id)}
+    >
+      <Poster
+        title={item.title}
+        src={item.poster_path}
+        alt=""
+        className={styles.miniPoster}
+        size="sm"
+      />
+      <div className={styles.miniInfo}>
+        <span className={styles.miniTitle}>{item.title}</span>
+        <span className={styles.miniYear}>
+          {item.release_year}{item.genres.length > 0 ? ` · ${item.genres[0]}` : ''}
+        </span>
+      </div>
+    </button>
+  )
+}
+
+/* ── Horizontal Carousel Row ── */
 interface ExploreRowProps {
   title: string
   items: SearchResult[]
@@ -471,7 +616,7 @@ function ExploreRow({
               cast: [],
               overview: item.overview,
             }
-            const inWatchlist = isInWatchlist(item.tmdb_id)
+            const inWatch = isInWatchlist(item.tmdb_id)
 
             return (
               <div key={item.tmdb_id} className={styles.card} role="listitem">
@@ -481,7 +626,7 @@ function ExploreRow({
                   showLogAction={false}
                   showMetaType={true}
                   onToggleWatchlist={() => onAddToWatchlist(item)}
-                  inWatchlist={inWatchlist}
+                  inWatchlist={inWatch}
                 />
               </div>
             )
