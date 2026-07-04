@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FolderPlus, Trash2, Plus, Film, X, Folder, Edit3 } from 'lucide-react'
 import { useToast } from '@/contexts'
 import { useStore } from '@/store/useStore'
-import { PageHeader, FormGroup, BackButton, SearchInput } from '@/components'
+import { PageHeader, FormGroup, BackButton, SearchInput, ConfirmModal } from '@/components'
 import { TitleCard } from '@/components/ui/TitleCard'
 import type { Title } from '@/types'
 import styles from './CollectionsPage.module.css'
@@ -22,6 +22,9 @@ export default function CollectionsPage() {
   // State
   const [selectedColId, setSelectedColId] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  
+  // Confirm delete state
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
   
   // Create form state
   const [colName, setColName] = useState('')
@@ -70,16 +73,20 @@ export default function CollectionsPage() {
     setSelectedColId(newId)
   }
 
-  function handleDeleteCollection(id: string, name: string, e: React.MouseEvent) {
+  function handleDeleteRequest(id: string, name: string, e: React.MouseEvent) {
     e.stopPropagation() // Prevent entering detail view
-    const confirmed = window.confirm(`Are you sure you want to delete the collection "${name}"?`)
-    if (confirmed) {
-      deleteCollection(id)
-      addToast(`Collection "${name}" has been deleted.`, 'info')
-      if (selectedColId === id) {
-        setSelectedColId(null)
-      }
+    setDeleteTarget({ id, name })
+  }
+
+  function handleConfirmDelete() {
+    if (!deleteTarget) return
+    const { id, name } = deleteTarget
+    deleteCollection(id)
+    addToast(`Collection "${name}" has been deleted.`, 'info')
+    if (selectedColId === id) {
+      setSelectedColId(null)
     }
+    setDeleteTarget(null)
   }
 
   function handleAddTitle(title: Title) {
@@ -188,7 +195,7 @@ export default function CollectionsPage() {
                       </h2>
                       <button
                         className={styles.deleteCardBtn}
-                        onClick={e => handleDeleteCollection(col.id, col.name, e)}
+                        onClick={e => handleDeleteRequest(col.id, col.name, e)}
                         aria-label={`Delete collection ${col.name}`}
                       >
                         <Trash2 size={14} />
@@ -335,7 +342,7 @@ export default function CollectionsPage() {
                       style={{ color: 'var(--color-error)' }}
                       onClick={e =>
                         activeCollection &&
-                        handleDeleteCollection(activeCollection.id, activeCollection.name, e)
+                        handleDeleteRequest(activeCollection.id, activeCollection.name, e)
                       }
                       title="Delete this collection"
                       aria-label="Delete collection"
@@ -432,6 +439,18 @@ export default function CollectionsPage() {
           </div>
         </div>
       )}
+
+      {/* Confirm delete modal */}
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete collection?"
+        message={`Are you sure you want to permanently delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }
